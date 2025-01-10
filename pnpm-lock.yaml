@@ -11,6 +11,9 @@ importers:
       next:
         specifier: ^15.1.3
         version: 15.1.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      re-resizable:
+        specifier: ^6.10.3
+        version: 6.10.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -268,6 +271,12 @@ packages:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
 
+  re-resizable@6.10.3:
+    resolution: {integrity: sha512-zvWb7X3RJMA4cuSrqoxgs3KR+D+pEXnGrD2FAD6BMYAULnZsSF4b7AOVyG6pC3VVNVOtlagGDCDmZSwWLjjBBw==}
+    peerDependencies:
+      react: ^16.13.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   react-dom@19.0.0:
     resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
     peerDependencies:
@@ -516,6 +525,11 @@ snapshots:
       nanoid: 3.3.8
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  re-resizable@6.10.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
 
   react-dom@19.0.0(react@19.0.0):
     dependencies:
