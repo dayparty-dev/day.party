@@ -3,6 +3,8 @@
 import { Resizable } from 're-resizable';
 import { useState } from 'react';
 
+import './styles.scss';
+
 export default function Rundown() {
   const [actions, setActions] = useState([
     {
@@ -46,7 +48,7 @@ export default function Rundown() {
   };
 
   return (
-    <div className="p-4">
+    <div className="actions-wrapper">
       {actions.map((action, index) => (
         <Resizable
           key={action.id}
@@ -58,14 +60,11 @@ export default function Rundown() {
             handleResize(index, newHeight);
           }}
         >
-          <div
-            className="border rounded p-4 mb-2 bg-white"
-            style={{ height: '100%' }}
-          >
+          <div className="action">
             <h3>{action.name}</h3>
             <p>{action.description}</p>
-            <p>Duration: {action.size * 15} minutes</p>
-            <p>Status: {action.status}</p>
+            <p className="duration">{action.size * 15} mins</p>
+            <p className="status">{action.status}</p>
           </div>
         </Resizable>
       ))}
