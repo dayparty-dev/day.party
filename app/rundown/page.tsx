@@ -1,7 +1,7 @@
 'use client';
 
 import { Resizable } from 're-resizable';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import useTasks from '../_hooks/useTasks';
 import {
   DndContext,
@@ -11,6 +11,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  MeasuringStrategy,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -21,8 +22,15 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useLongPress } from 'use-long-press';
+import type { Modifier } from '@dnd-kit/core';
 
 import './styles.scss';
+
+const preventScaleModifier: Modifier = ({ transform }) => ({
+  ...transform,
+  scaleX: 1,
+  scaleY: 1,
+});
 
 const SortableTask = ({
   task,
@@ -32,8 +40,16 @@ const SortableTask = ({
   onResize,
   onLongPress,
 }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: task._id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: task._id,
+  });
 
   const bind = useLongPress(
     () => {
@@ -48,12 +64,15 @@ const SortableTask = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-  };
+    position: 'relative',
+    zIndex: isDragging ? 1 : 0,
+    height: `${task.size * 60}px`,
+  } as React.CSSProperties;
 
   return (
     <div ref={setNodeRef} style={style} {...attributes}>
       <Resizable
-        size={{ width: '100%', height: task.size * 60 }}
+        size={{ width: '100%', height: '100%' }}
         enable={
           isEditMode
             ? {
@@ -70,26 +89,33 @@ const SortableTask = ({
           const newSize = newHeight / 60;
           onResize(task._id, newSize);
         }}
+        className="task-resizable"
       >
+        {isEditMode && (
+          <button
+            className="delete-btn"
+            onClick={() => onDelete(task._id)}
+            aria-label="Delete task"
+          >
+            ×
+          </button>
+        )}
         <div
           className="action"
           {...(isEditMode ? listeners : {})}
           {...(isEditMode ? {} : bind())}
         >
-          {isEditMode && (
-            <button className="delete-btn" onClick={() => onDelete(task._id)}>
-              ×
-            </button>
-          )}
           <h3>{task.title}</h3>
           <p className="duration">{task.size * 15} mins</p>
-          <button
-            className={`status ${task.status}`}
-            onClick={() => onStatusChange(task._id)}
-          >
-            {task.status}
-          </button>
         </div>
+        <button
+          className={`status ${task.status}`}
+          onClick={() => onStatusChange(task._id)}
+          aria-pressed={task.status === 'ongoing'}
+          aria-label={`Toggle task status: currently ${task.status}`}
+        >
+          {task.status}
+        </button>
       </Resizable>
     </div>
   );
@@ -108,39 +134,45 @@ export default function Rundown() {
     })
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
 
-    if (over && active.id !== over.id) {
-      const oldIndex = tasks.findIndex((task) => task._id === active.id);
-      const newIndex = tasks.findIndex((task) => task._id === over.id);
+      if (over && active.id !== over.id) {
+        const oldIndex = tasks.findIndex((task) => task._id === active.id);
+        const newIndex = tasks.findIndex((task) => task._id === over.id);
 
-      // Create new array with the moved item
-      const newTasks = arrayMove(tasks, oldIndex, newIndex);
+        // Create new array with the moved item
+        const newTasks = arrayMove(tasks, oldIndex, newIndex);
 
-      // First update the local state immediately for UI responsiveness
-      setTasks(
-        newTasks.map((task, index) => ({
-          ...task,
-          order: index,
-        }))
-      );
+        // First update the local state immediately for UI responsiveness
+        setTasks(
+          newTasks.map((task, index) => ({
+            ...task,
+            order: index,
+          }))
+        );
 
-      // Then update the backend
-      newTasks.forEach((task, index) => {
-        updateTask(task._id, { ...task, order: index });
-      });
-    }
-  };
+        // Then update the backend
+        newTasks.forEach((task, index) => {
+          updateTask(task._id, { ...task, order: index });
+        });
+      }
+    },
+    [tasks, setTasks, updateTask]
+  );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newTaskTitle.trim()) {
-      addTask({ title: newTaskTitle, size: newTaskSize });
-      setNewTaskTitle('');
-      setNewTaskSize(1);
-    }
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (newTaskTitle.trim()) {
+        addTask({ title: newTaskTitle, size: newTaskSize });
+        setNewTaskTitle('');
+        setNewTaskSize(1);
+      }
+    },
+    [newTaskTitle, newTaskSize, addTask]
+  );
 
   const timeOptions = [
     { value: 1, label: '15 min' },
@@ -178,6 +210,12 @@ export default function Rundown() {
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
+        modifiers={[preventScaleModifier]}
+        measuring={{
+          droppable: {
+            strategy: MeasuringStrategy.Always,
+          },
+        }}
       >
         <SortableContext
           items={tasks.map((t) => t._id)}

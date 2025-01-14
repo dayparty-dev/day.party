@@ -6,7 +6,6 @@ const dbName = 'dayparty';
 let db: Db;
 
 export async function getDb() {
-  console.log('getDb', uri, dbName);
   if (!db) {
     const client = new MongoClient(uri);
     db = await connectToDatabase(client);
