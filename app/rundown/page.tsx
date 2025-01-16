@@ -46,6 +46,8 @@ const SortableTask = ({
   onResize,
   onLongPress,
 }) => {
+  const [tempSize, setTempSize] = useState(null);
+
   const {
     attributes,
     listeners,
@@ -74,7 +76,6 @@ const SortableTask = ({
     transition,
     position: 'relative',
     zIndex: isDragging ? 999 : 0,
-    height: `${task.size * 60}px`,
     opacity: isDragging ? 0.8 : 1,
     touchAction: 'none',
     cursor: isEditMode ? 'grab' : 'default',
@@ -87,27 +88,39 @@ const SortableTask = ({
       {...attributes}
       data-is-dragging={isDragging}
     >
-      <div className="task-content">
-        <Resizable
-          size={{ width: '100%', height: '100%' }}
-          enable={
-            isEditMode
-              ? {
-                  top: false,
-                  right: false,
-                  bottom: true,
-                  left: false,
-                }
-              : {}
-          }
-          grid={[1, 60]}
-          onResizeStop={(_e, _direction, _ref, d) => {
-            const newHeight = Math.round((task.size * 60 + d.height) / 60) * 60;
-            const newSize = newHeight / 60;
+      <Resizable
+        size={{ width: '100%', height: task.size * 60 }}
+        enable={
+          isEditMode
+            ? {
+                top: false,
+                right: false,
+                bottom: true,
+                left: false,
+              }
+            : {}
+        }
+        grid={[1, 60]}
+        minHeight={60}
+        onResize={(_e, _direction, _ref, d) => {
+          const newSize = Math.max(
+            1,
+            Math.round((task.size * 60 + d.height) / 60)
+          );
+          setTempSize(newSize);
+        }}
+        onResizeStop={(_e, _direction, _ref, d) => {
+          const newSize = Math.max(
+            1,
+            Math.round((task.size * 60 + d.height) / 60)
+          );
+          setTempSize(null);
+          if (newSize !== task.size) {
             onResize(task._id, newSize);
-          }}
-          className="task-resizable"
-        >
+          }
+        }}
+      >
+        <div className="task-content">
           {isEditMode && (
             <button
               className="delete-btn"
@@ -123,7 +136,7 @@ const SortableTask = ({
             {...(isEditMode ? {} : bind())}
           >
             <h3>{task.title}</h3>
-            <p className="duration">{task.size * 15} mins</p>
+            <p className="duration">{(tempSize ?? task.size) * 15} mins</p>
           </div>
           <button
             className={`status ${task.status}`}
@@ -133,8 +146,8 @@ const SortableTask = ({
           >
             {task.status}
           </button>
-        </Resizable>
-      </div>
+        </div>
+      </Resizable>
     </div>
   );
 };
