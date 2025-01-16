@@ -20,17 +20,23 @@ import {
   verticalListSortingStrategy,
   useSortable,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { useLongPress } from 'use-long-press';
 import type { Modifier } from '@dnd-kit/core';
 
 import './styles.scss';
 
-const preventScaleModifier: Modifier = ({ transform }) => ({
-  ...transform,
-  scaleX: 1,
-  scaleY: 1,
-});
+const preventScaleModifier: Modifier = ({ transform }) => {
+  if (!transform) return transform;
+
+  const { x, y } = transform;
+
+  return {
+    x,
+    y,
+    scaleX: 1,
+    scaleY: 1,
+  };
+};
 
 const SortableTask = ({
   task,
@@ -62,61 +68,73 @@ const SortableTask = ({
   );
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
     transition,
     position: 'relative',
-    zIndex: isDragging ? 1 : 0,
+    zIndex: isDragging ? 999 : 0,
     height: `${task.size * 60}px`,
+    opacity: isDragging ? 0.8 : 1,
+    touchAction: 'none',
+    cursor: isEditMode ? 'grab' : 'default',
   } as React.CSSProperties;
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
-      <Resizable
-        size={{ width: '100%', height: '100%' }}
-        enable={
-          isEditMode
-            ? {
-                top: false,
-                right: false,
-                bottom: true,
-                left: false,
-              }
-            : {}
-        }
-        grid={[1, 60]}
-        onResizeStop={(e, direction, ref, d) => {
-          const newHeight = Math.round((task.size * 60 + d.height) / 60) * 60;
-          const newSize = newHeight / 60;
-          onResize(task._id, newSize);
-        }}
-        className="task-resizable"
-      >
-        {isEditMode && (
-          <button
-            className="delete-btn"
-            onClick={() => onDelete(task._id)}
-            aria-label="Delete task"
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      data-is-dragging={isDragging}
+    >
+      <div className="task-content">
+        <Resizable
+          size={{ width: '100%', height: '100%' }}
+          enable={
+            isEditMode
+              ? {
+                  top: false,
+                  right: false,
+                  bottom: true,
+                  left: false,
+                }
+              : {}
+          }
+          grid={[1, 60]}
+          onResizeStop={(_e, _direction, _ref, d) => {
+            const newHeight = Math.round((task.size * 60 + d.height) / 60) * 60;
+            const newSize = newHeight / 60;
+            onResize(task._id, newSize);
+          }}
+          className="task-resizable"
+        >
+          {isEditMode && (
+            <button
+              className="delete-btn"
+              onClick={() => onDelete(task._id)}
+              aria-label="Delete task"
+            >
+              ×
+            </button>
+          )}
+          <div
+            className="action"
+            {...(isEditMode ? listeners : {})}
+            {...(isEditMode ? {} : bind())}
           >
-            ×
+            <h3>{task.title}</h3>
+            <p className="duration">{task.size * 15} mins</p>
+          </div>
+          <button
+            className={`status ${task.status}`}
+            onClick={() => onStatusChange(task._id)}
+            aria-pressed={task.status === 'ongoing'}
+            aria-label={`Toggle task status: currently ${task.status}`}
+          >
+            {task.status}
           </button>
-        )}
-        <div
-          className="action"
-          {...(isEditMode ? listeners : {})}
-          {...(isEditMode ? {} : bind())}
-        >
-          <h3>{task.title}</h3>
-          <p className="duration">{task.size * 15} mins</p>
-        </div>
-        <button
-          className={`status ${task.status}`}
-          onClick={() => onStatusChange(task._id)}
-          aria-pressed={task.status === 'ongoing'}
-          aria-label={`Toggle task status: currently ${task.status}`}
-        >
-          {task.status}
-        </button>
-      </Resizable>
+        </Resizable>
+      </div>
     </div>
   );
 };
@@ -128,7 +146,11 @@ export default function Rundown() {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })

@@ -3,8 +3,8 @@
   position: relative;
 
   &.edit-mode {
-    .actions-wrapper > div {
-      &:not([data-dnd-kit-sortable-dragging]) {
+    .task-content {
+      &:not([data-is-dragging]) {
         animation: wiggle 0.3s ease-in-out infinite;
       }
     }
@@ -84,6 +84,7 @@
   height: 100%;
   box-sizing: border-box;
   position: relative;
+  width: 100%;
 
   h3,
   p {
@@ -179,34 +180,10 @@
   }
 }
 
-[data-dnd-kit-sortable-dragging] {
-  opacity: 1;
-  pointer-events: auto;
-  animation: none !important;
-
-  .task-resizable {
-    height: 100% !important;
-  }
-
-  .action {
-    background: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    height: 100%;
-  }
+.task-content {
+  height: 100%;
 }
 
-[data-dnd-kit-sortable-dragged] {
-  opacity: 0.5;
-}
-// Remove any transitions during drag
-.rundown.edit-mode [data-dnd-kit-sortable-dragging],
-.rundown.edit-mode [data-dnd-kit-sortable-dragged] {
-  * {
-    transition: none !important;
-  }
-}
-
-// Only prevent scale transform, not position transform
-[data-dnd-kit-sortable-dragging] {
-  transform: scale(1) !important;
+.task-resizable {
+  height: 100% !important;
 }
