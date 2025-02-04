@@ -24,6 +24,8 @@ import { useLongPress } from 'use-long-press';
 import type { Modifier } from '@dnd-kit/core';
 
 import './styles.scss';
+import DayCapacity from 'app/rundown/components/DayCapacity';
+import DayNavigator from 'app/rundown/components/DayNavigator';
 
 const preventScaleModifier: Modifier = ({ transform }) => {
   if (!transform) return transform;
@@ -59,7 +61,7 @@ const SortableTask = ({
     id: task._id,
   });
 
-  const bind = useLongPress(
+  const longPressBinding = useLongPress(
     () => {
       onLongPress();
     },
@@ -132,8 +134,7 @@ const SortableTask = ({
           )}
           <div
             className="action"
-            {...(isEditMode ? listeners : {})}
-            {...(isEditMode ? {} : bind())}
+            {...(isEditMode ? listeners : longPressBinding())}
           >
             <h3>{task.title}</h3>
             <p className="duration">{(tempSize ?? task.size) * 15} mins</p>
@@ -153,10 +154,13 @@ const SortableTask = ({
 };
 
 export default function Rundown() {
-  const { tasks, addTask, updateTask, deleteTask, setTasks } = useTasks();
+  const { tasks, addTask, updateTask, deleteTask, setTasks, getTasksForDate } =
+    useTasks();
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskSize, setNewTaskSize] = useState(1);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [dayCapacity, setDayCapacity] = useState(8); // 8 hours default
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -174,39 +178,79 @@ export default function Rundown() {
       const { active, over } = event;
 
       if (over && active.id !== over.id) {
-        const oldIndex = tasks.findIndex((task) => task._id === active.id);
-        const newIndex = tasks.findIndex((task) => task._id === over.id);
-
-        // Create new array with the moved item
-        const newTasks = arrayMove(tasks, oldIndex, newIndex);
-
-        // First update the local state immediately for UI responsiveness
-        setTasks(
-          newTasks.map((task, index) => ({
-            ...task,
-            order: index,
-          }))
+        const currentDayTasks = getTasksForDate(currentDate);
+        const oldIndex = currentDayTasks.findIndex(
+          (task) => task._id === active.id
+        );
+        const newIndex = currentDayTasks.findIndex(
+          (task) => task._id === over.id
         );
 
+        // Create new array with the moved item
+        const newDayTasks = arrayMove(currentDayTasks, oldIndex, newIndex);
+
+        // Update all tasks while preserving tasks from other days
+        const otherTasks = tasks.filter(
+          (task) =>
+            new Date(task.scheduledDate).toDateString() !==
+            currentDate.toDateString()
+        );
+
+        const updatedTasks = [
+          ...otherTasks,
+          ...newDayTasks.map((task, index) => ({
+            ...task,
+            order: index,
+          })),
+        ];
+
+        // First update the local state immediately for UI responsiveness
+        setTasks(updatedTasks);
+
         // Then update the backend
-        newTasks.forEach((task, index) => {
+        newDayTasks.forEach((task, index) => {
           updateTask(task._id, { ...task, order: index });
         });
       }
     },
-    [tasks, setTasks, updateTask]
+    [tasks, setTasks, updateTask, currentDate, getTasksForDate]
+  );
+
+  const totalMinutes = getTasksForDate(currentDate).reduce(
+    (acc, task) => acc + task.size * 15,
+    0
   );
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       if (newTaskTitle.trim()) {
-        addTask({ title: newTaskTitle, size: newTaskSize });
+        const newTaskMinutes = newTaskSize * 15;
+        if (totalMinutes + newTaskMinutes > dayCapacity * 60) {
+          if (
+            confirm('This will exceed your daily capacity. Move to next day?')
+          ) {
+            const nextDay = new Date(currentDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            addTask({
+              title: newTaskTitle,
+              size: newTaskSize,
+              scheduledDate: nextDay,
+            });
+            setCurrentDate(nextDay);
+          }
+          return;
+        }
+        addTask({
+          title: newTaskTitle,
+          size: newTaskSize,
+          scheduledDate: currentDate,
+        });
         setNewTaskTitle('');
         setNewTaskSize(1);
       }
     },
-    [newTaskTitle, newTaskSize, addTask]
+    [newTaskTitle, newTaskSize, addTask, currentDate, totalMinutes, dayCapacity]
   );
 
   const timeOptions = [
@@ -241,6 +285,13 @@ export default function Rundown() {
         </form>
       )}
 
+      <DayNavigator currentDate={currentDate} onDateChange={setCurrentDate} />
+      <DayCapacity
+        capacity={dayCapacity}
+        used={totalMinutes}
+        onCapacityChange={setDayCapacity}
+      />
+
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -257,13 +308,34 @@ export default function Rundown() {
           strategy={verticalListSortingStrategy}
         >
           <div className="actions-wrapper">
-            {tasks.map((task) => (
+            {getTasksForDate(currentDate).map((task) => (
               <SortableTask
                 key={task._id}
                 task={task}
                 isEditMode={isEditMode}
                 onDelete={deleteTask}
-                onResize={(id, size) => updateTask(id, { size })}
+                onResize={(id, size) => {
+                  const task = tasks.find((t) => t._id === id);
+                  const otherTasksMinutes = getTasksForDate(currentDate)
+                    .filter((t) => t._id !== id)
+                    .reduce((acc, t) => acc + t.size * 15, 0);
+                  const newTaskMinutes = size * 15;
+
+                  if (otherTasksMinutes + newTaskMinutes > dayCapacity * 60) {
+                    if (
+                      confirm(
+                        'This will exceed your daily capacity. Move to next day?'
+                      )
+                    ) {
+                      const nextDay = new Date(currentDate);
+                      nextDay.setDate(nextDay.getDate() + 1);
+                      updateTask(id, { size, scheduledDate: nextDay });
+                      setCurrentDate(nextDay);
+                    }
+                    return;
+                  }
+                  updateTask(id, { size });
+                }}
                 onStatusChange={(id) =>
                   updateTask(id, {
                     status: task.status === 'pending' ? 'ongoing' : 'pending',
@@ -272,6 +344,19 @@ export default function Rundown() {
                 onLongPress={() => setIsEditMode(true)}
               />
             ))}
+
+            {/* Add empty state with Create Task button */}
+            {getTasksForDate(currentDate).length === 0 && !isEditMode && (
+              <div className="empty-day">
+                <p>No tasks scheduled for this day</p>
+                <button
+                  className="create-task-btn"
+                  onClick={() => setIsEditMode(true)}
+                >
+                  Create Task
+                </button>
+              </div>
+            )}
           </div>
         </SortableContext>
       </DndContext>
