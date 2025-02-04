@@ -43,6 +43,7 @@ export default function useTasks() {
       updateTask: () => Promise.resolve(),
       deleteTask: () => Promise.resolve(),
       setTasks: () => {},
+      getTasksForDate: () => [],
     };
   }
 
@@ -52,9 +53,21 @@ export default function useTasks() {
     return mergedTasks.sort((a, b) => (a.order || 0) - (b.order || 0));
   };
 
-  const addTask = async ({ title, size }: { title: string; size: number }) => {
+  const addTask = async ({
+    title,
+    size,
+    scheduledDate,
+  }: {
+    title: string;
+    size: number;
+    scheduledDate: Date;
+  }) => {
     const currentDate = new Date();
     const maxOrder = Math.max(...tasks.map((t) => t.order || 0), -1);
+
+    // Ensure scheduledDate is set to midnight of the selected day
+    const normalizedScheduledDate = new Date(scheduledDate);
+    normalizedScheduledDate.setHours(0, 0, 0, 0);
 
     const task: Task = {
       title,
@@ -62,7 +75,7 @@ export default function useTasks() {
       status: 'pending',
       createdAt: currentDate,
       updatedAt: currentDate,
-      dueDate: currentDate,
+      scheduledDate: normalizedScheduledDate,
       _id: nanoid(),
       order: maxOrder + 1,
     };
@@ -112,11 +125,23 @@ export default function useTasks() {
     }
   };
 
+  const getTasksForDate = (date: Date) => {
+    const normalizedTargetDate = new Date(date);
+    normalizedTargetDate.setHours(0, 0, 0, 0);
+
+    return tasks.filter((task) => {
+      const taskDate = new Date(task.scheduledDate);
+      taskDate.setHours(0, 0, 0, 0);
+      return taskDate.getTime() === normalizedTargetDate.getTime();
+    });
+  };
+
   return {
     tasks,
     addTask,
     updateTask,
     deleteTask,
     setTasks,
+    getTasksForDate,
   };
 }
