@@ -10,7 +10,7 @@ import {
 } from '../_actions/tasks';
 import { nanoid } from 'nanoid';
 
-const isCloudSyncEnabled = true; // TODO: actually check if user has premium
+const isCloudSyncEnabled = !!process.env.MONGODB_URI; // TODO: actually check if user has premium
 
 export default function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -60,13 +60,15 @@ export default function useTasks() {
   }: {
     title: string;
     size: number;
-    scheduledDate: Date;
+    scheduledDate?: Date;
   }) => {
     const currentDate = new Date();
     const maxOrder = Math.max(...tasks.map((t) => t.order || 0), -1);
 
     // Ensure scheduledDate is set to midnight of the selected day
-    const normalizedScheduledDate = new Date(scheduledDate);
+    const normalizedScheduledDate = scheduledDate
+      ? new Date(scheduledDate)
+      : new Date();
     normalizedScheduledDate.setHours(0, 0, 0, 0);
 
     const task: Task = {
