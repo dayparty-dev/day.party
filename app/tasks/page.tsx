@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import useTasks from '../_hooks/useTasks';
 // import TaskCard, { Task } from '@/components/TaskCard';
-import TaskCard, { Task } from '../components/TaskCard';
+// import TaskCard, { Task } from '../components/TaskCard';
+import TaskCard from '../components/TaskCard';
 import TimeSlider from '../components/TimeSlider';
 import FeedbackForm from '../components/FeedbackForm';
 import UpcomingTask from '../components/UpcomingTask';
@@ -12,49 +14,50 @@ import { submitFeedback } from '../_actions/feedbackActions';
 
 import './styles.scss';
 
-
-const tasks: Task[] = [
-  {
-    title: 'Current Task',
-    createdAt: Date.now(),
-    dueDate: (Date.now() + 2400 * 1000), // 40 mins
-    _id: '1',
-  },
-  {
-    title: 'Next Task',
-    createdAt: Date.now(),
-    dueDate: (Date.now() + 7200 * 1000), // 2 hours
-    _id: '2',
-  },
-];
-
 const TaskPage: React.FC = () => {
-  const [currentTask, setCurrentTask] = useState<Task>(tasks[0]);
-  const [nextTask] = useState<Task>(tasks[1]);
+  const { tasks, getTasksForDate } =
+    useTasks();
+
+  useEffect(() => {
+    if (tasks.length > 0) {
+      // Actualizar currentTask con la primera tarea si existen tareas
+      setCurrentTask(tasks[0]);
+    }
+    if (tasks.length > 1) {
+      // Actualizar currentTask con la primera tarea si existen tareas
+      setNextTask(tasks[1]);
+    }
+    console.log("current task", currentTask);
+    console.log("next task", nextTask);
+  }, [tasks]);
+
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const currentDayTasks = getTasksForDate(currentDate);
+  // const [currentTask, setCurrentTask] = useState<Task | null>(null);
+  const [currentTask, setCurrentTask] = useState<{} | null>(tasks.length >= 0 ? tasks[0] : null);
+  const [nextTask, setNextTask] = useState<{} | null>(tasks.length >= 1 ? tasks[1] : null); // La siguiente tarea
 
   const updateDueDate = (newDueDate: number) => {
     console.log('Updating currentTask dueDate:', newDueDate);
     setCurrentTask({ ...currentTask, dueDate: newDueDate });
   };
 
-  const handleFeedback = (feedback: 'good' | 'bad') => {
-    submitFeedback(feedback, currentTask._id);
-  };
-
   return (
     <div className="task-page">
-      <TaskCard task={currentTask} />
-      <TimeSlider
-        task={{
-          dueDate: currentTask.dueDate,
-          createdAt: new Date(currentTask.createdAt), // Conversión explícita
-        }}
-        onUpdateDueDate={updateDueDate}
-      />
-      {/* <TimeSlider task={currentTask} onUpdateDueDate={updateDueDate} /> */}
-      {/* <TimeSlider task={{ dueDate: currentTask.dueDate }} onUpdateDueDate={updateDueDate} /> */}
-      <FeedbackForm onSubmitFeedback={handleFeedback} />
-      <UpcomingTask task={nextTask} />
+
+      {currentTask && (
+        <div id='current-task'>
+          <TaskCard task={currentTask} />
+          <TimeSlider
+            task={currentTask}
+            onUpdateDueDate={updateDueDate}
+          />
+          {/* <FeedbackForm onSubmitFeedback={handleFeedback} /> */}
+        </div>
+      )}
+      {nextTask
+        ? (<UpcomingTask task={nextTask} />)
+        : currentTask && (<p>No more task for today 😊</p>)}
       {/* <ToastContainer /> */}
     </div>
   );
