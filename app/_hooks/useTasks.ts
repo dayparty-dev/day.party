@@ -10,26 +10,60 @@ import {
 } from '../_actions/tasks';
 import { nanoid } from 'nanoid';
 
-const isCloudSyncEnabled = !!process.env.MONGODB_URI; // TODO: actually check if user has premium
+const isCloudSyncEnabled = !!process.env.MONGODB_URI;
+
+const getDateKey = (date: Date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime().toString();
+};
+
+const loadTasksFromStorage = () => {
+  const stored = localStorage.getItem('tasks');
+  if (!stored) return {};
+
+  try {
+    return JSON.parse(stored);
+  } catch (e) {
+    console.error('Failed to parse tasks from localStorage:', e);
+    return {};
+  }
+};
+
+const saveTasksToStorage = (tasksByDate: Record<string, Task[]>) => {
+  localStorage.setItem('tasks', JSON.stringify(tasksByDate));
+};
 
 export default function useTasks() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  // Store tasks grouped by date
+  const [tasksByDate, setTasksByDate] = useState<Record<string, Task[]>>({});
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Load initial data
   useEffect(() => {
-    const stored = localStorage.getItem('tasks');
-    const initialTasks = stored
-      ? JSON.parse(stored).sort((a, b) => (a.order || 0) - (b.order || 0))
-      : [];
-    setTasks(initialTasks);
+    const storedTasks = loadTasksFromStorage();
+    setTasksByDate(storedTasks);
     setIsInitialized(true);
 
     // Then fetch from server if needed
     if (isCloudSyncEnabled) {
       fetchTasksServer().then((cloudTasks) => {
         if (cloudTasks.length > 0) {
-          setTasks(cloudTasks.sort((a, b) => (a.order || 0) - (b.order || 0)));
+          // Group cloud tasks by date
+          const groupedTasks = cloudTasks.reduce((acc, task) => {
+            const dateKey = getDateKey(task.scheduledDate);
+            if (!acc[dateKey]) acc[dateKey] = [];
+            acc[dateKey].push(task);
+            return acc;
+          }, {} as Record<string, Task[]>);
+
+          // Sort tasks within each date
+          Object.values(groupedTasks).forEach((dateTasks) => {
+            dateTasks.sort((a, b) => (a.order || 0) - (b.order || 0));
+          });
+
+          setTasksByDate(groupedTasks);
+          saveTasksToStorage(groupedTasks);
         }
       });
     }
@@ -47,12 +81,6 @@ export default function useTasks() {
     };
   }
 
-  const mergeTasks = (localTasks: Task[], cloudTasks: Task[]) => {
-    // Merge tasks and ensure they're sorted by order
-    const mergedTasks = cloudTasks.length > 0 ? cloudTasks : localTasks;
-    return mergedTasks.sort((a, b) => (a.order || 0) - (b.order || 0));
-  };
-
   const addTask = async ({
     title,
     size,
@@ -63,13 +91,17 @@ export default function useTasks() {
     scheduledDate?: Date;
   }) => {
     const currentDate = new Date();
-    const maxOrder = Math.max(...tasks.map((t) => t.order || 0), -1);
-
-    // Ensure scheduledDate is set to midnight of the selected day
     const normalizedScheduledDate = scheduledDate
       ? new Date(scheduledDate)
       : new Date();
     normalizedScheduledDate.setHours(0, 0, 0, 0);
+
+    const dateKey = getDateKey(normalizedScheduledDate);
+    const dateTasks = tasksByDate[dateKey] || [];
+    const maxOrder =
+      dateTasks.length > 0
+        ? Math.max(...dateTasks.map((t) => t.order || 0))
+        : -1;
 
     const task: Task = {
       title,
@@ -82,10 +114,16 @@ export default function useTasks() {
       order: maxOrder + 1,
     };
 
-    // Update local state and storage
-    const updatedTasks = [...tasks, task].sort((a, b) => a.order - b.order);
-    setTasks(updatedTasks);
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    const updatedDateTasks = [...dateTasks, task].sort(
+      (a, b) => (a.order || 0) - (b.order || 0)
+    );
+    const updatedTasksByDate = {
+      ...tasksByDate,
+      [dateKey]: updatedDateTasks,
+    };
+
+    setTasksByDate(updatedTasksByDate);
+    saveTasksToStorage(updatedTasksByDate);
 
     if (isCloudSyncEnabled) {
       await addTaskServer(task);
@@ -93,34 +131,109 @@ export default function useTasks() {
   };
 
   const updateTask = async (id: string, updates: Partial<Task>) => {
-    // Don't update local state if it's just an order update
-    // (since we already did it in handleDragEnd)
-    if (!('order' in updates)) {
-      const updatedTasks = tasks.map((task) =>
-        task._id === id ? { ...task, ...updates, updatedAt: new Date() } : task
-      );
+    setTasksByDate((prevTasksByDate) => {
+      // Deep clone the state to avoid any mutation issues
+      const updatedTasksByDate = JSON.parse(
+        JSON.stringify(prevTasksByDate)
+      ) as typeof prevTasksByDate;
 
-      const sortedTasks = updatedTasks.sort((a, b) => a.order - b.order);
-      setTasks(sortedTasks);
-      localStorage.setItem('tasks', JSON.stringify(sortedTasks));
-    } else {
-      // For order updates, just update localStorage
-      const updatedTasks = tasks.map((task) =>
-        task._id === id ? { ...task, ...updates, updatedAt: new Date() } : task
-      );
-      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    }
+      // Find the task and its date
+      let targetDateKey: string | null = null;
+      let targetTask: Task | null = null;
 
+      // Find the task
+      for (const [dateKey, dateTasks] of Object.entries(updatedTasksByDate)) {
+        const task = dateTasks.find((t) => t._id === id);
+        if (task) {
+          targetDateKey = dateKey;
+          targetTask = task;
+          break;
+        }
+      }
+
+      if (!targetDateKey || !targetTask) return prevTasksByDate;
+
+      const dateTasks = updatedTasksByDate[targetDateKey];
+
+      // If this is a status update
+      if ('status' in updates) {
+        // If setting to ongoing, pause other ongoing tasks first
+        if (updates.status === 'ongoing') {
+          dateTasks.forEach((task) => {
+            if (task._id !== id && task.status === 'ongoing') {
+              task.status = 'paused';
+              task.updatedAt = new Date();
+            }
+          });
+        }
+
+        // Update the target task
+        const taskToUpdate = dateTasks.find((t) => t._id === id);
+        if (taskToUpdate) {
+          Object.assign(taskToUpdate, {
+            ...updates,
+            updatedAt: new Date(),
+          });
+        }
+
+        // Sort tasks based on status
+        dateTasks.sort((a, b) => {
+          if (a.status === 'ongoing') return -1;
+          if (b.status === 'ongoing') return 1;
+          if (a.status === 'paused' && b.status !== 'paused') return -1;
+          if (b.status === 'paused' && a.status !== 'paused') return 1;
+          if (a.status === 'done' && b.status !== 'done') return 1;
+          if (b.status === 'done' && a.status !== 'done') return -1;
+          return (a.order || 0) - (b.order || 0);
+        });
+
+        // Update orders after sorting
+        dateTasks.forEach((task, index) => {
+          task.order = index;
+        });
+      } else {
+        // For non-status updates, just update the task
+        const taskToUpdate = dateTasks.find((t) => t._id === id);
+        if (taskToUpdate) {
+          Object.assign(taskToUpdate, {
+            ...updates,
+            updatedAt: new Date(),
+          });
+        }
+      }
+
+      // Save to storage
+      saveTasksToStorage(updatedTasksByDate);
+
+      // Return new state
+      return updatedTasksByDate;
+    });
+
+    // Update server if needed
     if (isCloudSyncEnabled) {
       await updateTaskServer(id, updates);
     }
   };
 
   const deleteTask = async (id: string) => {
-    // Update local state and storage
-    const updatedTasks = tasks.filter((task) => task._id !== id);
-    setTasks(updatedTasks);
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    const updatedTasksByDate = { ...tasksByDate };
+    let found = false;
+
+    for (const dateKey of Object.keys(updatedTasksByDate)) {
+      const dateTasks = updatedTasksByDate[dateKey];
+      const taskIndex = dateTasks.findIndex((t) => t._id === id);
+
+      if (taskIndex !== -1) {
+        updatedTasksByDate[dateKey] = dateTasks.filter((t) => t._id !== id);
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) return;
+
+    setTasksByDate(updatedTasksByDate);
+    saveTasksToStorage(updatedTasksByDate);
 
     if (isCloudSyncEnabled) {
       await deleteTaskServer(id);
@@ -128,22 +241,30 @@ export default function useTasks() {
   };
 
   const getTasksForDate = (date: Date) => {
-    const normalizedTargetDate = new Date(date);
-    normalizedTargetDate.setHours(0, 0, 0, 0);
-
-    return tasks.filter((task) => {
-      const taskDate = new Date(task.scheduledDate);
-      taskDate.setHours(0, 0, 0, 0);
-      return taskDate.getTime() === normalizedTargetDate.getTime();
-    });
+    const dateKey = getDateKey(date);
+    return tasksByDate[dateKey] || [];
   };
 
+  // Flatten tasks for compatibility with existing code
+  const allTasks = Object.values(tasksByDate).flat();
+
   return {
-    tasks,
+    tasks: allTasks,
     addTask,
     updateTask,
     deleteTask,
-    setTasks,
+    setTasks: (newTasks: Task[]) => {
+      // Group tasks by date when setting them
+      const grouped = newTasks.reduce((acc, task) => {
+        const dateKey = getDateKey(task.scheduledDate);
+        if (!acc[dateKey]) acc[dateKey] = [];
+        acc[dateKey].push(task);
+        return acc;
+      }, {} as Record<string, Task[]>);
+
+      setTasksByDate(grouped);
+      saveTasksToStorage(grouped);
+    },
     getTasksForDate,
   };
 }

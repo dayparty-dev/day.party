@@ -1,7 +1,7 @@
 'use client';
 
 import { Resizable } from 're-resizable';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import useTasks from '../_hooks/useTasks';
 import {
   DndContext,
@@ -22,6 +22,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useLongPress } from 'use-long-press';
 import type { Modifier } from '@dnd-kit/core';
+import { Task, TaskStatus } from '../../models/Task';
 
 import './styles.scss';
 import DayCapacity from 'app/rundown/components/DayCapacity';
@@ -122,7 +123,11 @@ const SortableTask = ({
           }
         }}
       >
-        <div className="task-content">
+        <div
+          className={`task-content ${
+            task.status === 'ongoing' ? 'ongoing' : ''
+          }`}
+        >
           {isEditMode && (
             <button
               className="delete-btn"
@@ -138,15 +143,46 @@ const SortableTask = ({
           >
             <h3>{task.title}</h3>
             <p className="duration">{(tempSize ?? task.size) * 15} mins</p>
+            <div className="status-controls">
+              <button
+                className={`status ${task.status}`}
+                onClick={() => {
+                  const nextStatus: TaskStatus =
+                    {
+                      pending: 'ongoing',
+                      ongoing: 'paused',
+                      paused: 'ongoing',
+                      done: 'pending',
+                    }[task.status] || 'pending';
+                  onStatusChange(task._id, nextStatus);
+                }}
+                aria-pressed={task.status === 'ongoing'}
+                aria-label={`Toggle task status: currently ${task.status}`}
+              >
+                {task.status}
+              </button>
+              {task.status !== 'done' && (
+                <button
+                  className="finish-btn"
+                  onClick={() => onStatusChange(task._id, 'done')}
+                  aria-label="Mark task as done"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
-          <button
-            className={`status ${task.status}`}
-            onClick={() => onStatusChange(task._id)}
-            aria-pressed={task.status === 'ongoing'}
-            aria-label={`Toggle task status: currently ${task.status}`}
-          >
-            {task.status}
-          </button>
         </div>
       </Resizable>
     </div>
@@ -253,6 +289,116 @@ export default function Rundown() {
     [newTaskTitle, newTaskSize, addTask, currentDate, totalMinutes, dayCapacity]
   );
 
+  const handleStatusChange = useCallback(
+    async (taskId: string, newStatus: TaskStatus) => {
+      const currentDayTasks = getTasksForDate(currentDate);
+      const otherDayTasks = tasks.filter(
+        (task) =>
+          new Date(task.scheduledDate).toDateString() !==
+          currentDate.toDateString()
+      );
+
+      // First, update all tasks that need to be changed
+      let updatedCurrentDayTasks = [...currentDayTasks];
+
+      // If setting a task to ongoing, pause any currently ongoing task first
+      if (newStatus === 'ongoing') {
+        // Find and pause any ongoing tasks
+        const ongoingTasks = updatedCurrentDayTasks.filter(
+          (task) => task.status === 'ongoing' && task._id !== taskId
+        );
+
+        // Update backend first for ongoing tasks
+        for (const task of ongoingTasks) {
+          await updateTask(task._id, { status: 'paused' });
+        }
+
+        // Update local state for ongoing tasks
+        updatedCurrentDayTasks = updatedCurrentDayTasks.map((task) =>
+          task.status === 'ongoing' && task._id !== taskId
+            ? { ...task, status: 'paused' as TaskStatus }
+            : task
+        );
+      }
+
+      // Then update the target task in backend
+      await updateTask(taskId, { status: newStatus });
+
+      // Update the target task in local state
+      updatedCurrentDayTasks = updatedCurrentDayTasks.map((task) =>
+        task._id === taskId ? { ...task, status: newStatus } : task
+      );
+
+      // Reorder tasks based on status
+      const reorderedTasks = updatedCurrentDayTasks.sort((a, b) => {
+        if (a.status === 'ongoing') return -1;
+        if (b.status === 'ongoing') return 1;
+        if (a.status === 'paused' && b.status !== 'paused') return -1;
+        if (b.status === 'paused' && a.status !== 'paused') return 1;
+        if (a.status === 'done' && b.status !== 'done') return 1;
+        if (b.status === 'done' && a.status !== 'done') return -1;
+        return a.order - b.order;
+      });
+
+      // Update orders and set tasks
+      const updatedTasks = [
+        ...otherDayTasks,
+        ...reorderedTasks.map((task, index) => ({
+          ...task,
+          order: index,
+        })),
+      ];
+
+      // Update local state
+      setTasks(updatedTasks);
+
+      // Update orders in backend
+      for (const task of reorderedTasks) {
+        const newOrder = reorderedTasks.findIndex((t) => t._id === task._id);
+        if (task.order !== newOrder) {
+          await updateTask(task._id, { order: newOrder });
+        }
+      }
+    },
+    [tasks, setTasks, updateTask, currentDate, getTasksForDate]
+  );
+
+  // Only check for multiple ongoing tasks on initial load
+  useEffect(() => {
+    const ensureOneOngoingTask = async () => {
+      const currentDayTasks = getTasksForDate(currentDate);
+      const ongoingTasks = currentDayTasks.filter(
+        (task) => task.status === 'ongoing'
+      );
+
+      if (ongoingTasks.length > 1) {
+        // Keep the most recently updated ongoing task
+        const sortedOngoing = [...ongoingTasks].sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+        const [keepOngoing, ...othersOngoing] = sortedOngoing;
+
+        // Pause all other ongoing tasks
+        for (const task of othersOngoing) {
+          await updateTask(task._id, { status: 'paused' });
+        }
+
+        // Update local state
+        const updatedTasks = tasks.map((task) =>
+          othersOngoing.some((t) => t._id === task._id)
+            ? { ...task, status: 'paused' as TaskStatus }
+            : task
+        );
+
+        setTasks(updatedTasks);
+      }
+    };
+
+    // Only run this check once when the component mounts
+    ensureOneOngoingTask();
+  }, []); // Empty dependency array means it only runs once on mount
+
   const timeOptions = [
     { value: 1, label: '15 min' },
     { value: 2, label: '30 min' },
@@ -336,11 +482,7 @@ export default function Rundown() {
                   }
                   updateTask(id, { size });
                 }}
-                onStatusChange={(id) =>
-                  updateTask(id, {
-                    status: task.status === 'pending' ? 'ongoing' : 'pending',
-                  })
-                }
+                onStatusChange={handleStatusChange}
                 onLongPress={() => setIsEditMode(true)}
               />
             ))}
