@@ -130,7 +130,11 @@ export default function useTasks() {
     }
   };
 
-  const updateTask = async (id: string, updates: Partial<Task>) => {
+  const updateTask = async (
+    id: string,
+    updates: Partial<Task>,
+    options: { disableAutoPause?: boolean } = {}
+  ) => {
     setTasksByDate((prevTasksByDate) => {
       // Deep clone the state to avoid any mutation issues
       const updatedTasksByDate = JSON.parse(
@@ -157,8 +161,8 @@ export default function useTasks() {
 
       // If this is a status update
       if ('status' in updates) {
-        // If setting to ongoing, pause other ongoing tasks first
-        if (updates.status === 'ongoing') {
+        // For updates setting to "ongoing", run auto-pause logic only if not disabled
+        if (updates.status === 'ongoing' && !options.disableAutoPause) {
           dateTasks.forEach((task) => {
             if (task._id !== id && task.status === 'ongoing') {
               task.status = 'paused';
