@@ -6,6 +6,7 @@ export interface EmailService {
   sendEmail(emailSendDTO: EmailSendInput): Promise<void>;
 }
 
-export const emailService = process.env.EMAIL_RESEND_API_KEY
-  ? new ResendEmailService()
-  : new FakeEmailService();
+export const getEmailService = () =>
+  process.env.EMAIL_RESEND_API_KEY !== undefined
+    ? new ResendEmailService()
+    : new FakeEmailService();

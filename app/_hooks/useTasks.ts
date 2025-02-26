@@ -10,7 +10,8 @@ import {
 } from '../_actions/tasks';
 import { nanoid } from 'nanoid';
 
-const isCloudSyncEnabled = !!process.env.MONGODB_URI;
+const isCloudSyncEnabled =
+  process.env.NEXT_PUBLIC_IS_CLOUD_SYNC_ENABLED === 'true';
 
 const getDateKey = (date: Date) => {
   const d = new Date(date);
