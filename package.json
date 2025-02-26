@@ -22,6 +22,7 @@
     "re-resizable": "^6.10.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "resend": "^4.1.2",
     "sass": "^1.83.1",
     "use-long-press": "^3.2.0"
   },
