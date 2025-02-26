@@ -1,11 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
-
+import { Task } from 'models/Task';
 interface TimeSliderProps {
     task: any; // Se usa "any" porque Task no se importa
-    onUpdateDueDate: (newDueDate: number) => void;
+    onTaskResized: (newDuration: number) => void;
+    onTaskCompleted: () => void;
 }
 
-const TimeSlider: React.FC<TimeSliderProps> = ({ task, onUpdateDueDate }) => {
+const TimeSlider: React.FC<TimeSliderProps> = ({ task, onTaskResized, onTaskCompleted }) => {
     const now = new Date();
     const dueDate = new Date(new Date(task.scheduledDate).getTime() + task.size * 15 * 60 * 1000);
     const duration = task.size * 15 * 60 * 1000; // Duración en ms (35 min por defecto)
@@ -19,12 +20,13 @@ const TimeSlider: React.FC<TimeSliderProps> = ({ task, onUpdateDueDate }) => {
         return Math.max(0, dueDate.getTime() - now.getTime());
     }, [dueDate, now]);
 
-    // Finalizar tarea
     const completeTask = useCallback(() => {
         setIsAdjusting(false);
-        onUpdateDueDate(0);
+        onTaskResized(0);
+
+        onTaskCompleted();
         alert('¡Tarea finalizada!');
-    }, [onUpdateDueDate]);
+    }, [setIsAdjusting, onTaskResized, onTaskCompleted]);
 
     // Actualización automática del tiempo restante cada segundo
     useEffect(() => {
@@ -66,15 +68,15 @@ const TimeSlider: React.FC<TimeSliderProps> = ({ task, onUpdateDueDate }) => {
             return;
         }
 
-        const newDueDate = Date.now() + timeLeft;
+        const newDuration = Date.now() + timeLeft;
         const userConfirmed = window.confirm('¿Guardar cambios en la fecha de finalización?');
         if (userConfirmed) {
-            onUpdateDueDate(newDueDate);
+            onTaskResized(newDuration);
         } else {
             setTimeLeft(dueDate.getTime() - Date.now());
             setSliderValue(100 - ((timeLeft / duration) * 100));
         }
-    }, [timeLeft, dueDate, duration, completeTask, onUpdateDueDate]);
+    }, [timeLeft, dueDate, duration, completeTask, onTaskResized]);
 
     // Mostrar tiempo restante en formato legible
     const formatTimeLeft = (time: number) => {
@@ -123,10 +125,10 @@ export default TimeSlider;
 
 // interface TimeSliderProps {
 //     task: any; // Se usa "any" porque Task no se importa
-//     onUpdateDueDate: (newDueDate: number) => void;
+//     onTaskResized: (newDuration: number) => void;
 // }
 
-// const TimeSlider: React.FC<TimeSliderProps> = ({ task, onUpdateDueDate }) => {
+// const TimeSlider: React.FC<TimeSliderProps> = ({ task, onTaskResized }) => {
 //     const scheduledTime = new Date(task.scheduledTime).getTime(); // Convertir a timestamp
 //     const duration = task.duration ? task.duration * 60 * 1000 : 35 * 60 * 1000; // Duración en ms (35 min por defecto)
 //     const dueDate = scheduledTime + duration; // Fecha de vencimiento real
@@ -144,9 +146,9 @@ export default TimeSlider;
 //     // Finalizar tarea
 //     const completeTask = useCallback(() => {
 //         setIsAdjusting(false);
-//         onUpdateDueDate(0);
+//         onTaskResized(0);
 //         alert('¡Tarea finalizada!');
-//     }, [onUpdateDueDate]);
+//     }, [onTaskResized]);
 
 //     // Actualización automática del tiempo restante cada segundo
 //     useEffect(() => {
@@ -188,15 +190,15 @@ export default TimeSlider;
 //             return;
 //         }
 
-//         const newDueDate = Date.now() + timeLeft;
+//         const newDuration = Date.now() + timeLeft;
 //         const userConfirmed = window.confirm('¿Guardar cambios en la fecha de finalización?');
 //         if (userConfirmed) {
-//             onUpdateDueDate(newDueDate);
+//             onTaskResized(newDuration);
 //         } else {
 //             setTimeLeft(dueDate - Date.now());
 //             setSliderValue(100 - ((timeLeft / duration) * 100));
 //         }
-//     }, [timeLeft, dueDate, duration, completeTask, onUpdateDueDate]);
+//     }, [timeLeft, dueDate, duration, completeTask, onTaskResized]);
 
 //     // Mostrar tiempo restante en formato legible
 //     const formatTimeLeft = (time: number) => {

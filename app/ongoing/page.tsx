@@ -13,10 +13,11 @@ import { submitFeedback } from '../_actions/feedbackActions';
 
 
 import './styles.scss';
+import { Task } from 'models/Task';
 
 const TaskPage: React.FC = () => {
-  const { tasks, getTasksForDate } =
-    useTasks();
+  const { tasks, updateTask, getTasksForDate } = useTasks();
+
 
   useEffect(() => {
     if (tasks.length > 0) {
@@ -34,13 +35,10 @@ const TaskPage: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const currentDayTasks = getTasksForDate(currentDate);
   // const [currentTask, setCurrentTask] = useState<Task | null>(null);
-  const [currentTask, setCurrentTask] = useState<{} | null>(tasks.length >= 0 ? tasks[0] : null);
-  const [nextTask, setNextTask] = useState<{} | null>(tasks.length >= 1 ? tasks[1] : null); // La siguiente tarea
+  const [currentTask, setCurrentTask] = useState<Task | null>(tasks.length >= 0 ? tasks[0] : null);
+  const [nextTask, setNextTask] = useState<Task | null>(tasks.length >= 1 ? tasks[1] : null); // La siguiente tarea
 
-  const updateDueDate = (newDueDate: number) => {
-    console.log('Updating currentTask dueDate:', newDueDate);
-    setCurrentTask({ ...currentTask, dueDate: newDueDate });
-  };
+
 
   return (
     <div className="task-page">
@@ -50,7 +48,8 @@ const TaskPage: React.FC = () => {
           <TaskCard task={currentTask} />
           <TimeSlider
             task={currentTask}
-            onUpdateDueDate={updateDueDate}
+            onTaskResized={(value) => updateTask(currentTask._id, { duration: value })}
+            onTaskCompleted={() => updateTask(currentTask._id, { status: "done" })}
           />
           {/* <FeedbackForm onSubmitFeedback={handleFeedback} /> */}
         </div>
