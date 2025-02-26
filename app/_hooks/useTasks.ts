@@ -107,6 +107,7 @@ export default function useTasks() {
       title,
       size,
       status: 'pending',
+      duration: size * 15,
       createdAt: currentDate,
       updatedAt: currentDate,
       scheduledDate: normalizedScheduledDate,
