@@ -1,8 +1,7 @@
 import React from 'react';
-import { Task } from './TaskCard';
 
 interface UpcomingTaskProps {
-  task: Task;
+  task: any;
 }
 
 const UpcomingTask: React.FC<UpcomingTaskProps> = ({ task }) => {
@@ -10,7 +9,7 @@ const UpcomingTask: React.FC<UpcomingTaskProps> = ({ task }) => {
     <div className="upcoming-task">
       <h3>Upcoming</h3>
       <p>{task.title}</p>
-      <small>Due: {new Date(task.dueDate).toLocaleDateString()}</small>
+      <small>Scheduled: {new Date(task.scheduledDate).toLocaleString()}</small>
     </div>
   );
 };
