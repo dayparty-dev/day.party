@@ -1,4 +1,4 @@
-import { Task, TaskStatus } from '../../../models/Task';
+import { Task, TaskStatus } from '../../_models/Task';
 
 interface TaskPiPProps {
   currentTask: Task | null;

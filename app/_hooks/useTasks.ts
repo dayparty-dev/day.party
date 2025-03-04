@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Task } from 'models/Task';
+import { Task } from 'app/_models/Task';
 import {
   addTaskServer,
   updateTaskServer,

@@ -22,7 +22,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useLongPress } from 'use-long-press';
 import type { Modifier } from '@dnd-kit/core';
-import { TaskStatus } from '../../models/Task';
+import { TaskStatus } from '../_models/Task';
 import ReactDOM from 'react-dom/client';
 
 import './styles.scss';
