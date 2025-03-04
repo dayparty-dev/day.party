@@ -15,7 +15,6 @@ export interface CreateAuthSessionInput {
 
 export interface CreateAuthSessionOutput {
   email: string;
-  nonce: string;
 }
 
 export class CreateAuthSessionInteractor
@@ -53,7 +52,6 @@ export class CreateAuthSessionInteractor
 
       const output: CreateAuthSessionOutput = {
         email: authSession.email,
-        nonce: authSession.nonce,
       };
 
       return output;
@@ -71,14 +69,12 @@ export class CreateAuthSessionInteractor
   }
 
   private async createAuthSession(email: string): Promise<AuthSession> {
-    const nonce = nanoid();
     const collection = await getCollection<AuthSession>(this.COLLECTION_NAME);
 
     const now = new Date();
     const authSession: AuthSession = {
       _id: new ObjectId().toString(),
       email,
-      nonce,
       _createdAt: now,
       _updatedAt: now,
     };

@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 
 import { AuthTokenService } from './AuthTokenService';
-import { AuthTokenSigningDTO } from '../_models/AuthTokenSigningDTO';
-import { AuthTokenVerificationDTO } from '../_models/AuthTokenVerificationDTO';
+import { AuthTokenSigningInput } from '../_models/AuthTokenSigningInput';
+import { AuthTokenVerificationInput } from '../_models/AuthTokenVerificationInput';
 import { AuthToken } from '../_models/AuthToken';
 
 interface JsonWebTokenAuthTokenServiceConfig {
@@ -20,7 +20,7 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
     };
   }
 
-  public signToken(authTokenSigningDTO: AuthTokenSigningDTO): string {
+  public signToken(authTokenSigningDTO: AuthTokenSigningInput): string {
     const token = jwt.sign(authTokenSigningDTO, this.config.secret, {
       subject: authTokenSigningDTO.email,
       expiresIn: this.config.expirationTimeSecs,
@@ -29,7 +29,7 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
     return token;
   }
 
-  public verifyToken(verificationDTO: AuthTokenVerificationDTO): AuthToken {
+  public verifyToken(verificationDTO: AuthTokenVerificationInput): AuthToken {
     const { token } = verificationDTO;
 
     try {

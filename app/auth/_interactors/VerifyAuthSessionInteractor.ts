@@ -1,6 +1,6 @@
 import { Interactor } from 'app/_models/modules/Interactor';
 import { AuthSession } from '../_models/AuthSession';
-import { AuthTokenSigningDTO } from '../_models/AuthTokenSigningDTO';
+import { AuthTokenSigningInput } from '../_models/AuthTokenSigningInput';
 import { AuthTokenService } from '../_services/AuthTokenService';
 import { JsonWebTokenAuthTokenService } from '../_services/JsonWebTokenAuthTokenService';
 import { getCollection } from 'lib/mongodb';
@@ -27,7 +27,7 @@ export class VerifyAuthSessionInteractor
   ): Promise<VerifyAuthSessionOutput> {
     const authSession = await this.findAuthSession(input);
 
-    const authTokenSigningDTO: AuthTokenSigningDTO = {
+    const authTokenSigningDTO: AuthTokenSigningInput = {
       sessionId: authSession._id,
       email: authSession.email,
     };
