@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from './useAuth';
+import { ReactElement } from 'react';
 
 export interface useAuthGuardArgs {
   redirectUrl?: string;
@@ -14,7 +15,7 @@ export function useAuthGuard(args: useAuthGuardArgs = {}) {
     args;
   const router = useRouter();
 
-  function authGuard(element: React.ReactNode) {
+  function authGuard(element: ReactElement) {
     const { isLoggedIn } = useAuth();
 
     const shouldRedirect = (isLogin && isLoggedIn) || (!isLogin && !isLoggedIn);
