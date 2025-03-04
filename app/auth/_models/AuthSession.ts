@@ -2,5 +2,4 @@ import { Entity } from 'app/_models/Entity';
 
 export interface AuthSession extends Entity {
   email: string;
-  nonce: string;
 }

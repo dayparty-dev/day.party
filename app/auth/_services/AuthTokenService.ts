@@ -1,8 +1,8 @@
 import { AuthToken } from '../_models/AuthToken';
-import { AuthTokenSigningDTO } from '../_models/AuthTokenSigningDTO';
-import { AuthTokenVerificationDTO } from '../_models/AuthTokenVerificationDTO';
+import { AuthTokenSigningInput } from '../_models/AuthTokenSigningInput';
+import { AuthTokenVerificationInput } from '../_models/AuthTokenVerificationInput';
 
 export interface AuthTokenService {
-  signToken(authTokenSigningDTO: AuthTokenSigningDTO): string;
-  verifyToken(authTokenVerificationDTO: AuthTokenVerificationDTO): AuthToken;
+  signToken(authTokenSigningDTO: AuthTokenSigningInput): string;
+  verifyToken(authTokenVerificationDTO: AuthTokenVerificationInput): AuthToken;
 }
