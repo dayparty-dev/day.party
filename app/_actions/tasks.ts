@@ -1,7 +1,7 @@
 'use server';
 
 import { getCollection } from 'lib/mongodb';
-import { Task } from 'models/Task';
+import { Task } from 'app/_models/Task';
 
 export async function fetchTasksServer() {
   const tasksCollection = await getCollection<Task>('tasks');

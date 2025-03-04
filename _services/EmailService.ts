@@ -1,4 +1,4 @@
-import { EmailSendInput } from 'models/EmailSendInput';
+import { EmailSendInput } from 'app/_models/EmailSendInput';
 import { ResendEmailService } from './ResendEmailService';
 import { FakeEmailService } from './FakeEmailService';
 

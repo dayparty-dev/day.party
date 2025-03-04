@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
 import { EmailService } from './EmailService';
-import { EmailSendInput } from 'models/EmailSendInput';
+import { EmailSendInput } from 'app/_models/EmailSendInput';
 
 export class ResendEmailService implements EmailService {
   private resend: Resend;
