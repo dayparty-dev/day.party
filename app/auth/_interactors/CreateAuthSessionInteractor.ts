@@ -28,7 +28,13 @@ export class CreateAuthSessionInteractor
     env = process.env,
     private readonly emailService: EmailService = getEmailService()
   ) {
-    this.BASE_URL = env.BASE_URL;
+    if (env.BASE_URL) {
+      this.BASE_URL = env.BASE_URL;
+    } else if (env.VERCEL_PROJECT_PRODUCTION_URL) {
+      this.BASE_URL = `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    } else {
+      this.BASE_URL = 'http://localhost:3000';
+    }
   }
 
   public async interact(
