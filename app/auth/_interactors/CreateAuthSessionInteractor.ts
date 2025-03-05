@@ -77,6 +77,7 @@ export class CreateAuthSessionInteractor
       email,
       _createdAt: now,
       _updatedAt: now,
+      isActive:false,
     };
 
     await collection.insertOne(authSession);
