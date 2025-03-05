@@ -98,11 +98,11 @@ const SortableTask = ({
         enable={
           isEditMode
             ? {
-                top: false,
-                right: false,
-                bottom: true,
-                left: false,
-              }
+              top: false,
+              right: false,
+              bottom: true,
+              left: false,
+            }
             : {}
         }
         grid={[1, 60]}
@@ -126,9 +126,8 @@ const SortableTask = ({
         }}
       >
         <div
-          className={`task-content ${
-            task.status === 'ongoing' ? 'ongoing' : ''
-          }`}
+          className={`task-content ${task.status === 'ongoing' ? 'ongoing' : ''
+            }`}
         >
           {isEditMode && (
             <button

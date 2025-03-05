@@ -1,0 +1,18 @@
+// .rdp-day_selected:not(.rdp-day_outside) .rdp-day_button {
+//     background-color: var(--color-primary);
+//     color: var(--color-primary-content);
+//   }
+
+//   .rdp-day_selected:not(.rdp-day_outside) .rdp-day_button:hover {
+//     background-color: var(--color-primary-focus);
+//   }
+
+.rdp-week td:hover {
+    background-color: var(--color-primary);
+}
+
+// .rdp-day_selected, 
+// .rdp-day_selected:hover {
+//     background-color: var(--color-primary);
+//     color: white; /* O el color de texto que prefieras */
+// }

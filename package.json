@@ -27,6 +27,7 @@
     "postcss": "^8.5.3",
     "re-resizable": "^6.10.3",
     "react": "^19.0.0",
+    "react-day-picker": "^9.5.1",
     "react-dom": "^19.0.0",
     "resend": "^4.1.2",
     "sass": "^1.83.1",
