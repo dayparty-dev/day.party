@@ -68,7 +68,7 @@ export class VerifyAuthSessionInteractor
       const collection = await getCollection<AuthSession>(this.COLLECTION_NAME);
       const result = await collection.updateOne(
         { _id: session._id },
-        { $set: { isActive: false } }
+        { $set: { isActive: true } }
       );
   
       if (result.modifiedCount === 0) {
