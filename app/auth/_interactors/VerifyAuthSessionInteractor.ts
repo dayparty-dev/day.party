@@ -48,7 +48,10 @@ export class VerifyAuthSessionInteractor
   ): Promise<AuthSession> {
     try {
       const collection = await getCollection<AuthSession>(this.COLLECTION_NAME);
-      const authSession = await collection.findOne({ _id: input.id, isActive: false });
+      const authSession = await collection.findOne({
+        _id: input.id,
+        isActive: false,
+      });
 
       if (!authSession) {
         throw new Error('Invalid session');
@@ -61,16 +64,14 @@ export class VerifyAuthSessionInteractor
   }
 
   /* Invalidate session used for signedToken */
-  private async invalidateSession(
-    session: AuthSession
-  ): Promise<void> {
+  private async invalidateSession(session: AuthSession): Promise<void> {
     try {
       const collection = await getCollection<AuthSession>(this.COLLECTION_NAME);
       const result = await collection.updateOne(
         { _id: session._id },
         { $set: { isActive: true } }
       );
-  
+
       if (result.modifiedCount === 0) {
         throw new Error('Failed to invalidate session');
       }

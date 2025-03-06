@@ -29,6 +29,7 @@ import './styles.scss';
 import DayCapacity from 'app/rundown/components/DayCapacity';
 import DayNavigator from 'app/rundown/components/DayNavigator';
 import TaskPiP from './components/TaskPiP';
+import { useAuthGuard } from 'app/auth/_hooks/useAuthGuard';
 
 const preventScaleModifier: Modifier = ({ transform }) => {
   if (!transform) return transform;
@@ -713,7 +714,9 @@ export default function Rundown() {
     { value: 4, label: '60 min' },
   ];
 
-  return (
+  const { authGuard } = useAuthGuard();
+
+  return authGuard(
     <div className={`rundown ${isEditMode ? 'edit-mode' : ''}`}>
       <div className="header-actions">
         {!isEditMode && isPiPSupported && (
