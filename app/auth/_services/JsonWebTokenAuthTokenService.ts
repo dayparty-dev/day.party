@@ -7,7 +7,7 @@ import { AuthToken } from '../_models/AuthToken';
 
 interface JsonWebTokenAuthTokenServiceConfig {
   secret: string;
-  expirationTimeSecs?: string | number;
+  expirationTimeSecs: string;
 }
 
 export class JsonWebTokenAuthTokenService implements AuthTokenService {
@@ -23,8 +23,10 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
   public signToken(authTokenSigningDTO: AuthTokenSigningInput): string {
     const token = jwt.sign(authTokenSigningDTO, this.config.secret, {
       subject: authTokenSigningDTO.email,
-      expiresIn: this.config.expirationTimeSecs,
+      expiresIn: parseInt(this.config.expirationTimeSecs),
     });
+
+    console.log('token', token);
 
     return token;
   }
@@ -39,6 +41,7 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
 
       return authToken;
     } catch (err) {
+      console.log('err', err);
       throw new Error('Invalid/expired token');
     }
   }

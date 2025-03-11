@@ -24,6 +24,7 @@ import PiPManager, {
   setupPiPStyles,
   copyStylesheets,
 } from './components/PiPManager';
+import { useAuthGuard } from 'app/auth/_hooks/useAuthGuard';
 
 // Preventable scale modifier
 const preventScaleModifier: Modifier = ({ transform }) => {
@@ -458,7 +459,9 @@ export default function Rundown() {
     handleTaskFinish,
   ]);
 
-  return (
+  const { authGuard } = useAuthGuard();
+
+  return authGuard(
     <div className={`rundown ${isEditMode ? 'edit-mode' : ''}`}>
       <div className="header-actions">
         <PictureInPictureButton

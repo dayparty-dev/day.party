@@ -37,6 +37,7 @@
     "use-persisted-state": "^0.3.3"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "22.10.5",
     "@types/react": "19.0.3",
     "daisyui": "^5.0.0",

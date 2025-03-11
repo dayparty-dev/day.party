@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from './useAuth';
 import { ReactElement } from 'react';
@@ -17,16 +17,25 @@ export function useAuthGuard(args: useAuthGuardArgs = {}) {
 
   function authGuard(element: ReactElement) {
     const { isLoggedIn } = useAuth();
+    const [mounted, setMounted] = useState(false);
 
     const shouldRedirect = (isLogin && isLoggedIn) || (!isLogin && !isLoggedIn);
 
     useEffect(() => {
+      setMounted(true);
+
       if (shouldRedirect) {
         router.push(redirectUrl);
       }
     }, [shouldRedirect, redirectUrl, router]);
 
-    return shouldRedirect ? null : element;
+    // Prevents hydration error by ensuring we only render content on the client
+    // after we've confirmed the authentication state
+    if (!mounted) {
+      return <div style={{ display: 'none' }} />;
+    }
+
+    return shouldRedirect ? <div style={{ display: 'none' }} /> : element;
   }
 
   return {
