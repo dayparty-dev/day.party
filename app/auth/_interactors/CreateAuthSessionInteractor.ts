@@ -1,10 +1,9 @@
-import { nanoid } from 'nanoid';
 import dedent from 'dedent-tabs';
 import { ObjectId } from 'mongodb';
 
 import { Interactor } from 'app/_models/modules/Interactor';
 import { AuthSession } from '../_models/AuthSession';
-import { EmailService, getEmailService } from '_services/EmailService';
+import { EmailService, getEmailService } from 'app/_services/EmailService';
 import { EmailMessage } from 'app/_models/EmailMessage';
 import { EmailSendInput } from 'app/_models/EmailSendInput';
 import { getCollection } from 'lib/mongodb';
