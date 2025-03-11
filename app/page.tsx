@@ -2,16 +2,16 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-base-200 text-base-content">
       {/* Navbar */}
-      <div className="navbar bg-primary text-primary-content shadow-lg px-6">
-        <div className="navbar-start">
-          <a className="text-2xl font-bold tracking-wide">FancyAgenda</a>
-        </div>
-        <div className="navbar-end hidden md:flex gap-4">
+      {/* <div className="navbar bg-primary text-primary-content shadow-lg px-6"> */}
+      <div className="navbar bg-primary text-primary-content shadow-lg px-6 flex justify-center">
+        <a className="text-2xl font-bold tracking-wide">Day.Party</a>
+      </div>
+      {/* <div className="navbar-end hidden md:flex gap-4">
           <a className="btn btn-ghost hover:bg-secondary hover:text-white">Inicio</a>
           <a className="btn btn-ghost hover:bg-secondary hover:text-white">Características</a>
           <a className="btn btn-ghost hover:bg-secondary hover:text-white">Contacto</a>
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
 
       {/* Hero Section */}
       <div className="hero py-20 text-center flex flex-col items-center">
