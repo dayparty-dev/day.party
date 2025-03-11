@@ -1,63 +1,61 @@
-export default function Page() {
+export default function LandingPage() {
   return (
-    <div>
-      <h1>day.party</h1>
-      <h2>je</h2>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
-      <div>
-        <button className="btn btn-neutral">Neutral</button>
-        <button className="btn btn-primary">Primary</button>
-        <button className="btn btn-secondary">Secondary</button>
-        <button className="btn btn-accent">Accent</button>
-        <button className="btn btn-info">Info</button>
-        <button className="btn btn-success">Success</button>
-        <button className="btn btn-warning">Warning</button>
-        <button className="btn btn-error">Error</button>
+    <div className="min-h-screen bg-base-200 text-base-content">
+      {/* Navbar */}
+      <div className="navbar bg-primary text-primary-content shadow-lg px-6">
+        <div className="navbar-start">
+          <a className="text-2xl font-bold tracking-wide">FancyAgenda</a>
+        </div>
+        <div className="navbar-end hidden md:flex gap-4">
+          <a className="btn btn-ghost hover:bg-secondary hover:text-white">Inicio</a>
+          <a className="btn btn-ghost hover:bg-secondary hover:text-white">Características</a>
+          <a className="btn btn-ghost hover:bg-secondary hover:text-white">Contacto</a>
+        </div>
       </div>
-      <div>
-        <div className="carousel carousel-center rounded-box">
-          <div className="carousel-item">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp"
-              alt="Pizza"
-            />
+
+      {/* Hero Section */}
+      <div className="hero py-20 text-center flex flex-col items-center">
+        <div className="hero-content flex flex-col md:flex-row items-center">
+          <div className="md:w-1/2">
+            <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+              Organiza tu vida, <span className="text-secondary">jugando</span>
+            </h1>
+            <p className="mt-4 text-lg">Convierte tus tareas en misiones, gana recompensas y sube de nivel en la vida.</p>
+            <button className="btn btn-secondary mt-6">Empieza ahora</button>
           </div>
-          <div className="carousel-item">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.webp"
-              alt="Pizza"
-            />
+          <img src="/images/hero-image.svg" className="w-80 md:w-96 mt-6 md:mt-0" alt="Agenda digital" />
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="container mx-auto px-4 py-16 grid md:grid-cols-3 gap-8">
+        <div className="card bg-base-100 shadow-xl transform hover:scale-105 transition-transform">
+          <div className="card-body">
+            <h2 className="card-title">🎮 Gamificación Total</h2>
+            <p>Convierte tu día en un juego con retos, lootboxes y recompensas.</p>
           </div>
-          <div className="carousel-item">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.webp"
-              alt="Pizza"
-            />
+        </div>
+        <div className="card bg-base-100 shadow-xl transform hover:scale-105 transition-transform">
+          <div className="card-body">
+            <h2 className="card-title">🧠 Neurospicy Friendly</h2>
+            <p>Diseñado para mentes inquietas: flexibilidad total y sin presión.</p>
           </div>
-          <div className="carousel-item">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1494253109108-2e30c049369b.webp"
-              alt="Pizza"
-            />
+        </div>
+        <div className="card bg-base-100 shadow-xl transform hover:scale-105 transition-transform">
+          <div className="card-body">
+            <h2 className="card-title">💡 Personalización</h2>
+            <p>Cambia el look de tu agenda con skins diarios y modos visuales únicos.</p>
           </div>
-          <div className="carousel-item">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1550258987-190a2d41a8ba.webp"
-              alt="Pizza"
-            />
-          </div>
-          <div className="carousel-item">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1559181567-c3190ca9959b.webp"
-              alt="Pizza"
-            />
-          </div>
-          <div className="carousel-item">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1601004890684-d8cbf643f5f2.webp"
-              alt="Pizza"
-            />
-          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="text-center py-10 bg-secondary text-secondary-content relative">
+        <div className="absolute inset-0 bg-secondary bg-opacity-30 blur-lg"></div>
+        <div className="relative">
+          <h2 className="text-4xl font-bold">¿Listo para mejorar tu productividad?</h2>
+          <p className="mt-2">Únete ahora y descubre una nueva forma de organizar tu vida.</p>
+          <button className="btn btn-primary mt-4">Únete ahora</button>
         </div>
       </div>
     </div>
