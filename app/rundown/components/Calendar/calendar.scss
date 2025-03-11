@@ -8,11 +8,87 @@
 //   }
 
 .rdp-week td:hover {
-    background-color: var(--color-primary);
+  background-color: var(--color-primary);
 }
 
-// .rdp-day_selected, 
+// .rdp-day_selected,
 // .rdp-day_selected:hover {
 //     background-color: var(--color-primary);
 //     color: white; /* O el color de texto que prefieras */
 // }
+
+.day-picker {
+  position: relative;
+
+  /* Style for the Today button */
+  .today-button {
+    position: absolute;
+    top: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-primary);
+    color: var(--color-primary-content);
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    z-index: 10;
+
+    &:hover {
+      background-color: var(--color-primary-focus);
+    }
+
+    &:focus {
+      outline: 2px solid var(--color-primary-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  /* Adjust caption positioning to make room for the Today button */
+  .rdp-caption {
+    margin-top: 2.5rem;
+    padding-top: 0.5rem;
+    position: relative;
+  }
+
+  /* Adjust spacing for month navigation */
+  .rdp-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.25rem;
+  }
+
+  /* Improve button styling */
+  .rdp-button {
+    &:hover:not([disabled]) {
+      background-color: var(--color-base-300);
+    }
+  }
+
+  /* Style for today's date */
+  .rdp-day_today:not(.rdp-day_outside) {
+    font-weight: bold;
+
+    &:not(.rdp-day_selected) .rdp-button {
+      border: 1px solid var(--color-primary);
+    }
+  }
+
+  /* Style for days with tasks */
+  .has-tasks {
+    position: relative;
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: var(--color-secondary);
+    }
+  }
+}

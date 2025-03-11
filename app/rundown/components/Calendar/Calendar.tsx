@@ -1,82 +1,118 @@
-import { useState, useEffect } from "react";
-import { DayPicker, DayProps } from "react-day-picker";
-import useTasks from "app/_hooks/useTasks";
-import "react-day-picker/style.css";
+import { useState, useMemo } from 'react';
+import { addMonths, isSameMonth, isSameDay } from 'date-fns';
+import { DayPicker, DayProps } from 'react-day-picker';
+
+import useTasks from 'app/_hooks/useTasks';
+import 'react-day-picker/style.css';
 import './calendar.scss';
 
 interface CalendarProps {
-    selectedDate: Date;
-    onSelectDate: (date: Date) => void;
+  selectedDate: Date;
+  onSelectDate: (date: Date) => void;
 }
 
 function CustomDayCell(props: DayProps) {
-    const { getTasksForDate } = useTasks();
-    const { day, modifiers } = props;
-    const tasksForDay = getTasksForDate(day.date);
+  const { getTasksForDate } = useTasks();
+  const { day, modifiers } = props;
 
-    // Si es el día 3, añade un log específico
-    if (day.date.getDate() === 3) {
-        console.log("Day 3 details:", {
-            date: day.date,
-            tasks: tasksForDay,
-            modifiers: modifiers
-        });
-    }
+  // Only fetch tasks if the day has the 'withTasks' modifier
+  // This avoids unnecessary calls to getTasksForDate for days without tasks
+  const tasksForDay = modifiers.withTasks ? getTasksForDate(day.date) : [];
 
-    let cellClass = "p-2 text-center rounded-xl";
+  let cellClass = 'p-2 text-center rounded-xl';
 
-    if (modifiers.selected || modifiers.focused) {
-        cellClass += " bg-primary text-primary-content";
-    }
+  if (modifiers.selected || modifiers.focused) {
+    cellClass += ' bg-primary text-primary-content';
+  }
 
-    if (modifiers.outside) {
-        cellClass += " text-gray-400";
-    }
+  if (modifiers.outside) {
+    cellClass += ' text-gray-400';
+  }
 
-    if (!modifiers.outside) {
-        return <td className={cellClass}>{props.children}</td>;
-    }
+  if (modifiers.withTasks) {
+    cellClass += ' has-tasks';
+  }
 
+  // Prepare title attribute for days with tasks
+  let titleAttr = '';
+  if (tasksForDay.length > 0) {
+    titleAttr = `${tasksForDay.length} task${
+      tasksForDay.length > 1 ? 's' : ''
+    }`;
+  }
 
-
-    if (tasksForDay.length === 0) {
-        return (
-            <td className={cellClass}>
-                {props.children}
-            </td>
-        );
-    }
-
-    return (
-        <td className={cellClass}>
-            <div className="flex flex-col h-full">
-                <div className="text-left text-xs">{props.children}</div>
-                {tasksForDay.length > 0 && (
-                    <div className="flex-grow flex flex-wrap content-start gap-1 mt-1">
-                        {tasksForDay.map((task, index) => (
-                            <div key={index} className="w-2 h-2 bg-secondary" title={task.title}></div>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </td>
-    );
+  // Simplified rendering - just show the day number with the CSS dot indicator if there are tasks
+  return (
+    <td className={cellClass} title={titleAttr}>
+      {props.children}
+    </td>
+  );
 }
 
+export default function Calendar({
+  selectedDate,
+  onSelectDate,
+}: CalendarProps) {
+  const today = new Date();
+  const { getDaysWithTasksInMonth } = useTasks();
 
-export default function Calendar({ selectedDate, onSelectDate }: CalendarProps) {
-    return (
-        <div className="day-pîcker">
-            <DayPicker
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => date && onSelectDate(date)}
-                weekStartsOn={1}
-                showOutsideDays={true}
-                components={{
-                    Day: CustomDayCell
-                }}
-            />
-        </div>
-    );
+  const [month, setMonth] = useState(today);
+
+  // Get the days with tasks for the current month range (including prev/next month days)
+  // This is memoized internally in the useTasks hook for better performance
+  const daysWithTasks = getDaysWithTasksInMonth(month);
+
+  // Create a memoized modifiers object that includes days with tasks
+  const modifiers = useMemo(() => {
+    const modifiersObj: Record<string, Date[]> = {
+      today: [today],
+      withTasks: daysWithTasks,
+    };
+    return modifiersObj;
+  }, [today, daysWithTasks]);
+
+  // Check if the displayed month is the current month
+  const isCurrentMonth = isSameMonth(month, today);
+
+  // Check if the selected date is today
+  const isTodaySelected = isSameDay(selectedDate, today);
+
+  // Show the Today button if either:
+  // 1. We're not in the current month, OR
+  // 2. Today's date is not selected
+  const shouldShowTodayButton = !isCurrentMonth || !isTodaySelected;
+
+  // Handle going to today (both month and day selection)
+  const handleGoToToday = () => {
+    setMonth(today);
+    onSelectDate(today);
+  };
+
+  return (
+    <div className="day-picker">
+      <DayPicker
+        mode="single"
+        month={month}
+        selected={selectedDate}
+        onSelect={(date) => date && onSelectDate(date)}
+        onMonthChange={setMonth}
+        weekStartsOn={1}
+        showOutsideDays={true}
+        components={{
+          Day: CustomDayCell,
+        }}
+        modifiers={modifiers}
+        className="custom-day-picker"
+      />
+      {shouldShowTodayButton && (
+        <button
+          className="today-button"
+          onClick={handleGoToToday}
+          aria-label="Go to today's date"
+        >
+          Today
+        </button>
+      )}
+    </div>
+  );
 }

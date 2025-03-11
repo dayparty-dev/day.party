@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Task } from 'app/_models/Task';
 import {
   addTaskServer,
@@ -9,6 +9,13 @@ import {
   fetchTasksServer,
 } from '../_actions/tasks';
 import { nanoid } from 'nanoid';
+import {
+  startOfMonth,
+  endOfMonth,
+  isSameMonth,
+  addMonths,
+  subMonths,
+} from 'date-fns';
 
 const isCloudSyncEnabled =
   process.env.NEXT_PUBLIC_IS_CLOUD_SYNC_ENABLED === 'true';
@@ -39,6 +46,25 @@ export default function useTasks() {
   // Store tasks grouped by date
   const [tasksByDate, setTasksByDate] = useState<Record<string, Task[]>>({});
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // Memoize the getDaysWithTasksInMonth function to avoid redundant calculations
+  // IMPORTANT: Always declare hooks at the top level to maintain consistent hook order
+  const getMemoizedDaysWithTasksInMonthRange = useMemo(() => {
+    // Create a cache to store the results for each month
+    const cache = new Map<string, Date[]>();
+
+    return (month: Date) => {
+      if (!isInitialized) return [];
+
+      const monthKey = month.getFullYear() + '-' + month.getMonth();
+
+      if (!cache.has(monthKey)) {
+        cache.set(monthKey, getDaysWithTasksInMonthRange(month, tasksByDate));
+      }
+
+      return cache.get(monthKey) || [];
+    };
+  }, [isInitialized, tasksByDate]); // Recalculate when initialized state or tasksByDate changes
 
   // Load initial data
   useEffect(() => {
@@ -79,6 +105,7 @@ export default function useTasks() {
       deleteTask: () => Promise.resolve(),
       setTasks: () => {},
       getTasksForDate: () => [],
+      getDaysWithTasksInMonth: () => [],
     };
   }
 
@@ -251,6 +278,38 @@ export default function useTasks() {
     return tasksByDate[dateKey] || [];
   };
 
+  // Helper function moved outside the hook order to avoid issues
+  // This is now a regular function, not a hook
+  const getDaysWithTasksInMonthRange = (
+    month: Date,
+    tasksByDateMap: Record<string, Task[]>
+  ) => {
+    // Get the previous, current, and next months
+    const prevMonth = subMonths(month, 1);
+    const nextMonth = addMonths(month, 1);
+
+    // Create a map of dateKeys to true for dates with tasks in the specified month range
+    const daysWithTasks = new Map<string, Date>();
+
+    Object.entries(tasksByDateMap).forEach(([dateKeyStr, tasks]) => {
+      if (tasks.length > 0) {
+        // Convert the dateKey back to a Date
+        const dateFromKey = new Date(parseInt(dateKeyStr));
+
+        // Check if this date falls within the current, previous, or next month
+        if (
+          isSameMonth(dateFromKey, month) ||
+          isSameMonth(dateFromKey, prevMonth) ||
+          isSameMonth(dateFromKey, nextMonth)
+        ) {
+          daysWithTasks.set(dateKeyStr, dateFromKey);
+        }
+      }
+    });
+
+    return Array.from(daysWithTasks.values());
+  };
+
   // Flatten tasks for compatibility with existing code
   const allTasks = Object.values(tasksByDate).flat();
 
@@ -272,5 +331,6 @@ export default function useTasks() {
       saveTasksToStorage(grouped);
     },
     getTasksForDate,
+    getDaysWithTasksInMonth: getMemoizedDaysWithTasksInMonthRange,
   };
 }
