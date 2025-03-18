@@ -1,5 +1,5 @@
 import { jwtDecode, JwtPayload } from 'jwt-decode';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import createPersistedState from 'use-persisted-state';
 import {
   createAuthSessionServer,
@@ -55,27 +55,38 @@ export function useAuth(): UseAuth {
     }
   }, [token]);
 
-  async function sendLoginLink(email: string): Promise<void> {
+  const sendLoginLink = useCallback(async (email: string): Promise<void> => {
     await createAuthSessionServer({
       email,
     });
-  }
+  }, []);
 
-  async function verifyLoginLink(candidateSessionId: string): Promise<void> {
-    try {
-      const { token } = await verifyAuthSessionServer({
-        id: candidateSessionId,
-      });
+  const verifyLoginLink = useCallback(
+    async (candidateSessionId: string): Promise<void> => {
+      console.log('verifyLoginLink', candidateSessionId);
+      try {
+        const { token } = await verifyAuthSessionServer({
+          id: candidateSessionId,
+        });
 
-      setToken(token);
-      setSessionId(candidateSessionId);
-      setIsLoggedIn(true);
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
+        setToken(token);
+        setSessionId(candidateSessionId);
+        setIsLoggedIn(true);
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    []
+  );
 
-  async function logout(): Promise<void> {
+  const clearState = useCallback(() => {
+    setSessionId(null);
+    setToken(null);
+    setIsLoggedIn(false);
+    setUser(null);
+  }, []);
+
+  const logout = useCallback(async (): Promise<void> => {
     if (token) {
       await deleteAuthSessionServer({
         token,
@@ -83,14 +94,7 @@ export function useAuth(): UseAuth {
 
       clearState();
     }
-  }
-
-  function clearState() {
-    setSessionId(null);
-    setToken(null);
-    setIsLoggedIn(false);
-    setUser(null);
-  }
+  }, [token, clearState]);
 
   return {
     isLoggedIn,
