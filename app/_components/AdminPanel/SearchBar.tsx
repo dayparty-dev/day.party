@@ -6,7 +6,7 @@ interface SearchBarProps {
     placeholder?: string;
 }
 
-export default function SearchBar({ onSearch, placeholder = "Search actions..." }: SearchBarProps) {
+export default function SearchBar({ onSearch, placeholder = "Search an option..." }: SearchBarProps) {
     const [query, setQuery] = useState('');
 
     // Efecto para debounce la búsqueda
@@ -20,17 +20,15 @@ export default function SearchBar({ onSearch, placeholder = "Search actions..." 
 
     return (
         <div className="form-control mb-4">
-            <div className="input-group">
+            <div className="relative">
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary z-10" />
                 <input
                     type="text"
                     placeholder={placeholder}
-                    className="input input-bordered input-sm w-full"
+                    className="input input-bordered input-sm w-full pl-10"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
-                <button className="btn btn-square btn-sm" onClick={() => onSearch(query)}>
-                    <FaSearch />
-                </button>
             </div>
         </div>
     );
