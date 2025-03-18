@@ -5,7 +5,7 @@ import { useAuth } from '../_hooks/useAuth';
 import { useAuthGuard } from '../_hooks/useAuthGuard';
 import './styles.scss';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useRef } from 'react';
 
 enum LoginState {
   Email = 'EMAIL',
@@ -25,6 +25,7 @@ function LoginForm(): React.ReactElement {
 
   const [loginState, setLoginState] = useState<LoginState>(LoginState.Email);
   const [email, setEmail] = useState('');
+  const verificationAttemptedRef = useRef(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -36,7 +37,8 @@ function LoginForm(): React.ReactElement {
   };
 
   useEffect(() => {
-    if (sessionId) {
+    if (sessionId && !verificationAttemptedRef.current) {
+      verificationAttemptedRef.current = true;
       setLoginState(LoginState.Processing);
       verifyLoginLink(sessionId).catch((error) => {
         console.error('Failed to verify session:', error);

@@ -47,7 +47,7 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
   }
 
   public adaptJwtTokenToAuthToken(jwtToken: any): AuthToken {
-    const { sessionId, email, exp } = jwtToken;
+    const { sessionId, email, userId, exp } = jwtToken;
 
     // TODO: actually check if session exists
 
@@ -56,6 +56,7 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
     const authToken: AuthToken = {
       sessionId,
       email,
+      userId,
       expiresAt,
     };
 
