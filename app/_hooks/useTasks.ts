@@ -9,13 +9,8 @@ import {
   fetchTasksServer,
 } from '../_actions/tasks';
 import { nanoid } from 'nanoid';
-import {
-  startOfMonth,
-  endOfMonth,
-  isSameMonth,
-  addMonths,
-  subMonths,
-} from 'date-fns';
+import { isSameMonth, addMonths, subMonths } from 'date-fns';
+import { useAuth } from '../auth/_hooks/useAuth';
 
 const isCloudSyncEnabled =
   process.env.NEXT_PUBLIC_IS_CLOUD_SYNC_ENABLED === 'true';
@@ -38,7 +33,8 @@ const loadTasksFromStorage = () => {
   }
 };
 
-const saveTasksToStorage = (tasksByDate: Record<string, Task[]>) => {
+// FIXME: this shouldn't be exported, but I need it for the logout page
+export const saveTasksToStorage = (tasksByDate: Record<string, Task[]>) => {
   localStorage.setItem('tasks', JSON.stringify(tasksByDate));
 };
 
@@ -46,6 +42,7 @@ export default function useTasks() {
   // Store tasks grouped by date
   const [tasksByDate, setTasksByDate] = useState<Record<string, Task[]>>({});
   const [isInitialized, setIsInitialized] = useState(false);
+  const { user } = useAuth();
 
   // Memoize the getDaysWithTasksInMonth function to avoid redundant calculations
   // IMPORTANT: Always declare hooks at the top level to maintain consistent hook order
@@ -68,32 +65,40 @@ export default function useTasks() {
 
   // Load initial data
   useEffect(() => {
-    const storedTasks = loadTasksFromStorage();
-    setTasksByDate(storedTasks);
-    setIsInitialized(true);
+    const loadTasks = async () => {
+      const storedTasks = loadTasksFromStorage();
+      setTasksByDate(storedTasks);
+      setIsInitialized(true);
 
-    // Then fetch from server if needed
-    if (isCloudSyncEnabled) {
-      fetchTasksServer().then((cloudTasks) => {
-        if (cloudTasks.length > 0) {
-          // Group cloud tasks by date
-          const groupedTasks = cloudTasks.reduce((acc, task) => {
-            const dateKey = getDateKey(task.scheduledDate);
-            if (!acc[dateKey]) acc[dateKey] = [];
-            acc[dateKey].push(task);
-            return acc;
-          }, {} as Record<string, Task[]>);
+      // Then fetch from server if needed
+      if (isCloudSyncEnabled) {
+        try {
+          const cloudTasks = await fetchTasksServer();
 
-          // Sort tasks within each date
-          Object.values(groupedTasks).forEach((dateTasks) => {
-            dateTasks.sort((a, b) => (a.order || 0) - (b.order || 0));
-          });
+          if (cloudTasks && cloudTasks.length > 0) {
+            // Group cloud tasks by date
+            const groupedTasks = cloudTasks.reduce((acc, task) => {
+              const dateKey = getDateKey(new Date(task.scheduledDate));
+              if (!acc[dateKey]) acc[dateKey] = [];
+              acc[dateKey].push(task);
+              return acc;
+            }, {} as Record<string, Task[]>);
 
-          setTasksByDate(groupedTasks);
-          saveTasksToStorage(groupedTasks);
+            // Sort tasks within each date
+            Object.values(groupedTasks).forEach((dateTasks) => {
+              dateTasks.sort((a, b) => (a.order || 0) - (b.order || 0));
+            });
+
+            setTasksByDate(groupedTasks);
+            saveTasksToStorage(groupedTasks);
+          }
+        } catch (error) {
+          console.error('Error fetching tasks from server:', error);
         }
-      });
-    }
+      }
+    };
+
+    loadTasks();
   }, []);
 
   // Don't render anything until we've initialized from localStorage
@@ -141,6 +146,7 @@ export default function useTasks() {
       scheduledDate: normalizedScheduledDate,
       _id: nanoid(),
       order: maxOrder + 1,
+      userId: user?.id || 'local',
     };
 
     const updatedDateTasks = [...dateTasks, task].sort(

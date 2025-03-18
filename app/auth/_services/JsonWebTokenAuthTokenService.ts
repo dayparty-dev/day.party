@@ -4,6 +4,7 @@ import { AuthTokenService } from './AuthTokenService';
 import { AuthTokenSigningInput } from '../_models/AuthTokenSigningInput';
 import { AuthTokenVerificationInput } from '../_models/AuthTokenVerificationInput';
 import { AuthToken } from '../_models/AuthToken';
+import { AuthTokenJwt } from '../_models/AuthTokenJwt';
 
 interface JsonWebTokenAuthTokenServiceConfig {
   secret: string;
@@ -35,7 +36,10 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
     const { token } = verificationDTO;
 
     try {
-      const verifiedToken = jwt.verify(token, this.config.secret) as object;
+      const verifiedToken = jwt.verify(
+        token,
+        this.config.secret
+      ) as AuthTokenJwt;
 
       const authToken = this.adaptJwtTokenToAuthToken(verifiedToken);
 
@@ -46,12 +50,12 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
     }
   }
 
-  public adaptJwtTokenToAuthToken(jwtToken: any): AuthToken {
+  public adaptJwtTokenToAuthToken(jwtToken: AuthTokenJwt): AuthToken {
     const { sessionId, email, userId, exp } = jwtToken;
 
     // TODO: actually check if session exists
 
-    const expiresAt = new Date(exp);
+    const expiresAt = new Date(exp * 1000);
 
     const authToken: AuthToken = {
       sessionId,
