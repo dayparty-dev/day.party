@@ -114,76 +114,73 @@ export default function AdminPanel() {
 
     return (
         <div className="fixed bottom-4 right-4 z-50">
-            <div className={`bg-base-100 shadow-xl transition-all duration-300 ${isExpanded ? 'w-96 h-[600px] rounded-box' : 'w-12 h-12 rounded-full'}`}>
-                {!isExpanded && (
+            <div className={`bg-base-100 shadow-xl transition-all duration-300 ${isExpanded ? 'w-96 h-[600px] rounded-box' : 'w-10 h-10 rounded-full relative'}`}>
+                {!isExpanded ? (
                     <button
-                        className="btn btn-circle btn-sm -top-2 -right-2 z-10"
+                        className="btn btn-circle btn-sm bg-primary absolute m-auto top-0 bottom-0 left-0 right-0 z-10"
                         onClick={() => setIsExpanded(isExpanded => !isExpanded)}
                         aria-label="Open admin panel"
                     >
                         D.
                     </button>
+                ) : (
+                    <button
+                        className="btn btn-circle btn-sm absolute -top-2 -right-2 z-10"
+                        onClick={() => setIsExpanded(isExpanded => !isExpanded)}
+                        aria-label="Close admin panel"
+                    >
+                        <FaTimes />
+                    </button>
                 )}
-
                 {isExpanded && (
-                    <>
-                        <button
-                            className="btn btn-circle btn-sm absolute -top-2 -right-2 z-10"
-                            onClick={() => setIsExpanded(isExpanded => !isExpanded)}
-                            aria-label="Close admin panel"
-                        >
-                            <FaTimes />
-                        </button>
+                    <div className="p-4 h-full flex flex-col gap-4">
+                        <SearchBar onSearch={setSearchQuery} />
 
-                        <div className="p-4 h-full flex flex-col gap-4">
-                            <SearchBar onSearch={setSearchQuery} />
-
-                            <div className="flex-1 overflow-y-auto space-y-2">
-                                <Section
-                                    id="users"
-                                    isVisible={visibleSections.includes('users')}
-                                    title='Users'
-                                    isExpanded={true}
-                                    isSelected={selectedSection === 'users'}
-                                >
-                                    <UserManagement selectedOption='edit' />
-                                </Section>
-                                <Section
-                                    id="tasks"
-                                    isVisible={visibleSections.includes('tasks')}
-                                    title='Tasks'
-                                    isExpanded={true}
-                                    isSelected={selectedSection === 'tasks'}
-                                >
-                                    <TaskManagement
-                                        onTaskCreated={handleTaskCreated}
-                                        onTasksDeleted={handleDeleteTodaysTasks}
-                                    />
-                                </Section>
-                            </div>
-
-                            <nav className="navbar bg-base-200 rounded-box mt-4">
-                                <div className="flex overflow-x-auto gap-2">
-                                    <a
-                                        href="#users"
-                                        className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${!visibleSections.includes('users') ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
-                                        onClick={() => handleSectionClick('users')}
-                                    >
-                                        <FaUser />
-                                    </a>
-                                    <a
-                                        href="#tasks"
-                                        className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${!visibleSections.includes('tasks') ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
-                                        onClick={() => handleSectionClick('tasks')}
-                                    >
-                                        <FaTasks />
-                                    </a>
-
-                                </div>
-                            </nav>
-
+                        <div className="flex-1 overflow-y-auto space-y-2">
+                            <Section
+                                id="users"
+                                isVisible={visibleSections.includes('users')}
+                                title='Users'
+                                isExpanded={true}
+                                isSelected={selectedSection === 'users'}
+                            >
+                                <UserManagement selectedOption='edit' />
+                            </Section>
+                            <Section
+                                id="tasks"
+                                isVisible={visibleSections.includes('tasks')}
+                                title='Tasks'
+                                isExpanded={true}
+                                isSelected={selectedSection === 'tasks'}
+                            >
+                                <TaskManagement
+                                    onTaskCreated={handleTaskCreated}
+                                    onTasksDeleted={handleDeleteTodaysTasks}
+                                />
+                            </Section>
                         </div>
-                    </>
+
+                        <nav className="navbar bg-base-200 rounded-box mt-4">
+                            <div className="flex overflow-x-auto gap-2">
+                                <a
+                                    href="#users"
+                                    className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${!visibleSections.includes('users') ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                                    onClick={() => handleSectionClick('users')}
+                                >
+                                    <FaUser />
+                                </a>
+                                <a
+                                    href="#tasks"
+                                    className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${!visibleSections.includes('tasks') ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                                    onClick={() => handleSectionClick('tasks')}
+                                >
+                                    <FaTasks />
+                                </a>
+
+                            </div>
+                        </nav>
+
+                    </div>
                 )}
             </div>
         </div>
