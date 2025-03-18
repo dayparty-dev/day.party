@@ -48,6 +48,22 @@ export class VerifyAuthSessionInteractor
   ): Promise<AuthSession> {
     try {
       const collection = await getCollection<AuthSession>(this.COLLECTION_NAME);
+
+      // First check if the session exists at all
+      const sessionExists = await collection.findOne({
+        _id: input.id,
+      });
+
+      if (!sessionExists) {
+        throw new Error('Session not found');
+      }
+
+      // Then check if it's already been used
+      if (sessionExists.isActive) {
+        throw new Error('Session already used');
+      }
+
+      // Now get the valid inactive session
       const authSession = await collection.findOne({
         _id: input.id,
         isActive: false,
@@ -59,7 +75,7 @@ export class VerifyAuthSessionInteractor
 
       return authSession;
     } catch (err) {
-      throw new Error('Invalid session');
+      throw new Error(err instanceof Error ? err.message : 'Invalid session');
     }
   }
 
