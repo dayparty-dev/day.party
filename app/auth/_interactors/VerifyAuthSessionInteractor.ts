@@ -4,6 +4,7 @@ import { AuthTokenSigningInput } from '../_models/AuthTokenSigningInput';
 import { AuthTokenService } from '../_services/AuthTokenService';
 import { JsonWebTokenAuthTokenService } from '../_services/JsonWebTokenAuthTokenService';
 import { getCollection } from 'lib/mongodb';
+import { UserService, getUserService } from 'app/user/_services/UserService';
 
 export interface VerifyAuthSessionInput {
   id: string;
@@ -19,7 +20,8 @@ export class VerifyAuthSessionInteractor
   private readonly COLLECTION_NAME = 'auth_sessions';
 
   constructor(
-    private readonly authTokenService: AuthTokenService = new JsonWebTokenAuthTokenService()
+    private readonly authTokenService: AuthTokenService = new JsonWebTokenAuthTokenService(),
+    private readonly userService: UserService = getUserService()
   ) {}
 
   public async interact(
@@ -27,9 +29,23 @@ export class VerifyAuthSessionInteractor
   ): Promise<VerifyAuthSessionOutput> {
     const authSession = await this.findAuthSession(input);
 
+    // Find or create user
+    let user = await this.userService.findByEmail(authSession.email);
+
+    if (!user) {
+      // Create a new user with username derived from email
+      const username = authSession.email.split('@')[0];
+
+      user = await this.userService.createUser(authSession.email, username);
+    }
+
+    // Update session with userId
+    await this.updateSessionWithUserId(authSession._id, user._id);
+
     const authTokenSigningDTO: AuthTokenSigningInput = {
       sessionId: authSession._id,
       email: authSession.email,
+      userId: user._id,
     };
 
     const signedToken = this.authTokenService.signToken(authTokenSigningDTO);
@@ -76,6 +92,20 @@ export class VerifyAuthSessionInteractor
       return authSession;
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'Invalid session');
+    }
+  }
+
+  // Add new method to update session with userId
+  private async updateSessionWithUserId(
+    sessionId: string,
+    userId: string
+  ): Promise<void> {
+    try {
+      const collection = await getCollection<AuthSession>(this.COLLECTION_NAME);
+
+      await collection.updateOne({ _id: sessionId }, { $set: { userId } });
+    } catch (err) {
+      throw new Error('Error updating session with userId');
     }
   }
 
