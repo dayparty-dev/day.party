@@ -139,8 +139,8 @@ export default function UserManagement({ initialUserData, selectedOption = 'none
     };
 
     return (
-        <div className="form-control">
-            <div className="flex flex-wrap gap-2 mb-3">
+        <div className="form-control flex flex-col gap-2">
+            <div className="flex flex-wrap gap-2">
                 <button
                     className={`btn btn-sm ${formMode === 'create' ? 'btn-primary' : ''}`}
                     onClick={() => switchFormMode('create')}
@@ -167,13 +167,15 @@ export default function UserManagement({ initialUserData, selectedOption = 'none
                 </button>
             </div>
 
-            <div className="card bg-base-200 p-3 mb-3">
-                <h3 className="text-sm font-bold mb-2">{getFormTitle()}</h3>
-                {renderFormFields()}
-                <button className="btn btn-sm btn-success mt-2" onClick={handleSubmit}>
-                    Submit
-                </button>
-            </div>
+            {formMode !== 'none' && (
+                <div className="card bg-base-200 p-3">
+                    <h3 className="text-sm font-bold mb-2">{getFormTitle()}</h3>
+                    {renderFormFields()}
+                    <button className="btn btn-sm btn-success mt-2" onClick={handleSubmit}>
+                        Submit
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

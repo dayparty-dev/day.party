@@ -135,10 +135,10 @@ export default function AdminPanel() {
                             <FaTimes />
                         </button>
 
-                        <div className="p-4 h-full flex flex-col">
+                        <div className="p-4 h-full flex flex-col gap-4">
                             <SearchBar onSearch={setSearchQuery} />
 
-                            <div className="flex-1 overflow-y-auto">
+                            <div className="flex-1 overflow-y-auto space-y-2">
                                 <Section
                                     id="users"
                                     isVisible={visibleSections.includes('users')}

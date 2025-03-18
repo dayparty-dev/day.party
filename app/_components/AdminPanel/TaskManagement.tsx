@@ -1,12 +1,12 @@
 import { useState, useRef } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaCalendarTimes } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 
 // Función para generar títulos aleatorios para tareas
-const generateRandomTitle = () => {
+const generateRandomTitle = (id: string) => {
     const adjectives = ['Project', 'Task', 'Meeting', 'Review', 'Analysis'];
-    return `${adjectives[Math.floor(Math.random() * adjectives.length)]}-${uuidv4().slice(0, 4)}`;
+    return `${adjectives[Math.floor(Math.random() * adjectives.length)]}-${id}`;
 };
 
 interface TaskForm {
@@ -27,10 +27,11 @@ interface TaskManagementProps {
 }
 
 export default function TaskManagement({ initialTaskData, selectedOption = 'none', onTaskCreated, onTasksDeleted }: TaskManagementProps) {
+    const id = nanoid(3);
     const [taskData, setTaskData] = useState<TaskForm>(
         initialTaskData || {
-            id: '',
-            title: generateRandomTitle(),
+            id: id,
+            title: generateRandomTitle(id),
             date: new Date().toISOString().split('T')[0],
             duration: 15,
             description: ''
@@ -41,9 +42,10 @@ export default function TaskManagement({ initialTaskData, selectedOption = 'none
 
     // Función para resetear el formulario
     const resetForm = () => {
+        const id = nanoid(3);
         setTaskData({
-            id: '',
-            title: generateRandomTitle(),
+            id: id,
+            title: generateRandomTitle(id),
             date: new Date().toISOString().split('T')[0],
             duration: 15,
             description: ''
@@ -89,7 +91,7 @@ export default function TaskManagement({ initialTaskData, selectedOption = 'none
             case 'create':
                 const newTask = {
                     ...taskData,
-                    id: uuidv4()
+                    id: nanoid(3)
                 };
                 toast.success('Task created successfully');
                 if (onTaskCreated) {
@@ -185,8 +187,8 @@ export default function TaskManagement({ initialTaskData, selectedOption = 'none
     };
 
     return (
-        <div className="form-control">
-            <div className="flex flex-wrap gap-2 mb-3">
+        <div className="form-control flex flex-col gap-2">
+            <div className="flex flex-wrap gap-2">
                 <button
                     className={`btn btn-sm ${formMode === 'create' ? 'btn-primary' : ''}`}
                     onClick={() => switchFormMode('create')}
@@ -214,7 +216,7 @@ export default function TaskManagement({ initialTaskData, selectedOption = 'none
             </div>
 
             {formMode !== 'none' && (
-                <div className="card bg-base-200 p-3 mb-3">
+                <div className="card bg-base-200 p-3">
                     <h3 className="text-sm font-bold mb-2">{getFormTitle()}</h3>
                     {renderFormFields()}
                     <button className="btn btn-sm btn-success mt-2" onClick={handleSubmit}>

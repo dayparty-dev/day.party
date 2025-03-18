@@ -19,7 +19,7 @@ export default function SearchBar({ onSearch, placeholder = "Search an option...
     }, [query, onSearch]);
 
     return (
-        <div className="form-control mb-4">
+        <div className="form-control">
             <div className="relative">
                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary z-10" />
                 <input
