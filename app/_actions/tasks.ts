@@ -70,7 +70,7 @@ export const deleteTaskServer = withAuth(async (id: string) => {
 });
 
 // Delete several tasks, ensuring they belong to the current user
-export const deleteManyTasksServer = withAuth(async (ids: string[]) => {
+export const deleteAllDayTasksServer = withAuth(async (dayToDelete: Date) => {
   const userId = await getCurrentUserId();
 
   if (!userId) {
@@ -79,6 +79,12 @@ export const deleteManyTasksServer = withAuth(async (ids: string[]) => {
 
   const tasksCollection = await getCollection<Task>('tasks');
 
-  // Only delete if tasks belong to current user
-  await tasksCollection.deleteOne({ _id: { $in: ids }, userId });
+  const normalizedScheduledAt = new Date(dayToDelete);
+
+  normalizedScheduledAt.setHours(0, 0, 0, 0);
+
+  await tasksCollection.deleteMany({
+    scheduledAt: normalizedScheduledAt,
+    userId,
+  });
 });

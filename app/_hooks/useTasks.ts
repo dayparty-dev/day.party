@@ -7,14 +7,14 @@ import {
   updateTaskServer,
   deleteTaskServer,
   fetchTasksServer,
-  deleteManyTasksServer,
+  deleteAllDayTasksServer,
 } from '../_actions/tasks';
 import { nanoid } from 'nanoid';
 import { isSameMonth, addMonths, subMonths } from 'date-fns';
 import { useAuth } from '../auth/_hooks/useAuth';
 
-const isCloudSyncEnabled = false;
-// process.env.NEXT_PUBLIC_IS_CLOUD_SYNC_ENABLED === 'true';
+const isCloudSyncEnabled =
+  process.env.NEXT_PUBLIC_IS_CLOUD_SYNC_ENABLED === 'true';
 
 const getDateKey = (date: Date) => {
   const d = new Date(date);
@@ -114,7 +114,7 @@ export default function useTasks() {
       addTask: () => Promise.resolve(),
       updateTask: () => Promise.resolve(),
       deleteTask: () => Promise.resolve(),
-      deleteManyTasks: () => Promise.resolve(),
+      deleteAllDayTasks: () => Promise.resolve(),
       setTasks: () => {},
       getTasksForDate: () => [],
       getDaysWithTasksInMonth: () => [],
@@ -131,12 +131,12 @@ export default function useTasks() {
     scheduledAt?: Date;
   }) => {
     const currentDate = new Date();
-    const normalizedscheduledAt = scheduledAt
+    const normalizedScheduledAt = scheduledAt
       ? new Date(scheduledAt)
       : new Date();
-    normalizedscheduledAt.setHours(0, 0, 0, 0);
+    normalizedScheduledAt.setHours(0, 0, 0, 0);
 
-    const dateKey = getDateKey(normalizedscheduledAt);
+    const dateKey = getDateKey(normalizedScheduledAt);
     const dateTasks = tasksByDate[dateKey] || [];
     const maxOrder =
       dateTasks.length > 0
@@ -150,7 +150,7 @@ export default function useTasks() {
       duration: size * 15,
       createdAt: currentDate,
       updatedAt: currentDate,
-      scheduledAt: normalizedscheduledAt,
+      scheduledAt: normalizedScheduledAt,
       _id: nanoid(),
       order: maxOrder + 1,
       userId: user?.id || 'local',
@@ -284,33 +284,20 @@ export default function useTasks() {
     }
   };
 
-  const deleteManyTasks = async (idsToDelete: string[]) => {
+  const deleteAllDayTasks = async (dayToDelete: Date) => {
     const updatedTasksByDate = { ...tasksByDate };
-    let found = false;
 
-    for (const dateKey of Object.keys(updatedTasksByDate)) {
-      const dateTasks = updatedTasksByDate[dateKey];
+    const dateKey = getDateKey(dayToDelete);
 
-      for (const idToDelete of idsToDelete) {
-        const taskIndex = dateTasks.findIndex((t) => t._id == idToDelete);
+    if (tasksByDate[dateKey]) {
+      delete updatedTasksByDate[dateKey];
 
-        if (taskIndex !== -1) {
-          updatedTasksByDate[dateKey] = dateTasks.filter(
-            (t) => t._id !== idToDelete
-          );
+      setTasksByDate(updatedTasksByDate);
+      saveTasksToStorage(updatedTasksByDate);
 
-          found = true;
-        }
+      if (isCloudSyncEnabled) {
+        await deleteAllDayTasksServer(dayToDelete);
       }
-    }
-
-    if (!found) return;
-
-    setTasksByDate(updatedTasksByDate);
-    saveTasksToStorage(updatedTasksByDate);
-
-    if (isCloudSyncEnabled) {
-      await deleteManyTasksServer(idsToDelete);
     }
   };
 
@@ -359,7 +346,7 @@ export default function useTasks() {
     addTask,
     updateTask,
     deleteTask,
-    deleteManyTasks,
+    deleteAllDayTasks,
     setTasks: (newTasks: Task[]) => {
       // Group tasks by date when setting them
       const grouped = newTasks.reduce((acc, task) => {

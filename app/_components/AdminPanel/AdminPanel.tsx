@@ -25,8 +25,14 @@ interface MenuOption {
 }
 
 export default function AdminPanel() {
-  const { tasks, addTask, updateTask, deleteTask, getTasksForDate } =
-    useTasks();
+  const {
+    tasks,
+    addTask,
+    updateTask,
+    deleteTask,
+    deleteAllDayTasks,
+    getTasksForDate,
+  } = useTasks();
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -123,9 +129,9 @@ export default function AdminPanel() {
 
   // Manejador para borrar todas las tareas de hoy
   const handleDeleteTodaysTasks = () => {
-    console.warn('esta comentado lo que llama al back');
-    //deleteTasks(dayTasks);
+    deleteAllDayTasks(new Date()); // FIXME: this won't work for other days
     setDayTasks([]);
+
     toast.success(`Deleted tasks from today`);
   };
 

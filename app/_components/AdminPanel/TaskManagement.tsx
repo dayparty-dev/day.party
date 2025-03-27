@@ -31,6 +31,7 @@ const getDefaultTask = () => {
     duration: 15,
     size: 2,
     status: 'pending',
+    userId: '', // The userId is handled by the server actions
     updatedAt: new Date(),
     scheduledAt: new Date(),
     order: 0,
