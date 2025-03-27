@@ -3,8 +3,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { FaUser, FaTasks, FaTimes } from 'react-icons/fa';
 import useKeyboardShortcut from 'app/_hooks/useKeyboardShortcut';
 import { toast } from 'react-toastify';
-
-// Componentes extraídos
+import useTasks from 'app/_hooks/useTasks';
+import { Task } from 'app/_models/Task';
 import SearchBar from './SearchBar';
 import Section from './Section';
 import UserManagement from './UserManagement';
@@ -24,19 +24,13 @@ interface MenuOption {
     section: string;
 }
 
-interface TaskData {
-    id?: string;
-    title: string;
-    date: string;
-    duration: number;
-    description?: string;
-}
-
 export default function AdminPanel() {
+    const { tasks, addTask, updateTask, deleteTask, getTasksForDate } = useTasks();
+
     const [isExpanded, setIsExpanded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSection, setSelectedSection] = useState<string | null>(null); // Estado para rastrear la sección seleccionada
-    const [activeTasks, setActiveTasks] = useState<TaskData[]>([]);
+    const [dayTasks, setDayTasks] = useState<Task[]>([]);
     const [visibleSections, setVisibleSections] = useState<string[]>(['users', 'tasks']);
     const [visibleOptions, setVisibleOptions] = useState<string[]>([]);
 
@@ -65,6 +59,13 @@ export default function AdminPanel() {
         setSelectedSection(sectionId); // Actualiza el estado con la sección seleccionada
     };
 
+    useEffect(() => {
+        const tasks = getTasksForDate(new Date());
+        if (tasks.length)
+            setDayTasks(tasks);
+    }, [getTasksForDate]);
+
+
     // Filtrar opciones y secciones basadas en la búsqueda
     useEffect(() => {
         if (!searchQuery.trim()) {
@@ -89,28 +90,54 @@ export default function AdminPanel() {
 
     }, [searchQuery]);
 
+
+
     // Manejador para añadir una nueva tarea
-    const handleTaskCreated = (task: TaskData) => {
-        setActiveTasks([...activeTasks, task]);
+    const handleTaskCreated = (task: Task) => {
+        addTask(task);
+        setDayTasks([...dayTasks, task]);
         toast.success(`Task "${task.title}" created successfully`);
+    };
+
+    // Manejador para añadir una nueva tarea
+    const handleTaskUpdated = (task: Task) => {
+        console.log("task", task);
+        updateTask(task._id, task);
+        setDayTasks(prevTasks => {
+
+            console.log("prev", prevTasks);
+            return prevTasks.map(t => {
+                console.log("T", t);
+                return (t._id === task._id ? task : t)
+            })
+        }
+        );
+        console.log("task2", task);
+        toast.success(`Task "${task.title}" updated successfully`);
+    };
+
+    // Manejador para eliminae una tarea
+    const handleDeleteTask = (id: string) => {
+        // TODO remove task with id
+        //setDayTasks([...dayTasks, task]);
+        deleteTask(id);
+        toast.success(`Task "${id}" deleted successfully`);
     };
 
     // Manejador para borrar todas las tareas de hoy
     const handleDeleteTodaysTasks = () => {
-        const todayDate = new Date().toISOString().split('T')[0];
-        const remainingTasks = activeTasks.filter(task => task.date !== todayDate);
-        const deletedCount = activeTasks.length - remainingTasks.length;
-
-        setActiveTasks(remainingTasks);
-        toast.success(`Deleted ${deletedCount} tasks from today`);
+        console.warn("esta comentado lo que llama al back");
+        //deleteTasks(dayTasks);
+        setDayTasks([]);
+        toast.success(`Deleted tasks from today`);
     };
 
     // Mostrar mensaje de cuántas tareas activas hay
     useEffect(() => {
-        if (activeTasks.length > 0 && isExpanded) {
-            toast.info(`You have ${activeTasks.length} active task(s)`);
+        if (dayTasks.length > 0 && isExpanded) {
+            toast.info(`You have ${dayTasks.length} active task(s)`);
         }
-    }, [isExpanded, activeTasks.length]);
+    }, [isExpanded, dayTasks.length]);
 
     return (
         <div className="fixed bottom-4 right-4 z-50">
@@ -144,7 +171,7 @@ export default function AdminPanel() {
                                 isExpanded={true}
                                 isSelected={selectedSection === 'users'}
                             >
-                                <UserManagement selectedOption='edit' />
+                                <UserManagement selectedOption='none' />
                             </Section>
                             <Section
                                 id="tasks"
@@ -154,7 +181,10 @@ export default function AdminPanel() {
                                 isSelected={selectedSection === 'tasks'}
                             >
                                 <TaskManagement
+                                    dayTasks={dayTasks}
                                     onTaskCreated={handleTaskCreated}
+                                    onTaskUpdated={handleTaskUpdated}
+                                    onTaskDeleted={handleDeleteTask}
                                     onTasksDeleted={handleDeleteTodaysTasks}
                                 />
                             </Section>

@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaCalendarTimes } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { nanoid } from 'nanoid';
+import useTasks from 'app/_hooks/useTasks';
+import { Task } from 'app/_models/Task';
 
 // Función para generar títulos aleatorios para tareas
 const generateRandomTitle = (id: string) => {
@@ -9,47 +11,54 @@ const generateRandomTitle = (id: string) => {
     return `${adjectives[Math.floor(Math.random() * adjectives.length)]}-${id}`;
 };
 
-interface TaskForm {
-    id?: string;
-    title: string;
-    date: string;
-    duration: number;
-    description?: string;
-}
-
-type TaskFormMode = 'none' | 'create' | 'edit' | 'delete' | 'none';
+type TaskFormMode = 'create' | 'edit' | 'delete' | 'none';
 
 interface TaskManagementProps {
-    initialTaskData?: TaskForm;
+    dayTasks: Task[];
     selectedOption?: TaskFormMode;
-    onTaskCreated?: (task: TaskForm) => void;
-    onTasksDeleted?: () => void;
+    onTaskCreated: (task: Task) => void;
+    onTaskUpdated: (task: Task) => void;
+    onTaskDeleted: (id: string) => void;
+    onTasksDeleted: () => void;
 }
 
-export default function TaskManagement({ initialTaskData, selectedOption = 'none', onTaskCreated, onTasksDeleted }: TaskManagementProps) {
+
+const getDefaultTask = () => {
     const id = nanoid(3);
-    const [taskData, setTaskData] = useState<TaskForm>(
-        initialTaskData || {
-            id: id,
-            title: generateRandomTitle(id),
-            date: new Date().toISOString().split('T')[0],
-            duration: 15,
-            description: ''
-        }
+    const defaultTaskData: Task = {
+        _id: id,
+        title: generateRandomTitle(id),
+        createdAt: new Date(),
+        duration: 15,
+        size: 2,
+        status: "pending",
+        updatedAt: new Date(),
+        scheduledDate: new Date(),
+        order: 0
+    };
+    return defaultTaskData;
+};
+
+export default function TaskManagement({ dayTasks, selectedOption = 'none', onTaskCreated, onTaskUpdated, onTaskDeleted, onTasksDeleted }: TaskManagementProps) {
+    // const { addTask, updateTask, deleteTask, getTasksForDate } = useTasks();
+    const [taskData, setTaskDataReal] = useState<Task>(
+        getDefaultTask()
     );
+
+    function setTaskData(task: Task) {
+        setTaskDataReal(() => task);
+    }
+
+    const [date, setDate] = useState(new Date());
+    // const [tasks, setTasks] = useState(getTasksForDate(date));
+
     const [formMode, setFormMode] = useState<TaskFormMode>(selectedOption);
     const titleInputRef = useRef<HTMLInputElement>(null);
 
     // Función para resetear el formulario
     const resetForm = () => {
         const id = nanoid(3);
-        setTaskData({
-            id: id,
-            title: generateRandomTitle(id),
-            date: new Date().toISOString().split('T')[0],
-            duration: 15,
-            description: ''
-        });
+        setTaskData(getDefaultTask());
     };
 
     // Función para cambiar el modo del formulario
@@ -63,7 +72,7 @@ export default function TaskManagement({ initialTaskData, selectedOption = 'none
     // Validación del formulario de tarea
     const validateTaskForm = () => {
         if (formMode === 'delete') {
-            if (!taskData.id) {
+            if (!taskData._id) {
                 toast.error('Task ID is required');
                 return false;
             }
@@ -75,7 +84,7 @@ export default function TaskManagement({ initialTaskData, selectedOption = 'none
             return false;
         }
 
-        if (!taskData.date) {
+        if (!taskData.createdAt) {
             toast.error('Date is required');
             return false;
         }
@@ -101,9 +110,15 @@ export default function TaskManagement({ initialTaskData, selectedOption = 'none
                 break;
             case 'edit':
                 toast.success('Task updated successfully');
+                if (onTaskUpdated) {
+                    onTaskUpdated(taskData);
+                }
                 resetForm();
                 break;
             case 'delete':
+                if (onTaskDeleted) {
+                    onTaskDeleted(taskData._id)
+                }
                 toast.success('Task deleted successfully');
                 resetForm();
                 break;
@@ -136,15 +151,15 @@ export default function TaskManagement({ initialTaskData, selectedOption = 'none
                         <input
                             type="date"
                             className="input input-bordered input-sm mb-2"
-                            value={taskData.date}
-                            onChange={(e) => setTaskData({ ...taskData, date: e.target.value })}
+                            value={taskData.scheduledDate.toISOString().split('T')[0]}
+                            onChange={(e) => setTaskData({ ...taskData, scheduledDate: new Date(e.target.value) })}
                         />
-                        <textarea
+                        {/* <textarea
                             placeholder="Task description"
                             className="textarea textarea-bordered textarea-sm mb-2"
                             value={taskData.description}
                             onChange={(e) => setTaskData({ ...taskData, description: e.target.value })}
-                        />
+                        /> */}
                         <div className="flex items-center gap-2 mb-2">
                             <input
                                 type="range"
@@ -167,8 +182,8 @@ export default function TaskManagement({ initialTaskData, selectedOption = 'none
                         type="text"
                         placeholder="Task ID"
                         className="input input-bordered input-sm mb-2"
-                        value={taskData.id || ''}
-                        onChange={(e) => setTaskData({ ...taskData, id: e.target.value })}
+                        value={taskData._id || ''}
+                        onChange={(e) => setTaskData({ ...taskData, _id: e.target.value })}
                     />
                 );
             case 'none':
@@ -187,43 +202,72 @@ export default function TaskManagement({ initialTaskData, selectedOption = 'none
     };
 
     return (
-        <div className="form-control flex flex-col gap-2">
-            <div className="flex flex-wrap gap-2">
-                <button
-                    className={`btn btn-sm ${formMode === 'create' ? 'btn-primary' : ''}`}
-                    onClick={() => switchFormMode('create')}
-                >
-                    <FaPlus /> Create
-                </button>
-                <button
-                    className={`btn btn-sm ${formMode === 'edit' ? 'btn-primary' : ''}`}
-                    onClick={() => switchFormMode('edit')}
-                >
-                    <FaEdit /> Edit
-                </button>
-                <button
-                    className={`btn btn-sm ${formMode === 'delete' ? 'btn-primary' : ''}`}
-                    onClick={() => switchFormMode('delete')}
-                >
-                    <FaTrash /> Delete
-                </button>
-                <button
-                    className="btn btn-sm btn-error"
-                    onClick={handleDeleteTodaysTasks}
-                >
-                    <FaCalendarTimes /> Delete Today's Tasks
-                </button>
-            </div>
-
-            {formMode !== 'none' && (
-                <div className="card bg-base-200 p-3">
-                    <h3 className="text-sm font-bold mb-2">{getFormTitle()}</h3>
-                    {renderFormFields()}
-                    <button className="btn btn-sm btn-success mt-2" onClick={handleSubmit}>
-                        Submit
+        <>
+            <div className="form-control flex flex-col gap-2">
+                <div className="flex flex-wrap gap-2">
+                    <button
+                        className={`btn btn-sm ${formMode === 'create' ? 'btn-primary' : ''}`}
+                        onClick={() => switchFormMode('create')}
+                    >
+                        <FaPlus /> Create
+                    </button>
+                    <button
+                        className={`btn btn-sm ${formMode === 'edit' ? 'btn-primary' : ''}`}
+                        onClick={() => switchFormMode('edit')}
+                    >
+                        <FaEdit /> Edit
+                    </button>
+                    <button
+                        className={`btn btn-sm ${formMode === 'delete' ? 'btn-primary' : ''}`}
+                        onClick={() => switchFormMode('delete')}
+                    >
+                        <FaTrash /> Delete
+                    </button>
+                    <button
+                        className="btn btn-sm btn-error"
+                        onClick={handleDeleteTodaysTasks}
+                    >
+                        <FaCalendarTimes /> Delete Today's Tasks
                     </button>
                 </div>
-            )}
-        </div>
+
+                {formMode !== 'none' && (
+                    <div className="card bg-base-200 p-3">
+                        <h3 className="text-sm font-bold mb-2">{getFormTitle()}</h3>
+                        {renderFormFields()}
+                        <button className="btn btn-sm btn-success mt-2" onClick={handleSubmit}>
+                            Submit
+                        </button>
+                    </div>
+                )}
+            </div>
+            <div className="flex flex-col gap-2">
+                {dayTasks.map((task) => (
+                    <div key={task._id} className="flex items-center justify-between p-2 border rounded-lg shadow-sm">
+                        <span className="text-lg font-medium">{task.title}</span>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => {
+                                    switchFormMode('edit');
+                                    setTaskData(task);
+                                }}
+                                className="p-2 text-blue-500 hover:text-blue-700"
+                            >
+                                <FaEdit />
+                            </button>
+                            <button
+                                onClick={() => {
+                                    switchFormMode('delete');
+                                    setTaskData(task);
+                                }}
+                                className="p-2 text-red-500 hover:text-red-700"
+                            >
+                                <FaTrash />
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div >
+        </>
     );
 }
