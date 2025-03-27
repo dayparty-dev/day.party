@@ -13,7 +13,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
 }) => {
   const now = new Date();
   const dueDate = new Date(
-    new Date(task.scheduledDate).getTime() + task.size * 15 * 60 * 1000
+    new Date(task.scheduledAt).getTime() + task.size * 15 * 60 * 1000
   );
   const duration = task.size * 15 * 60 * 1000; // Duración en ms (35 min por defecto)
 
