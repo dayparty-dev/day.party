@@ -68,3 +68,17 @@ export const deleteTaskServer = withAuth(async (id: string) => {
   // Only delete if task belongs to current user
   await tasksCollection.deleteOne({ _id: id, userId });
 });
+
+// Delete several tasks, ensuring they belong to the current user
+export const deleteManyTasksServer = withAuth(async (ids: string[]) => {
+  const userId = await getCurrentUserId();
+
+  if (!userId) {
+    throw new Error('Unauthorized: User not authenticated');
+  }
+
+  const tasksCollection = await getCollection<Task>('tasks');
+
+  // Only delete if tasks belong to current user
+  await tasksCollection.deleteOne({ _id: { $in: ids }, userId });
+});

@@ -7,6 +7,7 @@ import {
   updateTaskServer,
   deleteTaskServer,
   fetchTasksServer,
+  deleteManyTasksServer,
 } from '../_actions/tasks';
 import { nanoid } from 'nanoid';
 import { isSameMonth, addMonths, subMonths } from 'date-fns';
@@ -113,6 +114,7 @@ export default function useTasks() {
       addTask: () => Promise.resolve(),
       updateTask: () => Promise.resolve(),
       deleteTask: () => Promise.resolve(),
+      deleteManyTasks: () => Promise.resolve(),
       setTasks: () => {},
       getTasksForDate: () => [],
       getDaysWithTasksInMonth: () => [],
@@ -282,6 +284,36 @@ export default function useTasks() {
     }
   };
 
+  const deleteManyTasks = async (idsToDelete: string[]) => {
+    const updatedTasksByDate = { ...tasksByDate };
+    let found = false;
+
+    for (const dateKey of Object.keys(updatedTasksByDate)) {
+      const dateTasks = updatedTasksByDate[dateKey];
+
+      for (const idToDelete of idsToDelete) {
+        const taskIndex = dateTasks.findIndex((t) => t._id == idToDelete);
+
+        if (taskIndex !== -1) {
+          updatedTasksByDate[dateKey] = dateTasks.filter(
+            (t) => t._id !== idToDelete
+          );
+
+          found = true;
+        }
+      }
+    }
+
+    if (!found) return;
+
+    setTasksByDate(updatedTasksByDate);
+    saveTasksToStorage(updatedTasksByDate);
+
+    if (isCloudSyncEnabled) {
+      await deleteManyTasksServer(idsToDelete);
+    }
+  };
+
   const getTasksForDate = (date: Date) => {
     const dateKey = getDateKey(date);
     return tasksByDate[dateKey] || [];
@@ -327,6 +359,7 @@ export default function useTasks() {
     addTask,
     updateTask,
     deleteTask,
+    deleteManyTasks,
     setTasks: (newTasks: Task[]) => {
       // Group tasks by date when setting them
       const grouped = newTasks.reduce((acc, task) => {

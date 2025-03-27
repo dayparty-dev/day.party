@@ -11,10 +11,9 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import type { Modifier } from '@dnd-kit/core';
+
 import { TaskStatus } from '../_models/Task';
 import ReactDOM from 'react-dom/client';
-
-import './styles.scss';
 import DayCapacity from 'app/rundown/components/DayCapacity';
 import DayNavigator from 'app/rundown/components/DayNavigator';
 import TaskForm from './components/TaskForm';
@@ -25,6 +24,8 @@ import PiPManager, {
   copyStylesheets,
 } from './components/PiPManager';
 import { useAuthGuard } from 'app/auth/_hooks/useAuthGuard';
+
+import './styles.scss';
 
 // Preventable scale modifier
 const preventScaleModifier: Modifier = ({ transform }) => {
