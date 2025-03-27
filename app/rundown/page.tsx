@@ -184,7 +184,7 @@ export default function Rundown() {
         // Update all tasks while preserving tasks from other days
         const otherTasks = tasks.filter(
           (task) =>
-            new Date(task.scheduledDate).toDateString() !==
+            new Date(task.scheduledAt).toDateString() !==
             currentDate.toDateString()
         );
 
@@ -225,7 +225,7 @@ export default function Rundown() {
             addTask({
               title: newTaskTitle,
               size: newTaskSize,
-              scheduledDate: nextDay,
+              scheduledAt: nextDay,
             });
             setCurrentDate(nextDay);
           }
@@ -234,7 +234,7 @@ export default function Rundown() {
         addTask({
           title: newTaskTitle,
           size: newTaskSize,
-          scheduledDate: currentDate,
+          scheduledAt: currentDate,
         });
         setNewTaskTitle('');
         setNewTaskSize(1);
@@ -250,7 +250,7 @@ export default function Rundown() {
     async (taskId: string, newStatus: TaskStatus) => {
       const otherDayTasks = tasks.filter(
         (task) =>
-          new Date(task.scheduledDate).toDateString() !==
+          new Date(task.scheduledAt).toDateString() !==
           currentDate.toDateString()
       );
 
@@ -336,7 +336,7 @@ export default function Rundown() {
         ) {
           const nextDay = new Date(currentDate);
           nextDay.setDate(nextDay.getDate() + 1);
-          updateTask(id, { size, scheduledDate: nextDay });
+          updateTask(id, { size, scheduledAt: nextDay });
           setCurrentDate(nextDay);
         }
         return;

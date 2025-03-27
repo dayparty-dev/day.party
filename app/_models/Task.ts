@@ -6,7 +6,7 @@ export interface Task {
   status: TaskStatus;
   createdAt: Date;
   updatedAt: Date;
-  scheduledDate: Date;
+  scheduledAt: Date;
   order: number;
 }
 

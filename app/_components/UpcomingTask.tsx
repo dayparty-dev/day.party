@@ -9,7 +9,7 @@ const UpcomingTask: React.FC<UpcomingTaskProps> = ({ task }) => {
     <div className="upcoming-task">
       <h3>Upcoming</h3>
       <p>{task.title}</p>
-      <small>Scheduled: {new Date(task.scheduledDate).toLocaleString()}</small>
+      <small>Scheduled: {new Date(task.scheduledAt).toLocaleString()}</small>
     </div>
   );
 };

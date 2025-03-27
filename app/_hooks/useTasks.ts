@@ -17,8 +17,8 @@ import {
   subMonths,
 } from 'date-fns';
 
-const isCloudSyncEnabled =
-  process.env.NEXT_PUBLIC_IS_CLOUD_SYNC_ENABLED === 'true';
+const isCloudSyncEnabled = false;
+// process.env.NEXT_PUBLIC_IS_CLOUD_SYNC_ENABLED === 'true';
 
 const getDateKey = (date: Date) => {
   const d = new Date(date);
@@ -31,7 +31,12 @@ const loadTasksFromStorage = () => {
   if (!stored) return {};
 
   try {
-    return JSON.parse(stored);
+    const tasks = JSON.parse(stored, (key, value) =>
+      // FIXME: find better way to store complex values (i.e. Date) in JSON
+      key.endsWith('At') ? new Date(value) : value
+    );
+
+    return tasks;
   } catch (e) {
     console.error('Failed to parse tasks from localStorage:', e);
     return {};
@@ -78,7 +83,7 @@ export default function useTasks() {
         if (cloudTasks.length > 0) {
           // Group cloud tasks by date
           const groupedTasks = cloudTasks.reduce((acc, task) => {
-            const dateKey = getDateKey(task.scheduledDate);
+            const dateKey = getDateKey(task.scheduledAt);
             if (!acc[dateKey]) acc[dateKey] = [];
             acc[dateKey].push(task);
             return acc;
@@ -112,19 +117,19 @@ export default function useTasks() {
   const addTask = async ({
     title,
     size,
-    scheduledDate,
+    scheduledAt,
   }: {
     title: string;
     size: number;
-    scheduledDate?: Date;
+    scheduledAt?: Date;
   }) => {
     const currentDate = new Date();
-    const normalizedScheduledDate = scheduledDate
-      ? new Date(scheduledDate)
+    const normalizedscheduledAt = scheduledAt
+      ? new Date(scheduledAt)
       : new Date();
-    normalizedScheduledDate.setHours(0, 0, 0, 0);
+    normalizedscheduledAt.setHours(0, 0, 0, 0);
 
-    const dateKey = getDateKey(normalizedScheduledDate);
+    const dateKey = getDateKey(normalizedscheduledAt);
     const dateTasks = tasksByDate[dateKey] || [];
     const maxOrder =
       dateTasks.length > 0
@@ -138,7 +143,7 @@ export default function useTasks() {
       duration: size * 15,
       createdAt: currentDate,
       updatedAt: currentDate,
-      scheduledDate: normalizedScheduledDate,
+      scheduledAt: normalizedscheduledAt,
       _id: nanoid(),
       order: maxOrder + 1,
     };
@@ -166,9 +171,7 @@ export default function useTasks() {
   ) => {
     setTasksByDate((prevTasksByDate) => {
       // Deep clone the state to avoid any mutation issues
-      const updatedTasksByDate = JSON.parse(
-        JSON.stringify(prevTasksByDate)
-      ) as typeof prevTasksByDate;
+      const updatedTasksByDate = structuredClone(prevTasksByDate);
 
       // Find the task and its date
       let targetDateKey: string | null = null;
@@ -321,7 +324,7 @@ export default function useTasks() {
     setTasks: (newTasks: Task[]) => {
       // Group tasks by date when setting them
       const grouped = newTasks.reduce((acc, task) => {
-        const dateKey = getDateKey(task.scheduledDate);
+        const dateKey = getDateKey(task.scheduledAt);
         if (!acc[dateKey]) acc[dateKey] = [];
         acc[dateKey].push(task);
         return acc;
