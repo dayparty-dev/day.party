@@ -2,22 +2,29 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../_hooks/useAuth';
 import { Suspense } from 'react';
+
+import { useAuth } from '../_hooks/useAuth';
+import { saveTasksToStorage } from 'app/_hooks/useTasks';
 
 function LogoutComponent() {
   const { logout } = useAuth();
   const router = useRouter();
 
+  function clearTasks() {
+    saveTasksToStorage({});
+  }
+
   useEffect(() => {
     const handleLogout = async () => {
       try {
         await logout();
-        router.push('/auth/login');
       } catch (error) {
         console.error('Error during logout:', error);
-        router.push('/auth/login');
       }
+
+      clearTasks();
+      router.push('/auth/login');
     };
 
     handleLogout();

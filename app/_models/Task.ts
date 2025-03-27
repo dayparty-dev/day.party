@@ -8,6 +8,7 @@ export interface Task {
   updatedAt: Date;
   scheduledAt: Date;
   order: number;
+  userId: string;
 }
 
 export type TaskStatus = 'ongoing' | 'paused' | 'pending' | 'done';
