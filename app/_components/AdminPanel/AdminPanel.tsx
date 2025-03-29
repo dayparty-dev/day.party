@@ -38,6 +38,7 @@ export default function AdminPanel() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSection, setSelectedSection] = useState<string | null>(null); // Estado para rastrear la sección seleccionada
   const [dayTasks, setDayTasks] = useState<Task[]>([]);
+  const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [visibleSections, setVisibleSections] = useState<string[]>([
     'users',
     'tasks',
@@ -70,9 +71,17 @@ export default function AdminPanel() {
   };
 
   useEffect(() => {
-    const tasks = getTasksForDate(new Date());
-    if (tasks.length) setDayTasks(tasks);
-  }, [getTasksForDate]);
+    const newTasks = getTasksForDate(selectedDay);
+
+    // Comparación profunda para evitar actualizaciones innecesarias
+    setDayTasks(prev => {
+      const prevIds = prev.map(task => task._id).join(',');
+      const newIds = newTasks.map(task => task._id).join(',');
+
+      return prevIds === newIds ? prev : newTasks;
+    });
+  }, [getTasksForDate, selectedDay]); // Añade selectedDay como dependencia
+
 
   // Filtrar opciones y secciones basadas en la búsqueda
   useEffect(() => {
@@ -128,8 +137,9 @@ export default function AdminPanel() {
   };
 
   // Manejador para borrar todas las tareas de hoy
-  const handleDeleteTodaysTasks = () => {
-    deleteAllDayTasks(new Date()); // FIXME: this won't work for other days
+  const handleDeleteTodaysTasks = (date: Date = new Date()) => {
+    console.log("DATE", date);
+    deleteAllDayTasks(date);
     setDayTasks([]);
 
     toast.success(`Deleted tasks from today`);
@@ -145,11 +155,10 @@ export default function AdminPanel() {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <div
-        className={`bg-base-100 shadow-xl transition-all duration-300 ${
-          isExpanded
-            ? 'w-96 h-[600px] rounded-box'
-            : 'w-10 h-10 rounded-full relative'
-        }`}
+        className={`bg-base-100 shadow-xl transition-all duration-300 ${isExpanded
+          ? 'w-96 h-[600px] rounded-box'
+          : 'w-10 h-10 rounded-full relative'
+          }`}
       >
         {!isExpanded ? (
           <button
@@ -193,8 +202,9 @@ export default function AdminPanel() {
                   dayTasks={dayTasks}
                   onTaskCreated={handleTaskCreated}
                   onTaskUpdated={handleTaskUpdated}
-                  onTaskDeleted={handleDeleteTask}
+                  deleteTask={handleDeleteTask}
                   onTasksDeleted={handleDeleteTodaysTasks}
+                  onDateChanged={(date) => setSelectedDay(date)}
                 />
               </Section>
             </div>
@@ -203,22 +213,20 @@ export default function AdminPanel() {
               <div className="flex overflow-x-auto gap-2">
                 <a
                   href="#users"
-                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${
-                    !visibleSections.includes('users')
-                      ? 'opacity-50 cursor-not-allowed pointer-events-none'
-                      : ''
-                  }`}
+                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${!visibleSections.includes('users')
+                    ? 'opacity-50 cursor-not-allowed pointer-events-none'
+                    : ''
+                    }`}
                   onClick={() => handleSectionClick('users')}
                 >
                   <FaUser />
                 </a>
                 <a
                   href="#tasks"
-                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${
-                    !visibleSections.includes('tasks')
-                      ? 'opacity-50 cursor-not-allowed pointer-events-none'
-                      : ''
-                  }`}
+                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${!visibleSections.includes('tasks')
+                    ? 'opacity-50 cursor-not-allowed pointer-events-none'
+                    : ''
+                    }`}
                   onClick={() => handleSectionClick('tasks')}
                 >
                   <FaTasks />

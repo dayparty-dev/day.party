@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { FaPlus, FaEdit, FaTrash, FaCalendarTimes } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaCalendarTimes, FaCheckCircle } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { nanoid } from 'nanoid';
 import useTasks from 'app/_hooks/useTasks';
 import { Task } from 'app/_models/Task';
-
+import DayNavigator from 'app/rundown/components/DayNavigator';
+import { navTo } from 'app/_utils/Functions';
 // Función para generar títulos aleatorios para tareas
 const generateRandomTitle = (id: string) => {
   const adjectives = ['Project', 'Task', 'Meeting', 'Review', 'Analysis'];
@@ -18,11 +19,12 @@ interface TaskManagementProps {
   selectedOption?: TaskFormMode;
   onTaskCreated: (task: Task) => void;
   onTaskUpdated: (task: Task) => void;
-  onTaskDeleted: (id: string) => void;
-  onTasksDeleted: () => void;
+  deleteTask: (id: string) => void;
+  onTasksDeleted: (date?: Date) => void;
+  onDateChanged: (date: Date) => void;
 }
 
-const getDefaultTask = () => {
+const getDefaultTask = (date) => {
   const id = nanoid(3);
   const defaultTaskData: Task = {
     _id: id,
@@ -33,7 +35,7 @@ const getDefaultTask = () => {
     status: 'pending',
     userId: '', // The userId is handled by the server actions
     updatedAt: new Date(),
-    scheduledAt: new Date(),
+    scheduledAt: date,
     order: 0,
   };
   return defaultTaskData;
@@ -44,29 +46,46 @@ export default function TaskManagement({
   selectedOption = 'none',
   onTaskCreated,
   onTaskUpdated,
-  onTaskDeleted,
+  deleteTask,
   onTasksDeleted,
+  onDateChanged
 }: TaskManagementProps) {
   // const { addTask, updateTask, deleteTask, getTasksForDate } = useTasks();
-  const [taskData, setTaskData] = useState<Task>(getDefaultTask());
-
   const [date, setDate] = useState(new Date());
+  const [taskData, setTaskData] = useState<Task>(getDefaultTask(date));
+
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
   // const [tasks, setTasks] = useState(getTasksForDate(date));
 
   const [formMode, setFormMode] = useState<TaskFormMode>(selectedOption);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
+  const changeDate = (date: Date) => {
+    onDateChanged(date);
+    setDate(date);
+    setTaskData((prevTask) => ({
+      ...prevTask, // Mantén las demás propiedades de la tarea
+      scheduledAt: date, // Actualiza "scheduledAt" con la nueva fecha
+    }));
+  }
+
   // Función para resetear el formulario
   const resetForm = () => {
     const id = nanoid(3);
-    setTaskData(getDefaultTask());
+    setTaskData(getDefaultTask(date));
   };
 
   // Función para cambiar el modo del formulario
   const switchFormMode = (mode: TaskFormMode) => {
     setFormMode(mode);
     if (mode !== 'none') {
-      resetForm();
+      // resetForm();
+
+      navTo("task-btns");
+      // const formElement = document.getElementById('task-btns');
+      // if (formElement) {
+      //   formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // }
     }
   };
 
@@ -103,34 +122,42 @@ export default function TaskManagement({
           ...taskData,
           id: nanoid(3),
         };
-        toast.success('Task created successfully');
+        // toast.success('Task created successfully');
         if (onTaskCreated) {
           onTaskCreated(newTask);
         }
         resetForm();
         break;
       case 'edit':
-        toast.success('Task updated successfully');
+        // toast.success('Task updated successfully');
         if (onTaskUpdated) {
           onTaskUpdated(taskData);
         }
-        resetForm();
+        //resetForm();
         break;
       case 'delete':
-        if (onTaskDeleted) {
-          onTaskDeleted(taskData._id);
+        if (deleteTask) {
+          deleteTask(taskData._id);
         }
-        toast.success('Task deleted successfully');
+        // toast.success('Task deleted successfully');
         resetForm();
         break;
     }
   };
 
   // Manejador para borrar todas las tareas de hoy
-  const handleDeleteTodaysTasks = () => {
-    toast.success("All of today's tasks have been deleted");
+  // const handleDeleteTodaysTasks = () => {
+  //   toast.success("All of today's tasks have been deleted");
+  //   if (onTasksDeleted) {
+  //     onTasksDeleted();
+  //   }
+  // };
+
+  const handleDeleteSelectedDayTasks = () => {
+    console.log("OK");
+    toast.success(`All of ${date.toISOString().split('T')[0]} tasks have been deleted`);
     if (onTasksDeleted) {
-      onTasksDeleted();
+      onTasksDeleted(date);
     }
   };
 
@@ -154,12 +181,14 @@ export default function TaskManagement({
             <input
               type="date"
               className="input input-bordered input-sm mb-2"
-              value={taskData.scheduledAt.toISOString().split('T')[0]}
-              onChange={(e) =>
+              value={date.toISOString().split('T')[0]}
+              onChange={(e) => {
                 setTaskData({
                   ...taskData,
                   scheduledAt: new Date(e.target.value),
-                })
+                });
+                setDate(new Date(e.target.value));
+              }
               }
             />
             {/* <textarea
@@ -219,82 +248,125 @@ export default function TaskManagement({
   };
 
   return (
-    <>
-      <div className="form-control flex flex-col gap-2">
-        <div className="flex flex-wrap gap-2">
-          <button
-            className={`btn btn-sm ${
-              formMode === 'create' ? 'btn-primary' : ''
+    <div className="form-control flex flex-col gap-2">
+      <div id={"task-btns"} className="flex flex-wrap gap-2">
+        <button
+          className={`btn btn-sm ${formMode === 'create' ? 'btn-primary' : ''
             }`}
-            onClick={() => switchFormMode('create')}
-          >
-            <FaPlus /> Create
-          </button>
-          <button
-            className={`btn btn-sm ${formMode === 'edit' ? 'btn-primary' : ''}`}
-            onClick={() => switchFormMode('edit')}
-          >
-            <FaEdit /> Edit
-          </button>
-          <button
-            className={`btn btn-sm ${
-              formMode === 'delete' ? 'btn-primary' : ''
+          onClick={() => switchFormMode('create')}
+        >
+          <FaPlus /> Create
+        </button>
+        <button
+          className={`btn btn-sm ${formMode === 'edit' ? 'btn-primary' : ''}`}
+          onClick={() => switchFormMode('edit')}
+        >
+          <FaEdit /> Edit
+        </button>
+        <button
+          className={`btn btn-sm ${formMode === 'delete' ? 'btn-primary' : ''
             }`}
-            onClick={() => switchFormMode('delete')}
-          >
-            <FaTrash /> Delete
-          </button>
+          onClick={() => switchFormMode('delete')}
+        >
+          <FaTrash /> Delete
+        </button>
+        {/* <button
+          className="btn btn-sm btn-error"
+          onClick={handleDeleteTodaysTasks}
+        >
+          <FaCalendarTimes /> Delete Today's Tasks
+        </button> */}
+      </div>
+
+      {formMode !== 'none' && (
+        <div className="card bg-base-200 p-3">
+          <h3 className="text-sm font-bold mb-2">{getFormTitle()}</h3>
+          {renderFormFields()}
           <button
-            className="btn btn-sm btn-error"
-            onClick={handleDeleteTodaysTasks}
+            className="btn btn-sm btn-success mt-2"
+            onClick={handleSubmit}
           >
-            <FaCalendarTimes /> Delete Today's Tasks
+            Submit
           </button>
         </div>
+      )}
+      <section className={`collapse collapse-arrow border border-base-300`}>
+        <input type="checkbox" defaultChecked={dayTasks.length > 0} />
 
-        {formMode !== 'none' && (
-          <div className="card bg-base-200 p-3">
-            <h3 className="text-sm font-bold mb-2">{getFormTitle()}</h3>
-            {renderFormFields()}
-            <button
-              className="btn btn-sm btn-success mt-2"
-              onClick={handleSubmit}
+        <div className="collapse-title font-medium">
+          Tasks by Day
+        </div>
+        <div className="collapse-content flex flex-col gap-2 card bg-base-200 p-3">
+          <DayNavigator currentDate={date} onDateChange={changeDate} />
+          {dayTasks.length > 0 &&
+            (<><button
+              className={`btn btn-sm btn-error`}
+              onClick={handleDeleteSelectedDayTasks}
             >
-              Submit
+              <FaTrash /> Delete All Tasks
             </button>
-          </div>
-        )}
-      </div>
-      <div className="flex flex-col gap-2">
-        {dayTasks.map((task) => (
-          <div
-            key={task._id}
-            className="flex items-center justify-between p-2 border rounded-lg shadow-sm"
-          >
-            <span className="text-lg font-medium">{task.title}</span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  switchFormMode('edit');
-                  setTaskData(() => task);
-                }}
-                className="p-2 text-blue-500 hover:text-blue-700"
-              >
-                <FaEdit />
-              </button>
-              <button
-                onClick={() => {
-                  switchFormMode('delete');
-                  setTaskData(task);
-                }}
-                className="p-2 text-red-500 hover:text-red-700"
-              >
-                <FaTrash />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
+              {dayTasks.map((task) => {
+                const isSelected = taskData && task._id === taskData._id; // Verifica si la tarea está seleccionada
+
+                return (
+                  <div
+                    key={task._id}
+                    className={`card p-4 shadow-md border ${isSelected ? 'bg-blue-100 border-blue-500' : 'bg-white'
+                      }`}
+                    onClick={() => setTaskData(task)} // Establece la tarea seleccionada
+                  >
+                    {/* Título y botones */}
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-black">{task.title}</h3>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // Evita que el evento haga clic en el contenedor
+                            switchFormMode('edit');
+                            setTaskData(task);
+                          }}
+                          className="btn btn-sm btn-outline btn-primary"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // Evita que el evento haga clic en el contenedor
+                            // switchFormMode('delete');
+                            // setTaskData(task);
+                            if (deleteTask) {
+                              deleteTask(task._id);
+                            }
+                            toast.success('Task deleted successfully');
+                          }}
+                          className="btn btn-sm btn-outline btn-error"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Información adicional (solo si está seleccionada) */}
+                    {isSelected && (
+                      <div className="mt-2">
+                        <p className="text-sm text-black">
+                          Scheduled for: {new Date(task.scheduledAt).toLocaleDateString()}
+                        </p>
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className="badge badge-info">{task.duration} mins</span>
+                          <span className="badge badge-success flex items-center gap-1">
+                            <FaCheckCircle /> Selected
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </>)}
+        </div>
+      </section>
+
+    </div>
   );
-}
+};
