@@ -1,4 +1,4 @@
-import { navTo } from 'app/_utils/Functions';
+import navTo from 'app/_utils/navTo';
 import { useEffect, useState } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaExchangeAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';

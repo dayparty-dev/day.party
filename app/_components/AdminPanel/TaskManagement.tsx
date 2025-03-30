@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import useTasks from 'app/_hooks/useTasks';
 import { Task } from 'app/_models/Task';
 import DayNavigator from 'app/rundown/components/DayNavigator';
-import { navTo } from 'app/_utils/Functions';
+import navTo from 'app/_utils/navTo';
 // import { MenuOption } from './AdminPanel';
 // Función para generar títulos aleatorios para tareas
 const generateRandomTitle = (id: string) => {
