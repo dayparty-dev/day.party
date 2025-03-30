@@ -6,17 +6,20 @@ import useTasks from 'app/_hooks/useTasks';
 import { Task } from 'app/_models/Task';
 import DayNavigator from 'app/rundown/components/DayNavigator';
 import { navTo } from 'app/_utils/Functions';
+// import { MenuOption } from './AdminPanel';
 // Función para generar títulos aleatorios para tareas
 const generateRandomTitle = (id: string) => {
   const adjectives = ['Project', 'Task', 'Meeting', 'Review', 'Analysis'];
   return `${adjectives[Math.floor(Math.random() * adjectives.length)]}-${id}`;
 };
 
-type TaskFormMode = 'create' | 'edit' | 'delete' | 'none';
+// type TaskFormMode = 'create' | 'edit' | 'delete' | 'none';
+export type TaskFormAction = 'CREATE' | 'EDIT' | 'DELETE' | 'NONE';
 
 interface TaskManagementProps {
   dayTasks: Task[];
-  selectedOption?: TaskFormMode;
+  visibleActions: string[]; // Opciones visibles
+  selectedAction?: TaskFormAction;
   onTaskCreated: (task: Task) => void;
   onTaskUpdated: (task: Task) => void;
   deleteTask: (id: string) => void;
@@ -43,7 +46,8 @@ const getDefaultTask = (date) => {
 
 export default function TaskManagement({
   dayTasks,
-  selectedOption = 'none',
+  selectedAction = 'NONE',
+  visibleActions,
   onTaskCreated,
   onTaskUpdated,
   deleteTask,
@@ -57,7 +61,7 @@ export default function TaskManagement({
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   // const [tasks, setTasks] = useState(getTasksForDate(date));
 
-  const [formMode, setFormMode] = useState<TaskFormMode>(selectedOption);
+  const [formMode, setFormMode] = useState<TaskFormAction>(selectedAction);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
   const changeDate = (date: Date) => {
@@ -75,23 +79,24 @@ export default function TaskManagement({
     setTaskData(getDefaultTask(date));
   };
 
-  // Función para cambiar el modo del formulario
-  const switchFormMode = (mode: TaskFormMode) => {
-    setFormMode(mode);
-    if (mode !== 'none') {
-      // resetForm();
+  useEffect(() => {
+    console.log("ACTION", selectedAction);
+    setFormMode(() => selectedAction);
+    console.log("FORM MODE", formMode);
+  }, [selectedAction]);
 
-      navTo("task-btns");
-      // const formElement = document.getElementById('task-btns');
-      // if (formElement) {
-      //   formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // }
-    }
+  // Función para cambiar el modo del formulario
+  const switchFormMode = (mode: TaskFormAction) => {
+    if (formMode === mode)
+      mode = "NONE";
+    else
+      navTo("task-options");
+    setFormMode(mode);
   };
 
   // Validación del formulario de tarea
   const validateTaskForm = () => {
-    if (formMode === 'delete') {
+    if (formMode === 'DELETE') {
       if (!taskData._id) {
         toast.error('Task ID is required');
         return false;
@@ -117,7 +122,7 @@ export default function TaskManagement({
     if (!validateTaskForm()) return;
 
     switch (formMode) {
-      case 'create':
+      case 'CREATE':
         const newTask = {
           ...taskData,
           id: nanoid(3),
@@ -128,14 +133,14 @@ export default function TaskManagement({
         }
         resetForm();
         break;
-      case 'edit':
+      case 'EDIT':
         // toast.success('Task updated successfully');
         if (onTaskUpdated) {
           onTaskUpdated(taskData);
         }
         //resetForm();
         break;
-      case 'delete':
+      case 'DELETE':
         if (deleteTask) {
           deleteTask(taskData._id);
         }
@@ -164,8 +169,8 @@ export default function TaskManagement({
   // Renderizado condicional del formulario basado en el modo
   const renderFormFields = () => {
     switch (formMode) {
-      case 'create':
-      case 'edit':
+      case 'CREATE':
+      case 'EDIT':
         return (
           <>
             <input
@@ -218,7 +223,7 @@ export default function TaskManagement({
             </div>
           </>
         );
-      case 'delete':
+      case 'DELETE':
         return (
           <input
             type="text"
@@ -228,7 +233,7 @@ export default function TaskManagement({
             onChange={(e) => setTaskData({ ...taskData, _id: e.target.value })}
           />
         );
-      case 'none':
+      case 'NONE':
         return null;
     }
   };
@@ -236,49 +241,42 @@ export default function TaskManagement({
   // Obtener título del formulario basado en el modo
   const getFormTitle = () => {
     switch (formMode) {
-      case 'create':
-        return 'Create Task';
-      case 'edit':
-        return 'Edit Task';
-      case 'delete':
-        return 'Delete Task';
-      case 'none':
-        return '';
+      case 'CREATE': return 'Create Task';
+      case 'EDIT': return 'Edit Task';
+      case 'DELETE': return 'Delete Task';
+      case 'NONE': return '';
     }
   };
 
   return (
     <div className="form-control flex flex-col gap-2">
-      <div id={"task-btns"} className="flex flex-wrap gap-2">
-        <button
-          className={`btn btn-sm ${formMode === 'create' ? 'btn-primary' : ''
-            }`}
-          onClick={() => switchFormMode('create')}
-        >
-          <FaPlus /> Create
-        </button>
-        <button
-          className={`btn btn-sm ${formMode === 'edit' ? 'btn-primary' : ''}`}
-          onClick={() => switchFormMode('edit')}
-        >
-          <FaEdit /> Edit
-        </button>
-        <button
-          className={`btn btn-sm ${formMode === 'delete' ? 'btn-primary' : ''
-            }`}
-          onClick={() => switchFormMode('delete')}
-        >
-          <FaTrash /> Delete
-        </button>
-        {/* <button
-          className="btn btn-sm btn-error"
-          onClick={handleDeleteTodaysTasks}
-        >
-          <FaCalendarTimes /> Delete Today's Tasks
-        </button> */}
+      <div id="task-options" className="flex flex-wrap gap-2">
+        {visibleActions.includes('create-task') && (
+          <button
+            className={`btn btn-sm ${formMode === 'CREATE' ? 'btn-primary' : ''}`}
+            onClick={() => switchFormMode('CREATE')}
+          >
+            <FaPlus /> Create
+          </button>
+        )}
+        {visibleActions.includes('edit-task') && (
+          <button
+            className={`btn btn-sm ${formMode === 'EDIT' ? 'btn-primary' : ''}`}
+            onClick={() => switchFormMode('EDIT')}
+          >
+            <FaEdit /> Edit
+          </button>
+        )}
+        {visibleActions.includes('delete-task') && (
+          <button
+            className={`btn btn-sm ${formMode === 'DELETE' ? 'btn-primary' : ''}`}
+            onClick={() => switchFormMode('DELETE')}
+          >
+            <FaTrash /> Delete
+          </button>
+        )}
       </div>
-
-      {formMode !== 'none' && (
+      {formMode !== 'NONE' && (
         <div className="card bg-base-200 p-3">
           <h3 className="text-sm font-bold mb-2">{getFormTitle()}</h3>
           {renderFormFields()}
@@ -322,7 +320,7 @@ export default function TaskManagement({
                         <button
                           onClick={(e) => {
                             e.stopPropagation(); // Evita que el evento haga clic en el contenedor
-                            switchFormMode('edit');
+                            switchFormMode('EDIT');
                             setTaskData(task);
                           }}
                           className="btn btn-sm btn-outline btn-primary"
