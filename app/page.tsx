@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function LandingPage() {
   return (
@@ -30,7 +31,9 @@ export default function LandingPage() {
                 Convierte tus tareas en misiones, gana recompensas y sube de
                 nivel en la vida.
               </p>
-              <button className="btn btn-secondary mt-6">Empieza ahora</button>
+              <Link href="/auth/login">
+                <button className="btn btn-secondary mt-6">Empieza ahora</button>
+              </Link>
             </div>
 
             {/* Right Image Column - Extended to touch the CTA section */}
@@ -91,7 +94,9 @@ export default function LandingPage() {
           <p className="mt-2">
             Únete ahora y descubre una nueva forma de organizar tu vida.
           </p>
-          <button className="btn btn-primary mt-4">Únete ahora</button>
+          <Link href="/auth/login">
+            <button className="btn btn-primary mt-4">Únete ahora</button>
+          </Link>
         </div>
       </div>
     </div>
