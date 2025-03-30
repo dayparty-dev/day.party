@@ -1,4 +1,5 @@
 import AdminPanel from './_components/AdminPanel/AdminPanel';
+import ThemeSwitcher from './_components/ThemeSwitcher';
 import './styles/global.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -17,6 +18,7 @@ export default function RootLayout({
         {children}
         {isAdminPanelEnabled && <AdminPanel />}
         <ToastContainer />
+        <ThemeSwitcher />
       </body>
     </html>
   );
