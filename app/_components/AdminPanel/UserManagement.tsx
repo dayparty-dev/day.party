@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import navTo from 'app/_utils/navTo';
+import { useEffect, useState } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaExchangeAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
@@ -9,37 +10,45 @@ interface UserForm {
     id?: string;
 }
 
-type FormMode = 'none' | 'create' | 'edit' | 'delete' | 'switch';
+// type FormMode = 'none' | 'create' | 'edit' | 'delete' | 'switch';
+export type UserFormAction = 'CREATE' | 'EDIT' | 'DELETE' | 'SWITCH' | 'NONE';
 
 interface UserManagementProps {
     initialUserData?: UserForm;
-    selectedOption?: FormMode;
+    visibleActions: string[];
+    selectedAction?: UserFormAction;
 }
 
-export default function UserManagement({ initialUserData, selectedOption = 'none' }: UserManagementProps) {
+export default function UserManagement({
+    initialUserData,
+    visibleActions,
+    selectedAction = 'NONE'
+}: UserManagementProps) {
     const [userData, setUserData] = useState<UserForm>(
         initialUserData || { name: '', email: '', role: 'user' }
     );
-    const [formMode, setFormMode] = useState<FormMode>(selectedOption);
-
+    const [formMode, setFormMode] = useState<UserFormAction>(selectedAction);
     // Función para resetear el formulario
     const resetForm = () => {
         setUserData({ name: '', email: '', role: 'user', id: '' });
     };
 
+    useEffect(() => {
+        setFormMode(selectedAction);
+    }, [selectedAction]);
+
     // Función para cambiar el modo del formulario
-    const switchFormMode = (mode: FormMode) => {
-        if (mode === formMode) {
-            mode = 'none';
-            // setFormMode('none');
-        }
+    const switchFormMode = (mode: UserFormAction) => {
+        if (formMode === mode)
+            mode = "NONE";
+        else
+            navTo("user-options");
         setFormMode(mode);
-        resetForm();
     };
 
     // Validación del formulario de usuario
     const validateUserForm = () => {
-        if (formMode === 'delete' || formMode === 'switch') {
+        if (formMode === 'DELETE' || formMode === 'SWITCH') {
             if (!userData.id) {
                 toast.error('User ID is required');
                 return false;
@@ -64,16 +73,16 @@ export default function UserManagement({ initialUserData, selectedOption = 'none
         if (!validateUserForm()) return;
 
         switch (formMode) {
-            case 'create':
+            case 'CREATE':
                 toast.success('User created successfully');
                 break;
-            case 'edit':
+            case 'EDIT':
                 toast.success('User updated successfully');
                 break;
-            case 'delete':
+            case 'DELETE':
                 toast.success('User deleted successfully');
                 break;
-            case 'switch':
+            case 'SWITCH':
                 toast.success('User switched successfully');
                 break;
         }
@@ -85,8 +94,8 @@ export default function UserManagement({ initialUserData, selectedOption = 'none
     // Renderizado condicional del formulario basado en el modo
     const renderFormFields = () => {
         switch (formMode) {
-            case 'create':
-            case 'edit':
+            case 'CREATE':
+            case 'EDIT':
                 return (
                     <>
                         <input
@@ -114,8 +123,8 @@ export default function UserManagement({ initialUserData, selectedOption = 'none
                         </select>
                     </>
                 );
-            case 'delete':
-            case 'switch':
+            case 'DELETE':
+            case 'SWITCH':
                 return (
                     <input
                         type="text"
@@ -131,43 +140,51 @@ export default function UserManagement({ initialUserData, selectedOption = 'none
     // Obtener título del formulario basado en el modo
     const getFormTitle = () => {
         switch (formMode) {
-            case 'create': return 'Create User';
-            case 'edit': return 'Edit User';
-            case 'delete': return 'Delete User';
-            case 'switch': return 'Switch User';
+            case 'CREATE': return 'Create User';
+            case 'EDIT': return 'Edit User';
+            case 'DELETE': return 'Delete User';
+            case 'SWITCH': return 'Switch User';
         }
     };
 
     return (
         <div className="form-control flex flex-col gap-2">
-            <div className="flex flex-wrap gap-2">
-                <button
-                    className={`btn btn-sm ${formMode === 'create' ? 'btn-primary' : ''}`}
-                    onClick={() => switchFormMode('create')}
-                >
-                    <FaPlus /> Create
-                </button>
-                <button
-                    className={`btn btn-sm ${formMode === 'edit' ? 'btn-primary' : ''}`}
-                    onClick={() => switchFormMode('edit')}
-                >
-                    <FaEdit /> Edit
-                </button>
-                <button
-                    className={`btn btn-sm ${formMode === 'delete' ? 'btn-primary' : ''}`}
-                    onClick={() => switchFormMode('delete')}
-                >
-                    <FaTrash /> Delete
-                </button>
-                <button
-                    className={`btn btn-sm ${formMode === 'switch' ? 'btn-primary' : ''}`}
-                    onClick={() => switchFormMode('switch')}
-                >
-                    <FaExchangeAlt /> Switch
-                </button>
+            <div id="user-options" className="flex flex-wrap gap-2">
+                {visibleActions.includes('create-user') && (
+                    <button
+                        className={`btn btn-sm ${formMode === 'CREATE' ? 'btn-primary' : ''}`}
+                        onClick={() => switchFormMode('CREATE')}
+                    >
+                        <FaPlus /> Create
+                    </button>
+                )}
+                {visibleActions.includes('edit-user') && (
+                    <button
+                        className={`btn btn-sm ${formMode === 'EDIT' ? 'btn-primary' : ''}`}
+                        onClick={() => switchFormMode('EDIT')}
+                    >
+                        <FaEdit /> Edit
+                    </button>
+                )}
+                {visibleActions.includes('delete-user') && (
+                    <button
+                        className={`btn btn-sm ${formMode === 'DELETE' ? 'btn-primary' : ''}`}
+                        onClick={() => switchFormMode('DELETE')}
+                    >
+                        <FaTrash /> Delete
+                    </button>
+                )}
+                {visibleActions.includes('switch-user') && (
+                    <button
+                        className={`btn btn-sm ${formMode === 'SWITCH' ? 'btn-primary' : ''}`}
+                        onClick={() => switchFormMode('SWITCH')}
+                    >
+                        <FaExchangeAlt /> Switch
+                    </button>
+                )}
             </div>
 
-            {formMode !== 'none' && (
+            {formMode !== 'NONE' && (
                 <div className="card bg-base-200 p-3">
                     <h3 className="text-sm font-bold mb-2">{getFormTitle()}</h3>
                     {renderFormFields()}

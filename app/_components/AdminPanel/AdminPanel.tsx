@@ -9,19 +9,21 @@ import SearchBar from './SearchBar';
 import Section from './Section';
 import UserManagement from './UserManagement';
 import TaskManagement from './TaskManagement';
-
+import { UserFormAction } from './UserManagement';
+import { TaskFormAction } from './TaskManagement';
 // Definición de tipos
-interface AdminSection {
-  id: string;
-  label: string;
-  section: string;
-  isVisible?: boolean;
-}
+// interface AdminSection {
+//   id: string;
+//   label: string;
+//   section: string;
+//   isVisible?: boolean;
+// }
 
-interface MenuOption {
+export interface MenuOption {
   id: string;
   label: string;
   section: string;
+  form: string;
 }
 
 export default function AdminPanel() {
@@ -36,25 +38,27 @@ export default function AdminPanel() {
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSection, setSelectedSection] = useState<string | null>(null); // Estado para rastrear la sección seleccionada
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [dayTasks, setDayTasks] = useState<Task[]>([]);
+  const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [visibleSections, setVisibleSections] = useState<string[]>([
     'users',
     'tasks',
   ]);
-  const [visibleOptions, setVisibleOptions] = useState<string[]>([]);
+  const [visibleActions, setVisibleOptions] = useState<string[]>([]);
+  const [selectedOption, setSelectedOption] = useState<MenuOption | null>(null);
 
   // Definir opciones del menú
   const menuOptions: MenuOption[] = [
-    { id: 'create-user', label: 'Create User', section: 'users' },
-    { id: 'edit-user', label: 'Edit User', section: 'users' },
-    { id: 'delete-user', label: 'Delete User', section: 'users' },
-    { id: 'switch-user', label: 'Switch User', section: 'users' },
-    { id: 'create-task', label: 'Create Task', section: 'tasks' },
-    { id: 'edit-task', label: 'Edit Task', section: 'tasks' },
-    { id: 'delete-task', label: 'Delete Task', section: 'tasks' },
-    { id: 'delete-today', label: "Delete Today's Tasks", section: 'tasks' },
+    { id: 'create-user', label: 'Create User', section: 'users', form: "CREATE" },
+    { id: 'edit-user', label: 'Edit User', section: 'users', form: "EDIT" },
+    { id: 'delete-user', label: 'Delete User', section: 'users', form: "DELETE" },
+    { id: 'switch-user', label: 'Switch User', section: 'users', form: "SWITCH" },
+    { id: 'create-task', label: 'Create Task', section: 'tasks', form: "CREATE" },
+    { id: 'edit-task', label: 'Edit Task', section: 'tasks', form: "EDIT" },
+    { id: 'delete-task', label: 'Delete Task', section: 'tasks', form: "DELETE" },
   ];
+  // { id: 'delete-today', label: "Delete Today's Tasks", section: 'tasks' },
 
   // Atajos de teclado
   useKeyboardShortcut('ctrl+u+c', () => {
@@ -70,9 +74,17 @@ export default function AdminPanel() {
   };
 
   useEffect(() => {
-    const tasks = getTasksForDate(new Date());
-    if (tasks.length) setDayTasks(tasks);
-  }, [getTasksForDate]);
+    const newTasks = getTasksForDate(selectedDay);
+
+    // Comparación profunda para evitar actualizaciones innecesarias
+    setDayTasks(prev => {
+      const prevIds = prev.map(task => task._id).join(',');
+      const newIds = newTasks.map(task => task._id).join(',');
+
+      return prevIds === newIds ? prev : newTasks;
+    });
+  }, [getTasksForDate, selectedDay]); // Añade selectedDay como dependencia
+
 
   // Filtrar opciones y secciones basadas en la búsqueda
   useEffect(() => {
@@ -128,11 +140,15 @@ export default function AdminPanel() {
   };
 
   // Manejador para borrar todas las tareas de hoy
-  const handleDeleteTodaysTasks = () => {
-    deleteAllDayTasks(new Date()); // FIXME: this won't work for other days
+  const handleDeleteTodaysTasks = (date: Date = new Date()) => {
+    deleteAllDayTasks(date);
     setDayTasks([]);
 
     toast.success(`Deleted tasks from today`);
+  };
+
+  const handleOptionSelected = (option: MenuOption) => {
+    setSelectedOption(option);
   };
 
   // Mostrar mensaje de cuántas tareas activas hay
@@ -145,11 +161,10 @@ export default function AdminPanel() {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <div
-        className={`bg-base-100 shadow-xl transition-all duration-300 ${
-          isExpanded
-            ? 'w-96 h-[600px] rounded-box'
-            : 'w-10 h-10 rounded-full relative'
-        }`}
+        className={`bg-base-100 shadow-xl transition-all duration-300 ${isExpanded
+          ? 'w-96 h-[600px] rounded-box'
+          : 'w-10 h-10 rounded-full relative'
+          }`}
       >
         {!isExpanded ? (
           <button
@@ -170,8 +185,11 @@ export default function AdminPanel() {
         )}
         {isExpanded && (
           <div className="p-4 h-full flex flex-col gap-4">
-            <SearchBar onSearch={setSearchQuery} />
-
+            <SearchBar
+              onSearch={setSearchQuery}
+              menuOptions={menuOptions}
+              onOptionSelected={handleOptionSelected}
+            />
             <div className="flex-1 overflow-y-auto space-y-2">
               <Section
                 id="users"
@@ -180,7 +198,10 @@ export default function AdminPanel() {
                 isExpanded={true}
                 isSelected={selectedSection === 'users'}
               >
-                <UserManagement selectedOption="none" />
+                <UserManagement
+                  selectedAction={selectedOption && selectedOption.section == "users" ? selectedOption.form as UserFormAction : "NONE"}
+                  visibleActions={visibleActions}
+                />
               </Section>
               <Section
                 id="tasks"
@@ -191,10 +212,13 @@ export default function AdminPanel() {
               >
                 <TaskManagement
                   dayTasks={dayTasks}
+                  visibleActions={visibleActions}
+                  selectedAction={selectedOption && selectedOption.section == "tasks" ? selectedOption.form as TaskFormAction : "NONE"}
                   onTaskCreated={handleTaskCreated}
                   onTaskUpdated={handleTaskUpdated}
-                  onTaskDeleted={handleDeleteTask}
+                  deleteTask={handleDeleteTask}
                   onTasksDeleted={handleDeleteTodaysTasks}
+                  onDateChanged={(date) => setSelectedDay(date)}
                 />
               </Section>
             </div>
@@ -203,22 +227,20 @@ export default function AdminPanel() {
               <div className="flex overflow-x-auto gap-2">
                 <a
                   href="#users"
-                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${
-                    !visibleSections.includes('users')
-                      ? 'opacity-50 cursor-not-allowed pointer-events-none'
-                      : ''
-                  }`}
+                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${!visibleSections.includes('users')
+                    ? 'opacity-50 cursor-not-allowed pointer-events-none'
+                    : ''
+                    }`}
                   onClick={() => handleSectionClick('users')}
                 >
                   <FaUser />
                 </a>
                 <a
                   href="#tasks"
-                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${
-                    !visibleSections.includes('tasks')
-                      ? 'opacity-50 cursor-not-allowed pointer-events-none'
-                      : ''
-                  }`}
+                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${!visibleSections.includes('tasks')
+                    ? 'opacity-50 cursor-not-allowed pointer-events-none'
+                    : ''
+                    }`}
                   onClick={() => handleSectionClick('tasks')}
                 >
                   <FaTasks />
