@@ -5,6 +5,11 @@ import { useAuth } from '../_hooks/useAuth';
 import { useAuthGuard } from '../_hooks/useAuthGuard';
 import './styles.scss';
 
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { GetStaticProps } from 'next';
+import a from "../../i18n"; // Importa la inicialización
+import { useTranslation } from 'next-i18next';
+
 import React, { useState, useEffect, Suspense, useRef } from 'react';
 
 enum LoginState {
@@ -14,6 +19,8 @@ enum LoginState {
 }
 
 function LoginForm(): React.ReactElement {
+  const { t } = useTranslation("", { "i18n": a });
+
   const { sendLoginLink, verifyLoginLink } = useAuth();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('sessionId');
@@ -55,7 +62,7 @@ function LoginForm(): React.ReactElement {
             className={
               'step ' +
               (loginState === LoginState.Code ||
-              loginState === LoginState.Processing
+                loginState === LoginState.Processing
                 ? 'step-secondary'
                 : '')
             }

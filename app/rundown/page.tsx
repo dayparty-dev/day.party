@@ -24,6 +24,8 @@ import PiPManager, {
   copyStylesheets,
 } from './components/PiPManager';
 import { useAuthGuard } from 'app/auth/_hooks/useAuthGuard';
+import a from "../i18n"; // Importa la inicialización
+import { useTranslation } from 'next-i18next';
 
 import './styles.scss';
 
@@ -42,6 +44,8 @@ const preventScaleModifier: Modifier = ({ transform }) => {
 };
 
 export default function Rundown() {
+  const { t } = useTranslation("", { "i18n": a });
+
   // Task management
   const { tasks, addTask, updateTask, deleteTask, setTasks, getTasksForDate } =
     useTasks();
@@ -464,6 +468,8 @@ export default function Rundown() {
 
   return authGuard(
     <div className={`rundown ${isEditMode ? 'edit-mode' : ''}`}>
+      <h1>{t("LoginPage.welcome")}</h1>
+
       <div className="header-actions">
         <PictureInPictureButton
           onActivate={handlePiPActivate}

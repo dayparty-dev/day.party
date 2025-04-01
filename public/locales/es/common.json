@@ -1,0 +1,27 @@
+{
+    "LandingPage": {
+      "greeting": "¡Hola, {name}!",
+      "welcome": "Bienvenido a nuestro sitio web."
+    },
+    "NotFoundPage": {
+      "title": "Página no encontrada"
+    },
+    "Error": {
+      "title": "Error",
+      "retry": "Reintentar"
+    },
+    "LoginPage": {
+      "steps": {
+        "email": "Correo electrónico",
+        "check": "Revisar",
+        "verify": "Verificar"
+      },
+      "welcome": "¡Bienvenido a day.party! Tu agenda menos agenda",
+      "emailLabel": "Tu correo electrónico",
+      "emailPlaceholder": "pepe@day.party",
+      "nextButton": "Siguiente",
+      "codeSent": "Hemos enviado un código a {email}. Por favor, revisa tu spam",
+      "verifying": "Verificando...",
+      "loading": "Cargando..."
+    }
+  }
