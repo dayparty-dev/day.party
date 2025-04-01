@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
-import { User } from '../_models/User';
+
+import { User, UserRole } from '../_models/User';
 import { getCollection } from 'lib/mongodb';
 
 export class UserService {
@@ -11,7 +12,11 @@ export class UserService {
     return collection.findOne({ email });
   }
 
-  async createUser(email: string, username: string): Promise<User> {
+  async createUser(
+    email: string,
+    username: string,
+    role: UserRole = UserRole.Standard
+  ): Promise<User> {
     const collection = await getCollection<User>(this.COLLECTION_NAME);
 
     const now = new Date();
@@ -19,6 +24,7 @@ export class UserService {
       _id: nanoid(),
       email,
       username,
+      role,
       _createdAt: now,
       _updatedAt: now,
     };
