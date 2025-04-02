@@ -18,11 +18,6 @@ import DayCapacity from 'app/rundown/components/DayCapacity';
 import DayNavigator from 'app/rundown/components/DayNavigator';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
-import PictureInPictureButton from './components/PictureInPictureButton';
-import PiPManager, {
-  setupPiPStyles,
-  copyStylesheets,
-} from './components/PiPManager';
 import { useAuthGuard } from 'app/auth/_hooks/useAuthGuard';
 import a from "../i18n"; // Importa la inicialización
 import { useTranslation } from 'next-i18next';
@@ -57,14 +52,6 @@ export default function Rundown() {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskSize, setNewTaskSize] = useState(1);
   const [isFinishing, setIsFinishing] = useState(false);
-
-  // Picture-in-Picture state
-  const [isPiPActive, setIsPiPActive] = useState(false);
-  const [isPiPSupported, setIsPiPSupported] = useState(false);
-  const [pipWindow, setPipWindow] = useState<Window | null>(null);
-  const pipRootRef = useRef<ReturnType<typeof ReactDOM.createRoot> | null>(
-    null
-  );
 
   // Memoized current day tasks to avoid redundant calls to getTasksForDate
   const currentDayTasks = useMemo(
@@ -125,11 +112,6 @@ export default function Rundown() {
   const { currentTask, nextTask } = useMemo(() => {
     return getCurrentAndNextTask(currentDayTasks);
   }, [currentDayTasks]);
-
-  // Check PiP support on mount
-  useEffect(() => {
-    setIsPiPSupported('documentPictureInPicture' in window);
-  }, []);
 
   // Only check for multiple ongoing tasks on initial load
   useEffect(() => {
@@ -380,104 +362,11 @@ export default function Rundown() {
     }
   }, [currentTask, nextTask, updateTask, isFinishing]);
 
-  /**
-   * Updates the PiP window content
-   */
-  const updatePipContent = () => {
-    if (pipRootRef.current && isPiPActive) {
-      pipRootRef.current.render(
-        <PiPManager
-          isPiPActive={isPiPActive}
-          currentTask={currentTask}
-          nextTask={nextTask}
-          onStatusChange={handleStatusChange}
-          onFinish={handleTaskFinish}
-        />
-      );
-    }
-  };
-
-  // Update PiP content when tasks change
-  useEffect(() => {
-    updatePipContent();
-  }, [
-    tasks,
-    isPiPActive,
-    currentTask,
-    nextTask,
-    handleStatusChange,
-    handleTaskFinish,
-  ]);
-
-  /**
-   * Activates Picture-in-Picture mode
-   */
-  const handlePiPActivate = useCallback(async () => {
-    if (!isPiPActive && isPiPSupported && currentTask) {
-      try {
-        const pipWindow = await window.documentPictureInPicture.requestWindow({
-          width: 320,
-          height: 240,
-          initialAspectRatio: 320 / 240,
-          copyStyleSheets: true,
-        });
-        setPipWindow(pipWindow);
-        setIsPiPActive(true);
-
-        // Copy stylesheets and set up styles
-        copyStylesheets(pipWindow);
-        setupPiPStyles(pipWindow);
-
-        // Create a new container for the PiP content
-        const pipContainer = document.createElement('div');
-        pipWindow.document.body.appendChild(pipContainer);
-
-        // Create a new root and render the PiP content
-        const root = ReactDOM.createRoot(pipContainer);
-        pipRootRef.current = root;
-        root.render(
-          <PiPManager
-            isPiPActive={isPiPActive}
-            currentTask={currentTask}
-            nextTask={nextTask}
-            onStatusChange={handleStatusChange}
-            onFinish={handleTaskFinish}
-          />
-        );
-
-        pipWindow.addEventListener('unload', () => {
-          root.unmount();
-          pipRootRef.current = null;
-          setIsPiPActive(false);
-          setPipWindow(null);
-        });
-      } catch (error) {
-        console.error('Failed to enter Picture-in-Picture mode:', error);
-      }
-    }
-  }, [
-    currentTask,
-    nextTask,
-    isPiPActive,
-    isPiPSupported,
-    handleStatusChange,
-    handleTaskFinish,
-  ]);
-
   const { authGuard } = useAuthGuard();
 
   return authGuard(
     <div className={`rundown ${isEditMode ? 'edit-mode' : ''}`}>
       <h1>{t("LoginPage.welcome")}</h1>
-
-      <div className="header-actions">
-        <PictureInPictureButton
-          onActivate={handlePiPActivate}
-          isActive={isPiPActive}
-          isPiPSupported={isPiPSupported}
-          isEditMode={isEditMode}
-        />
-      </div>
 
       {isEditMode && (
         <TaskForm
@@ -516,13 +405,6 @@ export default function Rundown() {
         </button>
       )}
 
-      <PiPManager
-        isPiPActive={isPiPActive}
-        currentTask={currentTask}
-        nextTask={nextTask}
-        onStatusChange={handleStatusChange}
-        onFinish={handleTaskFinish}
-      />
     </div>
   );
 }
