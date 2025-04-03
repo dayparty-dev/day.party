@@ -86,7 +86,8 @@ const SortableTask = ({
           }
         }}
       >
-        <div className={`task-content card bg-base-100 h-full shadow-md p-4 rounded-md border ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}>
+        <div className={`relative group task-content bg-base-100 h-full shadow-md p-4 rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}>
+          {/* <div className={`task-content card bg-base-100 h-full shadow-md p-4 rounded-md border ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}> */}
           {isEditMode && (
             <button
               className="btn btn-error btn-circle btn-sm absolute top-[-10px] right-[-10px] "
@@ -132,6 +133,9 @@ const SortableTask = ({
               )}
             </div>
           </div>
+          {isEditMode && (
+            <div className="absolute bottom-0 left-0 w-full h-[6px] bg-black/10 rounded-b-md opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
+          )}
         </div>
       </Resizable>
     </div >
