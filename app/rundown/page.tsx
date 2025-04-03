@@ -24,8 +24,7 @@ import PiPManager, {
   copyStylesheets,
 } from './components/PiPManager';
 import { useAuthGuard } from 'app/auth/_hooks/useAuthGuard';
-import a from "../i18n"; // Importa la inicialización
-import { useTranslation } from 'next-i18next';
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 
 import './styles.scss';
 
@@ -44,7 +43,7 @@ const preventScaleModifier: Modifier = ({ transform }) => {
 };
 
 export default function Rundown() {
-  const { t } = useTranslation("", { "i18n": a });
+  const { t } = useAppTranslation();
 
   // Task management
   const { tasks, addTask, updateTask, deleteTask, setTasks, getTasksForDate } =
