@@ -161,12 +161,13 @@ export default function Rundown() {
           onLongPress={() => setIsEditMode(true)}
           setIsEditMode={setIsEditMode}
         />
+
+        {isEditMode && (
+          <button className="btn btn-primary absolute bottom-1.5 right-1.5 rounded-2xl" onClick={() => setIsEditMode(false)}>
+            Done
+          </button>
+        )}
       </div>
-      {isEditMode && (
-        <button className="done-button" onClick={() => setIsEditMode(false)}>
-          Done
-        </button>
-      )}
 
     </div>
   );
