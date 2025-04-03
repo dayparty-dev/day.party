@@ -130,7 +130,7 @@ export default function Rundown() {
   return authGuard(
     // <TaskProvider>
     <div className={`rundown ${isEditMode ? 'edit-mode' : ''}`}>
-      <div className='w-full sm:w-3/5 p-4 sm:p-0 mx-auto'>
+      <div className='w-full sm:w-3/5 p-4 sm:p-0 mx-auto flex flex-col gap-4'>
         {isEditMode && (
           <TaskForm
             newTaskTitle={newTaskTitle}

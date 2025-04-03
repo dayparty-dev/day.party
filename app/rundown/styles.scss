@@ -249,45 +249,45 @@
   height: 100% !important;
 }
 
-.day-capacity {
-  max-width: 320px;
-  margin: 0 auto 20px;
+// .day-capacity {
+//   max-width: 320px;
+//   margin: 0 auto 20px;
 
-  .capacity-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
+//   .capacity-header {
+//     display: flex;
+//     justify-content: space-between;
+//     margin-bottom: 8px;
 
-    select {
-      margin-left: 8px;
-      padding: 2px 4px;
-    }
+//     select {
+//       margin-left: 8px;
+//       padding: 2px 4px;
+//     }
 
-    .capacity-used {
-      &.over-capacity {
-        color: #dc3545;
-        font-weight: bold;
-      }
-    }
-  }
+//     .capacity-used {
+//       &.over-capacity {
+//         color: #dc3545;
+//         font-weight: bold;
+//       }
+//     }
+//   }
 
-  .capacity-bar {
-    height: 8px;
-    background: #eee;
-    border-radius: 4px;
-    overflow: hidden;
+//   .capacity-bar {
+//     height: 8px;
+//     background: #eee;
+//     border-radius: 4px;
+//     overflow: hidden;
 
-    .capacity-fill {
-      height: 100%;
-      background: #0070f3;
-      transition: width 0.3s ease;
+//     .capacity-fill {
+//       height: 100%;
+//       background: #0070f3;
+//       transition: width 0.3s ease;
 
-      &.over-capacity {
-        background: #dc3545;
-      }
-    }
-  }
-}
+//       &.over-capacity {
+//         background: #dc3545;
+//       }
+//     }
+//   }
+// }
 
 // .day-navigator {
 //   display: flex;
