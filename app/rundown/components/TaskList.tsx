@@ -12,6 +12,9 @@ import {
 import SortableTask from './SortableTask';
 import { TaskStatus } from '../../_models/Task';
 
+import a from "../../i18n"; // Importa la inicialización
+import { useTranslation } from 'next-i18next';
+
 interface TaskListProps {
   tasks: any[]; // Replace with proper Task type
   currentDayTasks: any[]; // Replace with proper Task type
@@ -39,6 +42,8 @@ const TaskList: React.FC<TaskListProps> = ({
   onLongPress,
   setIsEditMode,
 }) => {
+  const { t } = useTranslation("", { "i18n": a });
+
   return (
     <DndContext
       sensors={sensors}
@@ -55,7 +60,7 @@ const TaskList: React.FC<TaskListProps> = ({
         items={tasks.map((t) => t._id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="actions-wrapper">
+        <div className="flex flex-col gap-4">
           {currentDayTasks.map((task) => (
             <SortableTask
               key={task._id}
@@ -68,15 +73,12 @@ const TaskList: React.FC<TaskListProps> = ({
             />
           ))}
 
-          {/* Add empty state with Create Task button */}
+          {/* Estado vacío con botón para crear tarea */}
           {currentDayTasks.length === 0 && !isEditMode && (
-            <div className="empty-day">
-              <p>No tasks scheduled for this day</p>
-              <button
-                className="create-task-btn"
-                onClick={() => setIsEditMode(true)}
-              >
-                Create Task
+            <div className="alert alert-info flex flex-col items-center text-center p-4">
+              <p>{t('taskList.emptyMessage')}</p>
+              <button className="btn btn-primary mt-2" onClick={() => setIsEditMode(true)}>
+                {t('taskList.createTask')}
               </button>
             </div>
           )}
