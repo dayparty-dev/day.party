@@ -130,38 +130,38 @@ export default function Rundown() {
   return authGuard(
     // <TaskProvider>
     <div className={`rundown ${isEditMode ? 'edit-mode' : ''}`}>
+      <div className='w-full sm:w-3/5 p-4 sm:p-0 mx-auto'>
+        {isEditMode && (
+          <TaskForm
+            newTaskTitle={newTaskTitle}
+            setNewTaskTitle={setNewTaskTitle}
+            newTaskSize={newTaskSize}
+            setNewTaskSize={setNewTaskSize}
+            onSubmit={handleSubmit}
+          />
+        )}
 
-      {isEditMode && (
-        <TaskForm
-          newTaskTitle={newTaskTitle}
-          setNewTaskTitle={setNewTaskTitle}
-          newTaskSize={newTaskSize}
-          setNewTaskSize={setNewTaskSize}
-          onSubmit={handleSubmit}
+        <DayNavigator currentDate={currentDate} onDateChange={setCurrentDate} />
+        <DayCapacity
+          capacity={dayCapacity}
+          used={totalMinutes}
+          onCapacityChange={setDayCapacity}
         />
-      )}
 
-      <DayNavigator currentDate={currentDate} onDateChange={setCurrentDate} />
-      <DayCapacity
-        capacity={dayCapacity}
-        used={totalMinutes}
-        onCapacityChange={setDayCapacity}
-      />
-
-      <TaskList
-        tasks={tasks}
-        currentDayTasks={currentDayTasks}
-        isEditMode={isEditMode}
-        sensors={dndSensors}
-        preventScaleModifier={preventScaleModifier}
-        onDragEnd={handleDragEnd}
-        onDelete={deleteTask}
-        onResize={handleTaskResize}
-        onStatusChange={handleStatusChange}
-        onLongPress={() => setIsEditMode(true)}
-        setIsEditMode={setIsEditMode}
-      />
-
+        <TaskList
+          tasks={tasks}
+          currentDayTasks={currentDayTasks}
+          isEditMode={isEditMode}
+          sensors={dndSensors}
+          preventScaleModifier={preventScaleModifier}
+          onDragEnd={handleDragEnd}
+          onDelete={deleteTask}
+          onResize={handleTaskResize}
+          onStatusChange={handleStatusChange}
+          onLongPress={() => setIsEditMode(true)}
+          setIsEditMode={setIsEditMode}
+        />
+      </div>
       {isEditMode && (
         <button className="done-button" onClick={() => setIsEditMode(false)}>
           Done
