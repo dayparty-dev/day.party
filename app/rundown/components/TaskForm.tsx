@@ -29,7 +29,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
   return (
     <>
-      <form onSubmit={onSubmit} className="task-form flex flex-col sm:flex-row gap-2">
+      <form onSubmit={onSubmit} className="task-form flex flex-col max-w-sm mx-auto sm:flex-row gap-2">
         <div className="flex w-full gap-2">
           <input
             type="text"
