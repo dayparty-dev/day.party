@@ -23,5 +23,10 @@
       "codeSent": "Hemos enviado un código a {email}. Por favor, revisa tu spam",
       "verifying": "Verificando...",
       "loading": "Cargando..."
+    },
+
+    "taskForm": {
+      "placeholder": "Título de la nueva tarea",
+      "addButton": "Agregar tarea"
     }
   }

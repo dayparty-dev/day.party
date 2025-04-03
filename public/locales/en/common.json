@@ -23,5 +23,10 @@
       "codeSent": "We have sent a code to {email}. Please check your spam",
       "verifying": "Verifying...",
       "loading": "Loading..."
+    },
+    
+    "taskForm": {
+      "placeholder": "New task title",
+      "addButton": "Add Task"
     }
   }
