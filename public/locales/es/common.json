@@ -32,5 +32,20 @@
     "dayCapacity": {
       "label": "Capacidad diaria",
       "hours": "{{hours}} horas"
+    },
+    "taskList": {
+      "emptyMessage": "No hay tareas programadas para este día",
+      "createTask": "Crear tarea"
+    },
+    "task": {
+      "delete": "Eliminar tarea",
+      "duration": "{{minutes}} min",
+      "markDone": "Marcar como completada",
+      "status": {
+        "pending": "Pendiente",
+        "ongoing": "En curso",
+        "paused": "Pausada",
+        "done": "Completada"
+      }
     }
   }
