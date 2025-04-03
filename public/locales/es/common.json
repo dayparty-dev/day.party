@@ -28,5 +28,9 @@
     "taskForm": {
       "placeholder": "Título de la nueva tarea",
       "addButton": "Agregar tarea"
+    },
+    "dayCapacity": {
+      "label": "Capacidad diaria",
+      "hours": "{{hours}} horas"
     }
   }
