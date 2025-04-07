@@ -23,5 +23,29 @@
       "codeSent": "Hemos enviado un código a {email}. Por favor, revisa tu spam",
       "verifying": "Verificando...",
       "loading": "Cargando..."
+    },
+
+    "taskForm": {
+      "placeholder": "Título de la nueva tarea",
+      "addButton": "Agregar tarea"
+    },
+    "dayCapacity": {
+      "label": "Capacidad diaria",
+      "hours": "{{hours}} horas"
+    },
+    "taskList": {
+      "emptyMessage": "No hay tareas programadas para este día",
+      "createTask": "Crear tarea"
+    },
+    "task": {
+      "delete": "Eliminar tarea",
+      "duration": "{{minutes}} min",
+      "markDone": "Marcar como completada",
+      "status": {
+        "pending": "Pendiente",
+        "ongoing": "En curso",
+        "paused": "Pausada",
+        "done": "Completada"
+      }
     }
   }

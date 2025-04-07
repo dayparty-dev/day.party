@@ -3,6 +3,8 @@ import { Resizable } from 're-resizable';
 import { useSortable } from '@dnd-kit/sortable';
 import { useLongPress } from 'use-long-press';
 import { TaskStatus } from '../../_models/Task';
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
+
 
 interface SortableTaskProps {
   task: any; // Replace with proper Task type
@@ -21,6 +23,8 @@ const SortableTask = ({
   onResize,
   onLongPress,
 }: SortableTaskProps) => {
+  const { t } = useAppTranslation();
+
   const [tempSize, setTempSize] = useState<number | null>(null);
 
   const {
@@ -57,6 +61,7 @@ const SortableTask = ({
   } as React.CSSProperties;
 
   return (
+
     <div
       ref={setNodeRef}
       style={style}
@@ -64,100 +69,75 @@ const SortableTask = ({
       data-is-dragging={isDragging}
     >
       <Resizable
-        size={{ width: '100%', height: task.size * 60 }}
-        enable={
-          isEditMode
-            ? {
-                top: false,
-                right: false,
-                bottom: true,
-                left: false,
-              }
-            : {}
-        }
+        size={{ width: '100%', height: 62 + (task.size * 30) }}
+        enable={isEditMode ? { top: false, right: false, bottom: true, left: false } : {}}
         grid={[1, 60]}
         minHeight={60}
         onResize={(_e, _direction, _ref, d) => {
-          const newSize = Math.max(
-            1,
-            Math.round((task.size * 60 + d.height) / 60)
-          );
+          const newSize = Math.max(1, Math.round((task.size * 60 + d.height) / 60));
           setTempSize(newSize);
         }}
         onResizeStop={(_e, _direction, _ref, d) => {
-          const newSize = Math.max(
-            1,
-            Math.round((task.size * 60 + d.height) / 60)
-          );
+          const newSize = Math.max(1, Math.round((task.size * 60 + d.height) / 60));
           setTempSize(null);
           if (newSize !== task.size) {
             onResize(task._id, newSize);
           }
         }}
       >
-        <div
-          className={`task-content ${
-            task.status === 'ongoing' ? 'ongoing' : ''
-          }`}
-        >
+        <div className={`relative group task-content bg-base-100 h-full shadow-md p-4 rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}>
+          {/* <div className={`task-content card bg-base-100 h-full shadow-md p-4 rounded-md border ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}> */}
           {isEditMode && (
             <button
-              className="delete-btn"
+              className="btn btn-error btn-circle btn-sm absolute top-[-10px] right-[-10px] "
               onClick={() => onDelete(task._id)}
-              aria-label="Delete task"
+              aria-label={t('task.delete')}
             >
               ×
             </button>
           )}
-          <div
-            className="action"
-            {...(isEditMode ? listeners : longPressBinding())}
-          >
-            <h3>{task.title}</h3>
-            <p className="duration">{(tempSize ?? task.size) * 15} mins</p>
-            <div className="status-controls">
+
+          <div className="flex flex-col gap-2" {...(isEditMode ? listeners : longPressBinding())}>
+            {/* <div
+              className="action"
+              {...(isEditMode ? listeners : longPressBinding())}
+            > */}
+            <h3 className="text-lg font-semibold">{task.title}</h3>
+            <p className="text-sm text-gray-500">{t('task.duration', { minutes: (tempSize ?? task.size) * 15 })}</p>
+
+            <div className="absolute right-1.5 bottom-1.5 flex justify-end items-center gap-2 mt-auto">
               <button
-                className={`status ${task.status}`}
+                className={`badge ${task.status === 'ongoing' ? 'badge-success' : task.status === 'paused' ? 'badge-warning' : task.status === 'done' ? 'badge-neutral' : 'badge-outline'}`}
                 onClick={() => {
                   const nextStatus: TaskStatus =
-                    {
-                      pending: 'ongoing',
-                      ongoing: 'paused',
-                      paused: 'ongoing',
-                      done: 'pending',
-                    }[task.status] || 'pending';
+                    { pending: 'ongoing', ongoing: 'paused', paused: 'ongoing', done: 'pending' }[task.status] || 'pending';
                   onStatusChange(task._id, nextStatus);
                 }}
                 aria-pressed={task.status === 'ongoing'}
-                aria-label={`Toggle task status: currently ${task.status}`}
+                aria-label={t('task.status.' + task.status)}
               >
-                {task.status}
+                {t('task.status.' + task.status)}
               </button>
+
               {task.status !== 'done' && (
                 <button
-                  className="finish-btn"
+                  className="btn btn-success btn-circle btn-xs"
                   onClick={() => onStatusChange(task._id, 'done')}
-                  aria-label="Mark task as done"
+                  aria-label={t('task.markDone')}
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </button>
               )}
             </div>
           </div>
+          {isEditMode && (
+            <div className="absolute bottom-0 left-0 w-full h-[6px] bg-black/10 rounded-b-md opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
+          )}
         </div>
       </Resizable>
-    </div>
+    </div >
   );
 };
 

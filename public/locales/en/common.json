@@ -23,5 +23,29 @@
       "codeSent": "We have sent a code to {email}. Please check your spam",
       "verifying": "Verifying...",
       "loading": "Loading..."
+    },
+    
+    "taskForm": {
+      "placeholder": "New task title",
+      "addButton": "Add Task"
+    },
+    "dayCapacity": {
+      "label": "Daily Capacity",
+      "hours": "{{hours}} hours"
+    },
+    "taskList": {
+      "emptyMessage": "No tasks scheduled for this day",
+      "createTask": "Create Task"
+    },
+    "task": {
+      "delete": "Delete task",
+      "duration": "{{minutes}} mins",
+      "markDone": "Mark as done",
+      "status": {
+        "pending": "Pending",
+        "ongoing": "Ongoing",
+        "paused": "Paused",
+        "done": "Done"
+      }
     }
   }

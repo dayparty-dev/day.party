@@ -54,7 +54,6 @@ export default function TaskManagement({
   onTasksDeleted,
   onDateChanged
 }: TaskManagementProps) {
-  // const { addTask, updateTask, deleteTask, getTasksForDate } = useTasks();
   const [date, setDate] = useState(new Date());
   const [taskData, setTaskData] = useState<Task>(getDefaultTask(date));
 
@@ -295,7 +294,7 @@ export default function TaskManagement({
           Tasks by Day
         </div>
         <div className="collapse-content flex flex-col gap-2 card bg-base-200 p-3">
-          <DayNavigator currentDate={date} onDateChange={changeDate} />
+          <DayNavigator />
           {dayTasks.length > 0 &&
             (<><button
               className={`btn btn-sm btn-error`}

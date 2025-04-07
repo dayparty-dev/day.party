@@ -13,61 +13,61 @@
   }
 }
 
-.task-form {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  max-width: 320px;
-  margin: 0 auto 20px;
+// .task-form {
+//   display: flex;
+//   gap: 8px;
+//   margin-bottom: 20px;
+//   max-width: 320px;
+//   margin: 0 auto 20px;
 
-  input[type='text'] {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
+//   input[type='text'] {
+//     flex: 1;
+//     padding: 8px;
+//     border: 1px solid #ccc;
+//     border-radius: 4px;
+//     font-size: 14px;
 
-    &:focus {
-      outline: none;
-      border-color: #0070f3;
-    }
-  }
+//     &:focus {
+//       outline: none;
+//       border-color: #0070f3;
+//     }
+//   }
 
-  .time-select {
-    width: 100px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: white;
-    cursor: pointer;
-    font-size: 14px;
+//   .time-select {
+//     width: 100px;
+//     padding: 8px;
+//     border: 1px solid #ccc;
+//     border-radius: 4px;
+//     background-color: white;
+//     cursor: pointer;
+//     font-size: 14px;
 
-    &:focus {
-      outline: none;
-      border-color: #0070f3;
-    }
-  }
+//     &:focus {
+//       outline: none;
+//       border-color: #0070f3;
+//     }
+//   }
 
-  button {
-    padding: 8px 16px;
-    background-color: #0070f3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s;
+//   button {
+//     padding: 8px 16px;
+//     background-color: #0070f3;
+//     color: white;
+//     border: none;
+//     border-radius: 4px;
+//     cursor: pointer;
+//     font-size: 14px;
+//     transition: background-color 0.2s;
 
-    &:hover {
-      background-color: #0051b3;
-    }
+//     &:hover {
+//       background-color: #0051b3;
+//     }
 
-    &:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.2);
-    }
-  }
-}
+//     &:focus {
+//       outline: none;
+//       box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.2);
+//     }
+//   }
+// }
 
 .actions-wrapper {
   display: flex;
@@ -174,28 +174,28 @@
   }
 }
 
-.delete-btn {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background: #ff4444;
-  border: 2px solid white;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  z-index: 2;
+// .delete-btn {
+//   position: absolute;
+//   top: -10px;
+//   right: -10px;
+//   background: #ff4444;
+//   border: 2px solid white;
+//   border-radius: 50%;
+//   width: 24px;
+//   height: 24px;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   color: white;
+//   font-size: 16px;
+//   cursor: pointer;
+//   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+//   z-index: 2;
 
-  &:hover {
-    background: #ff2222;
-  }
-}
+//   &:hover {
+//     background: #ff2222;
+//   }
+// }
 
 .done-button {
   position: fixed;
@@ -231,63 +231,63 @@
   }
 }
 
-.task-content {
-  height: 100%;
-  padding: 8px;
-  box-sizing: border-box;
+// .task-content {
+//   height: 100%;
+//   padding: 8px;
+//   box-sizing: border-box;
 
-  &.ongoing {
-    background: rgba(76, 175, 80, 0.1);
-    border: 2px solid #4caf50;
-    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
-    transform: scale(1.02);
-    transition: all 0.3s ease;
-  }
-}
+//   &.ongoing {
+//     background: rgba(76, 175, 80, 0.1);
+//     border: 2px solid #4caf50;
+//     box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+//     transform: scale(1.02);
+//     transition: all 0.3s ease;
+//   }
+// }
 
-.task-resizable {
-  height: 100% !important;
-}
+// .task-resizable {
+//   height: 100% !important;
+// }
 
-.day-capacity {
-  max-width: 320px;
-  margin: 0 auto 20px;
+// .day-capacity {
+//   max-width: 320px;
+//   margin: 0 auto 20px;
 
-  .capacity-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
+//   .capacity-header {
+//     display: flex;
+//     justify-content: space-between;
+//     margin-bottom: 8px;
 
-    select {
-      margin-left: 8px;
-      padding: 2px 4px;
-    }
+//     select {
+//       margin-left: 8px;
+//       padding: 2px 4px;
+//     }
 
-    .capacity-used {
-      &.over-capacity {
-        color: #dc3545;
-        font-weight: bold;
-      }
-    }
-  }
+//     .capacity-used {
+//       &.over-capacity {
+//         color: #dc3545;
+//         font-weight: bold;
+//       }
+//     }
+//   }
 
-  .capacity-bar {
-    height: 8px;
-    background: #eee;
-    border-radius: 4px;
-    overflow: hidden;
+//   .capacity-bar {
+//     height: 8px;
+//     background: #eee;
+//     border-radius: 4px;
+//     overflow: hidden;
 
-    .capacity-fill {
-      height: 100%;
-      background: #0070f3;
-      transition: width 0.3s ease;
+//     .capacity-fill {
+//       height: 100%;
+//       background: #0070f3;
+//       transition: width 0.3s ease;
 
-      &.over-capacity {
-        background: #dc3545;
-      }
-    }
-  }
-}
+//       &.over-capacity {
+//         background: #dc3545;
+//       }
+//     }
+//   }
+// }
 
 // .day-navigator {
 //   display: flex;
@@ -324,37 +324,37 @@
 //   }
 // }
 
-.empty-day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  text-align: center;
-  background: #f5f5f5;
-  border-radius: 8px;
-  margin: 1rem 0;
+// .empty-day {
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 2rem;
+//   text-align: center;
+//   background: #f5f5f5;
+//   border-radius: 8px;
+//   margin: 1rem 0;
 
-  p {
-    color: #666;
-    margin-bottom: 1rem;
-  }
+//   p {
+//     color: #666;
+//     margin-bottom: 1rem;
+//   }
 
-  .create-task-btn {
-    padding: 0.5rem 1rem;
-    background-color: #0070f3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.2s;
+//   .create-task-btn {
+//     padding: 0.5rem 1rem;
+//     background-color: #0070f3;
+//     color: white;
+//     border: none;
+//     border-radius: 4px;
+//     cursor: pointer;
+//     font-size: 1rem;
+//     transition: background-color 0.2s;
 
-    &:hover {
-      background-color: #0051b3;
-    }
-  }
-}
+//     &:hover {
+//       background-color: #0051b3;
+//     }
+//   }
+// }
 
 .pip-container {
   background: white;

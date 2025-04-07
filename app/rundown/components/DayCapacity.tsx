@@ -1,46 +1,51 @@
 'use client';
 
-interface DayCapacityProps {
-  capacity: number;
-  used: number;
-  onCapacityChange: (newCapacity: number) => void;
-}
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
+import { useTaskContext } from '../../_contexts/TaskContext';
 
-export default function DayCapacity({
-  capacity,
-  used,
-  onCapacityChange,
-}: DayCapacityProps) {
-  const percentageUsed = (used / (capacity * 60)) * 100;
-  const isOverCapacity = used > capacity * 60;
+export default function DayCapacity() {
+  const { t } = useAppTranslation();
+  const { tasks,
+    dayCapacity,
+    setDayCapacity,
+    totalMinutes,
+  } = useTaskContext();
+
+  const percentageUsed = (totalMinutes / (dayCapacity * 60)) * 100;
+  const isOverCapacity = totalMinutes > dayCapacity * 60;
 
   return (
-    <div className="day-capacity">
-      <div className="capacity-header">
-        <label>
-          Daily Capacity:
-          <select
-            value={capacity}
-            onChange={(e) => onCapacityChange(Number(e.target.value))}
-          >
-            <option value={4}>4 hours</option>
-            <option value={6}>6 hours</option>
-            <option value={8}>8 hours</option>
-            <option value={10}>10 hours</option>
-          </select>
-        </label>
-        <span
-          className={`capacity-used ${isOverCapacity ? 'over-capacity' : ''}`}
-        >
-          {Math.floor(used / 60)}h {used % 60}m / {capacity}h
-        </span>
+    <>
+      <div className="max-w-sm mx-auto mb-5">
+        <div className="flex justify-between items-center mb-2 gap-2">
+          <label className="flex items-center gap-2">
+            {t('dayCapacity.label')}:
+            <select
+              value={dayCapacity}
+              onChange={(e) => setDayCapacity(Number(e.target.value))}
+              className="select select-bordered select-sm w-fit"
+            >
+              {[4, 6, 8, 10].map((value) => (
+                <option key={value} value={value}>
+                  {t('dayCapacity.hours', { hours: value })}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <span className={`font-semibold ${isOverCapacity ? 'text-error' : ''}`}>
+            {Math.floor(totalMinutes / 60)}h {totalMinutes % 60}m / {dayCapacity}h
+          </span>
+        </div>
+
+        <div className="h-2 bg-base-300 rounded-lg overflow-hidden">
+          <div
+            className={`h-full transition-all ${isOverCapacity ? 'bg-error' : 'bg-primary'}`}
+            style={{ width: `${Math.min(percentageUsed, 100)}%` }}
+          />
+        </div>
       </div>
-      <div className="capacity-bar">
-        <div
-          className={`capacity-fill ${isOverCapacity ? 'over-capacity' : ''}`}
-          style={{ width: `${Math.min(percentageUsed, 100)}%` }}
-        />
-      </div>
-    </div>
+    </>
+
   );
 }
