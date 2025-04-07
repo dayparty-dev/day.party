@@ -27,7 +27,7 @@ import { useTaskUtils } from './scripts/useTaskUtils';
 import { useDndSensors } from './scripts/useDndSensors';
 import { TaskProvider, useTaskContext } from './scripts/TaskContext';
 import { useAuthGuard } from 'app/auth/_hooks/useAuthGuard';
-import { useTranslation } from 'next-i18next';
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 
 import './styles.scss';
 
@@ -46,7 +46,7 @@ const preventScaleModifier: Modifier = ({ transform }) => {
 };
 
 export default function Rundown() {
-  const { t } = useTranslation("", { "i18n": a });
+  const { t } = useAppTranslation();
 
   // Task management
   const { tasks,
