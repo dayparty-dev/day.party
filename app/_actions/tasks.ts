@@ -1,13 +1,12 @@
 'use server';
 
-import { getCollection } from 'lib/mongodb';
 import { Task } from 'app/_models/Task';
-import { getCurrentUserId } from 'app/auth/_utils/serverAuth';
-import { withAuth } from 'app/auth/_middleware/withAuth';
+import { AuthContext, withAuth } from 'app/auth/_middleware/withAuth';
+import { getCollection } from 'lib/mongodb';
 
 // Fetch only tasks belonging to the current user
-export const fetchTasksServer = withAuth(async () => {
-  const userId = await getCurrentUserId();
+export const fetchTasksServer = withAuth(async (ctx: AuthContext) => {
+  const { userId } = ctx.auth;
 
   if (!userId) {
     throw new Error('Unauthorized: User not authenticated');
@@ -18,8 +17,8 @@ export const fetchTasksServer = withAuth(async () => {
 });
 
 // Add a new task with the current user's ID
-export const addTaskServer = withAuth(async (task: Task) => {
-  const userId = await getCurrentUserId();
+export const addTaskServer = withAuth(async (ctx: AuthContext, task: Task) => {
+  const { userId } = ctx.auth;
 
   if (!userId) {
     throw new Error('Unauthorized: User not authenticated');
@@ -37,27 +36,22 @@ export const addTaskServer = withAuth(async (task: Task) => {
 });
 
 // Update a task, ensuring it belongs to the current user
-export const updateTaskServer = withAuth(
-  async (id: string, updates: Partial<Task>) => {
-    const userId = await getCurrentUserId();
+export const updateTaskServer = withAuth(async (ctx: AuthContext, id: string, updates: Partial<Task>) => {
+  const { userId } = ctx.auth;
 
-    if (!userId) {
-      throw new Error('Unauthorized: User not authenticated');
-    }
-
-    const tasksCollection = await getCollection<Task>('tasks');
-
-    // Only update if task belongs to current user
-    await tasksCollection.updateOne(
-      { _id: id, userId },
-      { $set: { ...updates, updatedAt: new Date() } }
-    );
+  if (!userId) {
+    throw new Error('Unauthorized: User not authenticated');
   }
-);
+
+  const tasksCollection = await getCollection<Task>('tasks');
+
+  // Only update if task belongs to current user
+  await tasksCollection.updateOne({ _id: id, userId }, { $set: { ...updates, updatedAt: new Date() } });
+});
 
 // Delete a task, ensuring it belongs to the current user
-export const deleteTaskServer = withAuth(async (id: string) => {
-  const userId = await getCurrentUserId();
+export const deleteTaskServer = withAuth(async (ctx: AuthContext, id: string) => {
+  const { userId } = ctx.auth;
 
   if (!userId) {
     throw new Error('Unauthorized: User not authenticated');
@@ -70,8 +64,8 @@ export const deleteTaskServer = withAuth(async (id: string) => {
 });
 
 // Delete several tasks, ensuring they belong to the current user
-export const deleteAllDayTasksServer = withAuth(async (dayToDelete: Date) => {
-  const userId = await getCurrentUserId();
+export const deleteAllDayTasksServer = withAuth(async (ctx: AuthContext, dayToDelete: Date) => {
+  const { userId } = ctx.auth;
 
   if (!userId) {
     throw new Error('Unauthorized: User not authenticated');
