@@ -6,6 +6,8 @@ import esTranslation from "../public/locales/es/common.json";
 i18next
   .use(initReactI18next) // Conecta i18next con react-i18next
   .init({
+  //   ns: ['common', 'moduleA', 'moduleB'],
+  // defaultNS: 'moduleA',
     resources: {
       en: { translation: enTranslation },
       es: { translation: esTranslation },
@@ -16,3 +18,5 @@ i18next
   });
 
 export default i18next;
+// i18next.loadNamespaces('anotherNamespace', (err, t) => { /* ... */ });
+//https://www.i18next.com/principles/namespaces
