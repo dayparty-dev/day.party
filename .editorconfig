@@ -1,0 +1,18 @@
+# EditorConfig is awesome: https://editorconfig.org
+root = true
+
+# Top-most EditorConfig file
+[*]
+
+# Set indentation to 2 spaces
+indent_style = space
+indent_size = 2
+
+# Ensure files end with a newline
+insert_final_newline = true
+
+# Trim trailing whitespace
+trim_trailing_whitespace = true
+
+# Use Unix-style line endings
+end_of_line = lf
