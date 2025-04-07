@@ -1,11 +1,10 @@
 'use client';
 
-import a from "../../i18n"; // Importa la inicialización
-import { useTranslation } from 'next-i18next';
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 import { useTaskContext } from '../../_contexts/TaskContext';
 
 export default function DayCapacity() {
-  const { t } = useTranslation("", { "i18n": a });
+  const { t } = useAppTranslation();
   const { tasks,
     dayCapacity,
     setDayCapacity,

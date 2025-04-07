@@ -3,9 +3,8 @@ import { Resizable } from 're-resizable';
 import { useSortable } from '@dnd-kit/sortable';
 import { useLongPress } from 'use-long-press';
 import { TaskStatus } from '../../_models/Task';
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 
-import a from "../../i18n"; // Importa la inicialización
-import { useTranslation } from 'next-i18next';
 
 interface SortableTaskProps {
   task: any; // Replace with proper Task type
@@ -24,7 +23,7 @@ const SortableTask = ({
   onResize,
   onLongPress,
 }: SortableTaskProps) => {
-  const { t } = useTranslation("", { "i18n": a });
+  const { t } = useAppTranslation();
 
   const [tempSize, setTempSize] = useState<number | null>(null);
 
