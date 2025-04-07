@@ -1,13 +1,9 @@
+import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { jwtDecode } from 'jwt-decode';
-import { useEffect, useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import createPersistedState from 'use-persisted-state';
-import { getCookie, setCookie, deleteCookie } from 'cookies-next';
-import {
-  createAuthSessionServer,
-  deleteAuthSessionServer,
-  verifyAuthSessionServer,
-} from './authActions';
 import { AuthTokenJwt } from '../_models/AuthTokenJwt';
+import { createAuthSessionServer, deleteAuthSessionServer, verifyAuthSessionServer } from './authActions';
 
 interface UseAuthUser {
   id: string;
@@ -38,9 +34,7 @@ export interface UseAuth {
 export function useAuth(): UseAuth {
   const [sessionId, setSessionId] = useSessionIdState<string | null>(null);
   const [token, setToken] = useState<string | null>(() => {
-    return typeof window !== 'undefined'
-      ? (getCookie(AUTH_TOKEN_COOKIE) as string) || null
-      : null;
+    return typeof window !== 'undefined' ? (getCookie(AUTH_TOKEN_COOKIE) as string) || null : null;
   });
 
   const [isLoggedIn, setIsLoggedIn] = useIsLoggedInState<boolean>(false);
@@ -73,26 +67,23 @@ export function useAuth(): UseAuth {
     });
   }, []);
 
-  const verifyLoginLink = useCallback(
-    async (candidateSessionId: string): Promise<void> => {
-      console.log('verifyLoginLink', candidateSessionId);
-      try {
-        const { token } = await verifyAuthSessionServer({
-          id: candidateSessionId,
-        });
+  const verifyLoginLink = useCallback(async (candidateSessionId: string): Promise<void> => {
+    console.log('verifyLoginLink', candidateSessionId);
+    try {
+      const { token } = await verifyAuthSessionServer({
+        id: candidateSessionId,
+      });
 
-        // Store token in cookies for server access
-        setCookie(AUTH_TOKEN_COOKIE, token, COOKIE_OPTIONS);
+      // Store token in cookies for server access
+      setCookie(AUTH_TOKEN_COOKIE, token, COOKIE_OPTIONS);
 
-        setToken(token);
-        setSessionId(candidateSessionId);
-        setIsLoggedIn(true);
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
-    []
-  );
+      setToken(token);
+      setSessionId(candidateSessionId);
+      setIsLoggedIn(true);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }, []);
 
   const clearState = useCallback(() => {
     setSessionId(null);

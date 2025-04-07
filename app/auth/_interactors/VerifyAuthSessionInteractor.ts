@@ -1,10 +1,10 @@
 import { Interactor } from 'app/_models/modules/Interactor';
+import { UserService, getUserService } from 'app/user/_services/UserService';
+import { getCollection } from 'lib/mongodb';
 import { AuthSession } from '../_models/AuthSession';
 import { AuthTokenSigningInput } from '../_models/AuthTokenSigningInput';
 import { AuthTokenService } from '../_services/AuthTokenService';
 import { JsonWebTokenAuthTokenService } from '../_services/JsonWebTokenAuthTokenService';
-import { getCollection } from 'lib/mongodb';
-import { UserService, getUserService } from 'app/user/_services/UserService';
 
 export interface VerifyAuthSessionInput {
   id: string;
@@ -14,19 +14,15 @@ export interface VerifyAuthSessionOutput {
   token: string;
 }
 
-export class VerifyAuthSessionInteractor
-  implements Interactor<VerifyAuthSessionInput, VerifyAuthSessionOutput>
-{
+export class VerifyAuthSessionInteractor implements Interactor<VerifyAuthSessionInput, VerifyAuthSessionOutput> {
   private readonly COLLECTION_NAME = 'auth_sessions';
 
   constructor(
     private readonly authTokenService: AuthTokenService = new JsonWebTokenAuthTokenService(),
-    private readonly userService: UserService = getUserService()
+    private readonly userService: UserService = getUserService(),
   ) {}
 
-  public async interact(
-    input: VerifyAuthSessionInput
-  ): Promise<VerifyAuthSessionOutput> {
+  public async interact(input: VerifyAuthSessionInput): Promise<VerifyAuthSessionOutput> {
     const authSession = await this.findAuthSession(input);
 
     // Find or create user
@@ -46,6 +42,7 @@ export class VerifyAuthSessionInteractor
       sessionId: authSession._id,
       email: authSession.email,
       userId: user._id,
+      role: user.role,
     };
 
     const signedToken = this.authTokenService.signToken(authTokenSigningDTO);
@@ -59,9 +56,7 @@ export class VerifyAuthSessionInteractor
     return output;
   }
 
-  private async findAuthSession(
-    input: VerifyAuthSessionInput
-  ): Promise<AuthSession> {
+  private async findAuthSession(input: VerifyAuthSessionInput): Promise<AuthSession> {
     try {
       const collection = await getCollection<AuthSession>(this.COLLECTION_NAME);
 
@@ -96,10 +91,7 @@ export class VerifyAuthSessionInteractor
   }
 
   // Add new method to update session with userId
-  private async updateSessionWithUserId(
-    sessionId: string,
-    userId: string
-  ): Promise<void> {
+  private async updateSessionWithUserId(sessionId: string, userId: string): Promise<void> {
     try {
       const collection = await getCollection<AuthSession>(this.COLLECTION_NAME);
 
@@ -113,10 +105,7 @@ export class VerifyAuthSessionInteractor
   private async invalidateSession(session: AuthSession): Promise<void> {
     try {
       const collection = await getCollection<AuthSession>(this.COLLECTION_NAME);
-      const result = await collection.updateOne(
-        { _id: session._id },
-        { $set: { isActive: true } }
-      );
+      const result = await collection.updateOne({ _id: session._id }, { $set: { isActive: true } });
 
       if (result.modifiedCount === 0) {
         throw new Error('Failed to invalidate session');

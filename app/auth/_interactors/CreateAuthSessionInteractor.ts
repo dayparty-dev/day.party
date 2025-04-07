@@ -1,12 +1,12 @@
 import dedent from 'dedent-tabs';
-import { ObjectId } from 'mongodb';
 
-import { Interactor } from 'app/_models/modules/Interactor';
-import { AuthSession } from '../_models/AuthSession';
-import { EmailService, getEmailService } from 'app/_services/EmailService';
 import { EmailMessage } from 'app/_models/EmailMessage';
 import { EmailSendInput } from 'app/_models/EmailSendInput';
+import { Interactor } from 'app/_models/modules/Interactor';
+import { EmailService, getEmailService } from 'app/_services/EmailService';
 import { getCollection } from 'lib/mongodb';
+import { nanoid } from 'nanoid';
+import { AuthSession } from '../_models/AuthSession';
 
 export interface CreateAuthSessionInput {
   email: string;
@@ -16,16 +16,11 @@ export interface CreateAuthSessionOutput {
   email: string;
 }
 
-export class CreateAuthSessionInteractor
-  implements Interactor<CreateAuthSessionInput, CreateAuthSessionOutput>
-{
+export class CreateAuthSessionInteractor implements Interactor<CreateAuthSessionInput, CreateAuthSessionOutput> {
   private readonly BASE_URL: string;
   private readonly COLLECTION_NAME = 'auth_sessions';
 
-  constructor(
-    env = process.env,
-    private readonly emailService: EmailService = getEmailService()
-  ) {
+  constructor(env = process.env, private readonly emailService: EmailService = getEmailService()) {
     if (env.BASE_URL) {
       this.BASE_URL = env.BASE_URL;
     } else if (env.VERCEL_PROJECT_PRODUCTION_URL) {
@@ -35,9 +30,7 @@ export class CreateAuthSessionInteractor
     }
   }
 
-  public async interact(
-    input: CreateAuthSessionInput
-  ): Promise<CreateAuthSessionOutput> {
+  public async interact(input: CreateAuthSessionInput): Promise<CreateAuthSessionOutput> {
     const { email: originalEmail } = input;
 
     if (this.isValidEmail(originalEmail)) {
@@ -72,7 +65,7 @@ export class CreateAuthSessionInteractor
 
     const now = new Date();
     const authSession: AuthSession = {
-      _id: new ObjectId().toString(),
+      _id: nanoid(),
       email,
       _createdAt: now,
       _updatedAt: now,
@@ -112,7 +105,7 @@ export class CreateAuthSessionInteractor
       <p>
         <strong><a href="${emailLink}">${emailLink}</a></strong>
       </p>
-      
+
       <p>¿No has sido tú? Ignora el enlace y avísanos con un correo a <a href="mailto:dayparty.dev@gmail.com">dayparty.dev@gmail.com</a>.</p>`;
 
     const emailMessage: EmailMessage = {
@@ -124,10 +117,7 @@ export class CreateAuthSessionInteractor
     return emailMessage;
   }
 
-  private async sendEmailMessage(
-    email: string,
-    emailMessage: EmailMessage
-  ): Promise<void> {
+  private async sendEmailMessage(email: string, emailMessage: EmailMessage): Promise<void> {
     const emailSendInput: EmailSendInput = {
       to: email,
       message: emailMessage,

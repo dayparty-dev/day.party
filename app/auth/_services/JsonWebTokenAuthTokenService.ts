@@ -1,10 +1,11 @@
 import jwt from 'jsonwebtoken';
 
-import { AuthTokenService } from './AuthTokenService';
-import { AuthTokenSigningInput } from '../_models/AuthTokenSigningInput';
-import { AuthTokenVerificationInput } from '../_models/AuthTokenVerificationInput';
+import { UserRole } from 'app/user/_models/User';
 import { AuthToken } from '../_models/AuthToken';
 import { AuthTokenJwt } from '../_models/AuthTokenJwt';
+import { AuthTokenSigningInput } from '../_models/AuthTokenSigningInput';
+import { AuthTokenVerificationInput } from '../_models/AuthTokenVerificationInput';
+import { AuthTokenService } from './AuthTokenService';
 
 interface JsonWebTokenAuthTokenServiceConfig {
   secret: string;
@@ -23,7 +24,7 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
 
   public signToken(authTokenSigningDTO: AuthTokenSigningInput): string {
     const token = jwt.sign(authTokenSigningDTO, this.config.secret, {
-      subject: authTokenSigningDTO.email,
+      subject: authTokenSigningDTO.userId,
       expiresIn: parseInt(this.config.expirationTimeSecs),
     });
 
@@ -36,10 +37,7 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
     const { token } = verificationDTO;
 
     try {
-      const verifiedToken = jwt.verify(
-        token,
-        this.config.secret
-      ) as AuthTokenJwt;
+      const verifiedToken = jwt.verify(token, this.config.secret) as AuthTokenJwt;
 
       const authToken = this.adaptJwtTokenToAuthToken(verifiedToken);
 
@@ -51,7 +49,7 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
   }
 
   public adaptJwtTokenToAuthToken(jwtToken: AuthTokenJwt): AuthToken {
-    const { sessionId, email, userId, exp } = jwtToken;
+    const { sessionId, email, userId, role, exp } = jwtToken;
 
     // TODO: actually check if session exists
 
@@ -61,6 +59,7 @@ export class JsonWebTokenAuthTokenService implements AuthTokenService {
       sessionId,
       email,
       userId,
+      role: role ?? UserRole.Standard,
       expiresAt,
     };
 
