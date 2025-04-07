@@ -1,10 +1,19 @@
+import { UserRole } from 'app/user/_models/User';
 import { cookies } from 'next/headers';
-import { JsonWebTokenAuthTokenService } from '../_services/JsonWebTokenAuthTokenService';
 import { redirect } from 'next/navigation';
+import { JsonWebTokenAuthTokenService } from '../_services/JsonWebTokenAuthTokenService';
 
 interface WithAuthOptions {
   redirectToLogin?: boolean;
 }
+
+export type AuthContext = {
+  auth: {
+    userId: string;
+    email: string;
+    role: UserRole;
+  };
+};
 
 /**
  * Higher-order function that wraps server actions to require authentication
@@ -13,11 +22,11 @@ interface WithAuthOptions {
  * @param options Options for authentication behavior
  * @returns The wrapped server action that checks for authentication
  */
-export function withAuth<T extends (...args: any[]) => Promise<any>>(
+export function withAuth<T extends (ctx: AuthContext, ...args: any[]) => Promise<any>>(
   action: T,
-  options: WithAuthOptions = {}
-): (...args: Parameters<T>) => Promise<ReturnType<T>> {
-  return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+  options: WithAuthOptions = {},
+): (...args: OmitFirstParam<Parameters<T>>) => Promise<ReturnType<T>> {
+  return async (...args: OmitFirstParam<Parameters<T>>): Promise<ReturnType<T>> => {
     const { redirectToLogin = false } = options;
     const cookieStore = await cookies();
 
@@ -35,16 +44,17 @@ export function withAuth<T extends (...args: any[]) => Promise<any>>(
       const authTokenService = new JsonWebTokenAuthTokenService();
       const authToken = authTokenService.verifyToken({ token });
 
-      // Add auth data to the context for the action to use
-      const contextWithAuth = {
+      // Create the auth context
+      const contextWithAuth: AuthContext = {
         auth: {
           userId: authToken.userId,
           email: authToken.email,
+          role: authToken.role,
         },
       };
 
-      // Call the original action with the auth context
-      return await action(...args, contextWithAuth);
+      // Call the original action with the injected context
+      return await action(contextWithAuth, ...args);
     } catch (error) {
       console.error('Authentication error:', error);
       if (redirectToLogin) {
@@ -54,3 +64,6 @@ export function withAuth<T extends (...args: any[]) => Promise<any>>(
     }
   };
 }
+
+// Utility type to omit the first parameter of a function
+type OmitFirstParam<T extends any[]> = T extends [any, ...infer Rest] ? Rest : never;

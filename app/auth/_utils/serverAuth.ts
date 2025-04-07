@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
-import { JsonWebTokenAuthTokenService } from '../_services/JsonWebTokenAuthTokenService';
 import { AuthToken } from '../_models/AuthToken';
+import { JsonWebTokenAuthTokenService } from '../_services/JsonWebTokenAuthTokenService';
 
 const AUTH_COOKIE_NAME = 'day_party_auth_token';
 
