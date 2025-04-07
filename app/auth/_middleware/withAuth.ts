@@ -1,3 +1,4 @@
+import { UserRole } from 'app/user/_models/User';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { JsonWebTokenAuthTokenService } from '../_services/JsonWebTokenAuthTokenService';
@@ -10,7 +11,7 @@ export type AuthContext = {
   auth: {
     userId: string;
     email: string;
-    role: string;
+    role: UserRole;
   };
 };
 
