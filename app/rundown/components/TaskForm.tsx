@@ -1,14 +1,12 @@
-import React from 'react';
-import a from "../../i18n"; // Importa la inicialización
-import { useTranslation } from 'next-i18next';
-
+import React, { useCallback } from 'react';
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
+import { useTaskContext } from '../../_contexts/TaskContext';
 
 interface TaskFormProps {
   newTaskTitle: string;
   setNewTaskTitle: (title: string) => void;
   newTaskSize: number;
   setNewTaskSize: (size: number) => void;
-  onSubmit: (e: React.FormEvent) => void;
 }
 
 const timeOptions = [
@@ -23,13 +21,51 @@ const TaskForm: React.FC<TaskFormProps> = ({
   setNewTaskTitle,
   newTaskSize,
   setNewTaskSize,
-  onSubmit,
 }) => {
-  const { t } = useTranslation("", { "i18n": a });
+  const { t } = useAppTranslation();
+  const {
+    addTask,
+    currentDate,
+    setCurrentDate,
+    dayCapacity,
+    totalMinutes,
+  } = useTaskContext();
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (newTaskTitle.trim()) {
+        const newTaskMinutes = newTaskSize * 15;
+        if (totalMinutes + newTaskMinutes > dayCapacity * 60) {
+          if (
+            confirm('This will exceed your daily capacity. Move to next day?')
+          ) {
+            const nextDay = new Date(currentDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            addTask({
+              title: newTaskTitle,
+              size: newTaskSize,
+              scheduledAt: nextDay,
+            });
+            setCurrentDate(nextDay);
+          }
+          return;
+        }
+        addTask({
+          title: newTaskTitle,
+          size: newTaskSize,
+          scheduledAt: currentDate,
+        });
+        setNewTaskTitle('');
+        setNewTaskSize(1);
+      }
+    },
+    [newTaskTitle, newTaskSize, addTask, currentDate, totalMinutes, dayCapacity]
+  );
 
   return (
     <>
-      <form onSubmit={onSubmit} className="task-form flex flex-col max-w-sm mx-auto sm:flex-row gap-2">
+      <form onSubmit={handleSubmit} className="task-form flex flex-col max-w-sm mx-auto sm:flex-row gap-2">
         <div className="flex w-full gap-2">
           <input
             type="text"

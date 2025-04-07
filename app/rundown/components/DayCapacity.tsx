@@ -2,21 +2,18 @@
 
 import a from "../../i18n"; // Importa la inicialización
 import { useTranslation } from 'next-i18next';
+import { useTaskContext } from '../../_contexts/TaskContext';
 
-interface DayCapacityProps {
-  capacity: number;
-  used: number;
-  onCapacityChange: (newCapacity: number) => void;
-}
-
-export default function DayCapacity({
-  capacity,
-  used,
-  onCapacityChange,
-}: DayCapacityProps) {
+export default function DayCapacity() {
   const { t } = useTranslation("", { "i18n": a });
-  const percentageUsed = (used / (capacity * 60)) * 100;
-  const isOverCapacity = used > capacity * 60;
+  const { tasks,
+    dayCapacity,
+    setDayCapacity,
+    totalMinutes,
+  } = useTaskContext();
+
+  const percentageUsed = (totalMinutes / (dayCapacity * 60)) * 100;
+  const isOverCapacity = totalMinutes > dayCapacity * 60;
 
   return (
     <>
@@ -25,8 +22,8 @@ export default function DayCapacity({
           <label className="flex items-center gap-2">
             {t('dayCapacity.label')}:
             <select
-              value={capacity}
-              onChange={(e) => onCapacityChange(Number(e.target.value))}
+              value={dayCapacity}
+              onChange={(e) => setDayCapacity(Number(e.target.value))}
               className="select select-bordered select-sm w-fit"
             >
               {[4, 6, 8, 10].map((value) => (
@@ -38,7 +35,7 @@ export default function DayCapacity({
           </label>
 
           <span className={`font-semibold ${isOverCapacity ? 'text-error' : ''}`}>
-            {Math.floor(used / 60)}h {used % 60}m / {capacity}h
+            {Math.floor(totalMinutes / 60)}h {totalMinutes % 60}m / {dayCapacity}h
           </span>
         </div>
 

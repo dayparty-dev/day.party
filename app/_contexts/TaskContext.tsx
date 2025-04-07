@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react';
-import useTasks from '../../_hooks/useTasks';
+import useTasks from '../_hooks/useTasks';
 import { Task } from 'app/_models/Task';
 
 interface TaskContextType {

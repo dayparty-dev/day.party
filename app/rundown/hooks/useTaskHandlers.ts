@@ -3,7 +3,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { TaskStatus, Task } from '../../_models/Task';
 
-export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setCurrentDate, currentDayTasks, addTask, newTaskTitle, setNewTaskTitle, newTaskSize, setNewTaskSize, totalMinutes, dayCapacity }) {
+export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setCurrentDate, currentDayTasks, dayCapacity }) {
   
   /**
    * Handles drag end event for task reordering
@@ -48,41 +48,6 @@ export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setC
       }
     },
     [tasks, setTasks, updateTask, currentDate, currentDayTasks]
-  );
-
-  /**
-   * Handles submission of new task
-   */
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (newTaskTitle.trim()) {
-        const newTaskMinutes = newTaskSize * 15;
-        if (totalMinutes + newTaskMinutes > dayCapacity * 60) {
-          if (
-            confirm('This will exceed your daily capacity. Move to next day?')
-          ) {
-            const nextDay = new Date(currentDate);
-            nextDay.setDate(nextDay.getDate() + 1);
-            addTask({
-              title: newTaskTitle,
-              size: newTaskSize,
-              scheduledAt: nextDay,
-            });
-            setCurrentDate(nextDay);
-          }
-          return;
-        }
-        addTask({
-          title: newTaskTitle,
-          size: newTaskSize,
-          scheduledAt: currentDate,
-        });
-        setNewTaskTitle('');
-        setNewTaskSize(1);
-      }
-    },
-    [newTaskTitle, newTaskSize, addTask, currentDate, totalMinutes, dayCapacity]
   );
 
     /**
@@ -217,5 +182,5 @@ export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setC
   // }, [currentTask, nextTask, updateTask, isFinishing]);
 
 
-  return { handleDragEnd, handleSubmit, handleStatusChange, handleTaskResize };
+  return { handleDragEnd, handleStatusChange, handleTaskResize };
 }

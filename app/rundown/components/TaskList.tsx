@@ -1,54 +1,75 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
   DragEndEvent,
   MeasuringStrategy,
+  Modifier,
 } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import SortableTask from './SortableTask';
-import { TaskStatus } from '../../_models/Task';
-
-import a from "../../i18n"; // Importa la inicialización
-import { useTranslation } from 'next-i18next';
+import { useTaskContext } from '../../_contexts/TaskContext';
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
+import { useTaskUtils } from '../hooks/useTaskUtils';
+import { useDndSensors } from '../hooks/useDndSensors';
+import { useTaskHandlers } from '../hooks/useTaskHandlers';
 
 interface TaskListProps {
-  tasks: any[]; // Replace with proper Task type
-  currentDayTasks: any[]; // Replace with proper Task type
   isEditMode: boolean;
-  sensors: any;
-  preventScaleModifier: any;
-  onDragEnd: (event: DragEndEvent) => void;
-  onDelete: (id: string) => void;
-  onResize: (id: string, size: number) => void;
-  onStatusChange: (id: string, status: TaskStatus) => void;
   onLongPress: () => void;
   setIsEditMode: (isEdit: boolean) => void;
 }
 
+// Preventable scale modifier
+const preventScaleModifier: Modifier = ({ transform }) => {
+  if (!transform) return transform;
+
+  const { x, y } = transform;
+
+  return {
+    x,
+    y,
+    scaleX: 1,
+    scaleY: 1,
+  };
+};
+
 const TaskList: React.FC<TaskListProps> = ({
-  tasks,
-  currentDayTasks,
   isEditMode,
-  sensors,
-  preventScaleModifier,
-  onDragEnd,
-  onDelete,
-  onResize,
-  onStatusChange,
   onLongPress,
   setIsEditMode,
 }) => {
-  const { t } = useTranslation("", { "i18n": a });
+  const { t } = useAppTranslation();
+  const { tasks,
+    addTask,
+    updateTask,
+    deleteTask,
+    setTasks,
+    currentDate,
+    setCurrentDate,
+    dayCapacity,
+    currentDayTasks,
+  } = useTaskContext();
+
+  const dndSensors = useDndSensors();
+
+  const { ensureOneOngoingTask } = useTaskUtils({ tasks, setTasks, updateTask, currentDayTasks });
+  const { handleDragEnd, handleStatusChange, handleTaskResize } = useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setCurrentDate, currentDayTasks, dayCapacity });
+
+  // Only check for multiple ongoing tasks on initial load
+  useEffect(() => {
+    ensureOneOngoingTask();
+  }, []); // Empty dependency array means it only runs once on mount
+
 
   return (
     <DndContext
-      sensors={sensors}
+      sensors={dndSensors}
       collisionDetection={closestCenter}
-      onDragEnd={onDragEnd}
+      onDragEnd={handleDragEnd}
       modifiers={[preventScaleModifier]}
       measuring={{
         droppable: {
@@ -66,9 +87,9 @@ const TaskList: React.FC<TaskListProps> = ({
               key={task._id}
               task={task}
               isEditMode={isEditMode}
-              onDelete={onDelete}
-              onResize={onResize}
-              onStatusChange={onStatusChange}
+              onDelete={deleteTask}
+              onResize={handleTaskResize}
+              onStatusChange={handleStatusChange}
               onLongPress={onLongPress}
             />
           ))}

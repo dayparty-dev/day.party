@@ -2,26 +2,24 @@
 
 import Calendar from './Calendar/Calendar';
 import { useState } from 'react';
+import { useTaskContext } from '../../_contexts/TaskContext';
 
-interface DayNavigatorProps {
-  currentDate: Date;
-  onDateChange: (date: Date) => void;
-}
-
-export default function DayNavigator({
-  currentDate,
-  onDateChange,
-}: DayNavigatorProps) {
+export default function DayNavigator() {
   const [showCalendar, setShowCalendar] = useState(false);
+
+  const {
+    currentDate,
+    setCurrentDate,
+  } = useTaskContext();
 
   // Modificado para aceptar tanto número como Date
   const goToDay = (offsetOrDate: number | Date) => {
     if (offsetOrDate instanceof Date) {
-      onDateChange(offsetOrDate);
+      setCurrentDate(offsetOrDate);
     } else {
       const newDate = new Date(currentDate);
       newDate.setDate(newDate.getDate() + offsetOrDate);
-      onDateChange(newDate);
+      setCurrentDate(newDate);
     }
   };
 
