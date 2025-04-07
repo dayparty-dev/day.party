@@ -39,11 +39,5 @@ export function useTaskUtils({ tasks, setTasks, updateTask, currentDayTasks }) {
     }
   };
 
-    // Calculate total minutes once
-    const totalMinutes = useMemo(
-      () => currentDayTasks.reduce((acc, task) => acc + task.size * 15, 0),
-      [currentDayTasks]
-    );
-
   return { ensureOneOngoingTask };
 }
