@@ -3,7 +3,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { TaskStatus, Task } from '../../_models/Task';
 
-export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setCurrentDate, currentDayTasks, dayCapacity }) {
+export function useTaskHandlers({ tasksByDate, setTasks, updateTask, currentDate, setCurrentDate, currentDayTasks, dayCapacity }) {
   
   /**
    * Handles drag end event for task reordering
@@ -24,7 +24,7 @@ export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setC
         const newDayTasks = arrayMove(currentDayTasks, oldIndex, newIndex);
 
         // Update all tasks while preserving tasks from other days
-        const otherTasks = tasks.filter(
+        const otherTasks = tasksByDate.filter(
           (task) =>
             new Date(task.scheduledAt).toDateString() !==
             currentDate.toDateString()
@@ -47,7 +47,7 @@ export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setC
         });
       }
     },
-    [tasks, setTasks, updateTask, currentDate, currentDayTasks]
+    [tasksByDate, setTasks, updateTask, currentDate, currentDayTasks]
   );
 
     /**
@@ -55,7 +55,7 @@ export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setC
    */
     const handleStatusChange = useCallback(
       async (taskId: string, newStatus: TaskStatus) => {
-        const otherDayTasks = tasks.filter(
+        const otherDayTasks = tasksByDate.filter(
           (task) =>
             new Date(task.scheduledAt).toDateString() !==
             currentDate.toDateString()
@@ -123,7 +123,7 @@ export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setC
           }
         }
       },
-      [tasks, setTasks, updateTask, currentDate, currentDayTasks]
+      [tasksByDate, setTasks, updateTask, currentDate, currentDayTasks]
     );
 
       /**
@@ -131,7 +131,7 @@ export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setC
    */
   const handleTaskResize = useCallback(
     (id, size) => {
-      const task = tasks.find((t) => t._id === id);
+      const task = tasksByDate.find((t) => t._id === id);
       const otherTasksMinutes = currentDayTasks
         .filter((t) => t._id !== id)
         .reduce((acc, t) => acc + t.size * 15, 0);
@@ -150,7 +150,7 @@ export function useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setC
       }
       updateTask(id, { size });
     },
-    [tasks, updateTask, currentDate, dayCapacity, currentDayTasks]
+    [tasksByDate, updateTask, currentDate, dayCapacity, currentDayTasks]
   );
 
     /**

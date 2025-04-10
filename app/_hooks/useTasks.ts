@@ -1,312 +1,60 @@
-'use client';
-
-import { useState, useEffect, useMemo } from 'react';
-import { Task } from 'app/_models/Task';
-import {
-  addTaskServer,
-  updateTaskServer,
-  deleteTaskServer,
-  fetchTasksServer,
-  deleteAllDayTasksServer,
-} from '../_actions/tasks';
-import { nanoid } from 'nanoid';
+import { useMemo } from 'react';
+import { useTaskStore } from '../_stores/useTaskStore';
 import { isSameMonth, addMonths, subMonths } from 'date-fns';
-import { useAuth } from '../auth/_hooks/useAuth';
+import { Task } from '../_models/Task';
 
-const isCloudSyncEnabled =
-  process.env.NEXT_PUBLIC_IS_CLOUD_SYNC_ENABLED === 'true';
+export const useTasks = () => {
+  const isInitialized = useTaskStore(state => state.isInitialized);
 
-const getDateKey = (date: Date) => {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d.getTime().toString();
-};
+  // Obtener tareas globales
+  const tasksByDate = useTaskStore(state => state.tasksByDate);
 
-const loadTasksFromStorage = () => {
-  const stored = localStorage.getItem('tasks');
-  if (!stored) return {};
+  // Obtener tareas para el día seleccionado
+  const currentDayTasks = useTaskStore(state => state.currentDayTasks);
 
-  try {
-    const tasks = JSON.parse(stored, (key, value) =>
-      // FIXME: find better way to store complex values (i.e. Date) in JSON
-      key.endsWith('At') ? new Date(value) : value
-    );
+  // Obtener la capacidad del día
+  const dayCapacity = useTaskStore(state => state.dayCapacity);
 
-    return tasks;
-  } catch (e) {
-    console.error('Failed to parse tasks from localStorage:', e);
-    return {};
-  }
-};
+  // Obtener la fecha actual
+  const currentDate = useTaskStore(state => state.currentDate);
 
-// FIXME: this shouldn't be exported, but I need it for the logout page
-export const saveTasksToStorage = (tasksByDate: Record<string, Task[]>) => {
-  localStorage.setItem('tasks', JSON.stringify(tasksByDate));
-};
+  // Obtener el total de minutos de las tareas
+  const totalMinutes = useTaskStore(state => state.totalMinutes);
 
-export default function useTasks() {
-  // Store tasks grouped by date
-  const [tasksByDate, setTasksByDate] = useState<Record<string, Task[]>>({});
-  const [isInitialized, setIsInitialized] = useState(false);
-  const { user } = useAuth();
+  // Inicialización del store
+  const initialize = useTaskStore(state => state.initialize);
 
-  // Memoize the getDaysWithTasksInMonth function to avoid redundant calculations
-  // IMPORTANT: Always declare hooks at the top level to maintain consistent hook order
-  const getMemoizedDaysWithTasksInMonthRange = useMemo(() => {
-    // Create a cache to store the results for each month
-    const cache = new Map<string, Date[]>();
+  // Actualizar fecha actual
+  const setCurrentDate = useTaskStore(state => state.setCurrentDate);
 
-    return (month: Date) => {
-      if (!isInitialized) return [];
+  // Cambiar capacidad del día
+  const setDayCapacity = useTaskStore(state => state.setDayCapacity);
 
-      const monthKey = month.getFullYear() + '-' + month.getMonth();
+  // Establecer todas las tareas
+  const setTasks = useTaskStore(state => state.setTasks);
 
-      if (!cache.has(monthKey)) {
-        cache.set(monthKey, getDaysWithTasksInMonthRange(month, tasksByDate));
-      }
+  // Agregar tarea
+  const addTask = useTaskStore(state => state.addTask);
+  
+  // Actualizar tarea
+  const updateTask = useTaskStore(state => state.updateTask);
+  
+  // Delete task
+  const deleteTask = useTaskStore(state => state.deleteTask);
 
-      return cache.get(monthKey) || [];
-    };
-  }, [isInitialized, tasksByDate]); // Recalculate when initialized state or tasksByDate changes
+  // Delete all tasks for a specific day
+  const deleteAllDayTasks = useTaskStore(state => state.deleteAllDayTasks);
 
-  // Load initial data
-  useEffect(() => {
-    const loadTasks = async () => {
-      const storedTasks = loadTasksFromStorage();
-      setTasksByDate(storedTasks);
-      setIsInitialized(true);
+  // Get tasks for a specific date
+  const getTasksForDate = useTaskStore(state => state.getTasksForDate);
+  
+  // Establecer las tareas del día seleccionado
+  const setCurrentDayTasks = useTaskStore(state => state.setCurrentDayTasks);
 
-      // Then fetch from server if needed
-      if (isCloudSyncEnabled) {
-        try {
-          const cloudTasks = await fetchTasksServer();
+  // Calcular el total de minutos de las tareas
+  const calculateTotalMinutes = useTaskStore(state => state.calculateTotalMinutes);
 
-          if (cloudTasks && cloudTasks.length > 0) {
-            // Group cloud tasks by date
-            const groupedTasks = cloudTasks.reduce((acc, task) => {
-              const dateKey = getDateKey(new Date(task.scheduledAt));
-              if (!acc[dateKey]) acc[dateKey] = [];
-              acc[dateKey].push(task);
-              return acc;
-            }, {} as Record<string, Task[]>);
-
-            // Sort tasks within each date
-            Object.values(groupedTasks).forEach((dateTasks) => {
-              dateTasks.sort((a, b) => (a.order || 0) - (b.order || 0));
-            });
-
-            setTasksByDate(groupedTasks);
-            saveTasksToStorage(groupedTasks);
-          }
-        } catch (error) {
-          console.error('Error fetching tasks from server:', error);
-        }
-      }
-    };
-
-    loadTasks();
-  }, []);
-
-  // Don't render anything until we've initialized from localStorage
-  if (!isInitialized) {
-    return {
-      tasks: [],
-      addTask: () => Promise.resolve(),
-      updateTask: () => Promise.resolve(),
-      deleteTask: () => Promise.resolve(),
-      deleteAllDayTasks: () => Promise.resolve(),
-      setTasks: () => {},
-      getTasksForDate: () => [],
-      getDaysWithTasksInMonth: () => [],
-    };
-  }
-
-  const addTask = async ({
-    title,
-    size,
-    scheduledAt,
-  }: {
-    title: string;
-    size: number;
-    scheduledAt?: Date;
-  }) => {
-    const currentDate = new Date();
-    const normalizedScheduledAt = scheduledAt
-      ? new Date(scheduledAt)
-      : new Date();
-    normalizedScheduledAt.setHours(0, 0, 0, 0);
-
-    const dateKey = getDateKey(normalizedScheduledAt);
-    const dateTasks = tasksByDate[dateKey] || [];
-    const maxOrder =
-      dateTasks.length > 0
-        ? Math.max(...dateTasks.map((t) => t.order || 0))
-        : -1;
-
-    const task: Task = {
-      title,
-      size,
-      status: 'pending',
-      duration: size * 15,
-      createdAt: currentDate,
-      updatedAt: currentDate,
-      scheduledAt: normalizedScheduledAt,
-      _id: nanoid(),
-      order: maxOrder + 1,
-      userId: user?.id || 'local',
-    };
-
-    const updatedDateTasks = [...dateTasks, task].sort(
-      (a, b) => (a.order || 0) - (b.order || 0)
-    );
-    const updatedTasksByDate = {
-      ...tasksByDate,
-      [dateKey]: updatedDateTasks,
-    };
-
-    setTasksByDate(updatedTasksByDate);
-    saveTasksToStorage(updatedTasksByDate);
-
-    if (isCloudSyncEnabled) {
-      await addTaskServer(task);
-    }
-  };
-
-  const updateTask = async (
-    id: string,
-    updates: Partial<Task>,
-    options: { disableAutoPause?: boolean } = {}
-  ) => {
-    setTasksByDate((prevTasksByDate) => {
-      // Deep clone the state to avoid any mutation issues
-      const updatedTasksByDate = structuredClone(prevTasksByDate);
-
-      // Find the task and its date
-      let targetDateKey: string | null = null;
-      let targetTask: Task | null = null;
-
-      // Find the task
-      for (const [dateKey, dateTasks] of Object.entries(updatedTasksByDate)) {
-        const task = dateTasks.find((t) => t._id === id);
-        if (task) {
-          targetDateKey = dateKey;
-          targetTask = task;
-          break;
-        }
-      }
-
-      if (!targetDateKey || !targetTask) return prevTasksByDate;
-
-      const dateTasks = updatedTasksByDate[targetDateKey];
-
-      // If this is a status update
-      if ('status' in updates) {
-        // For updates setting to "ongoing", run auto-pause logic only if not disabled
-        if (updates.status === 'ongoing' && !options.disableAutoPause) {
-          dateTasks.forEach((task) => {
-            if (task._id !== id && task.status === 'ongoing') {
-              task.status = 'paused';
-              task.updatedAt = new Date();
-            }
-          });
-        }
-
-        // Update the target task
-        const taskToUpdate = dateTasks.find((t) => t._id === id);
-        if (taskToUpdate) {
-          Object.assign(taskToUpdate, {
-            ...updates,
-            updatedAt: new Date(),
-          });
-        }
-
-        // Sort tasks based on status
-        dateTasks.sort((a, b) => {
-          if (a.status === 'ongoing') return -1;
-          if (b.status === 'ongoing') return 1;
-          if (a.status === 'paused' && b.status !== 'paused') return -1;
-          if (b.status === 'paused' && a.status !== 'paused') return 1;
-          if (a.status === 'done' && b.status !== 'done') return 1;
-          if (b.status === 'done' && a.status !== 'done') return -1;
-          return (a.order || 0) - (b.order || 0);
-        });
-
-        // Update orders after sorting
-        dateTasks.forEach((task, index) => {
-          task.order = index;
-        });
-      } else {
-        // For non-status updates, just update the task
-        const taskToUpdate = dateTasks.find((t) => t._id === id);
-        if (taskToUpdate) {
-          Object.assign(taskToUpdate, {
-            ...updates,
-            updatedAt: new Date(),
-          });
-        }
-      }
-
-      // Save to storage
-      saveTasksToStorage(updatedTasksByDate);
-
-      // Return new state
-      return updatedTasksByDate;
-    });
-
-    // Update server if needed
-    if (isCloudSyncEnabled) {
-      await updateTaskServer(id, updates);
-    }
-  };
-
-  const deleteTask = async (id: string) => {
-    const updatedTasksByDate = { ...tasksByDate };
-    let found = false;
-
-    for (const dateKey of Object.keys(updatedTasksByDate)) {
-      const dateTasks = updatedTasksByDate[dateKey];
-      const taskIndex = dateTasks.findIndex((t) => t._id === id);
-
-      if (taskIndex !== -1) {
-        updatedTasksByDate[dateKey] = dateTasks.filter((t) => t._id !== id);
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) return;
-
-    setTasksByDate(updatedTasksByDate);
-    saveTasksToStorage(updatedTasksByDate);
-
-    if (isCloudSyncEnabled) {
-      await deleteTaskServer(id);
-    }
-  };
-
-  const deleteAllDayTasks = async (dayToDelete: Date) => {
-    const updatedTasksByDate = { ...tasksByDate };
-
-    const dateKey = getDateKey(dayToDelete);
-
-    if (tasksByDate[dateKey]) {
-      delete updatedTasksByDate[dateKey];
-
-      setTasksByDate(updatedTasksByDate);
-      saveTasksToStorage(updatedTasksByDate);
-
-      if (isCloudSyncEnabled) {
-        await deleteAllDayTasksServer(dayToDelete);
-      }
-    }
-  };
-
-  const getTasksForDate = (date: Date) => {
-    const dateKey = getDateKey(date);
-    return tasksByDate[dateKey] || [];
-  };
-
-  // Helper function moved outside the hook order to avoid issues
+    // Helper function moved outside the hook order to avoid issues
   // This is now a regular function, not a hook
   const getDaysWithTasksInMonthRange = (
     month: Date,
@@ -337,29 +85,43 @@ export default function useTasks() {
 
     return Array.from(daysWithTasks.values());
   };
-
-  // Flatten tasks for compatibility with existing code
-  const allTasks = Object.values(tasksByDate).flat();
+ 
+  const getMemoizedDaysWithTasksInMonthRange = useMemo(() => {
+    const cache = new Map<string, Date[]>();
+    return (month: Date) => {
+      console.log("isInitialized", isInitialized);
+      console.log("tasksByDate", tasksByDate);
+      // if (!isInitialized) return [];
+  
+      const monthKey = `${month.getFullYear()}-${month.getMonth()}`;
+      console.log("cache", cache);
+      console.log("monthKey", monthKey);
+      if (!cache.has(monthKey)) {
+        console.log("Calculating days with tasks for month", monthKey);
+        cache.set(monthKey, getDaysWithTasksInMonthRange(month, tasksByDate));
+      }
+  
+      return cache.get(monthKey) || [];
+    };
+  }, [isInitialized, tasksByDate]);
 
   return {
-    tasks: allTasks,
+    tasksByDate,
+    currentDayTasks,
+    dayCapacity,
+    currentDate,
+    totalMinutes,
+    initialize,
+    setCurrentDate,
+    setDayCapacity,
+    setTasks,
     addTask,
     updateTask,
     deleteTask,
     deleteAllDayTasks,
-    setTasks: (newTasks: Task[]) => {
-      // Group tasks by date when setting them
-      const grouped = newTasks.reduce((acc, task) => {
-        const dateKey = getDateKey(task.scheduledAt);
-        if (!acc[dateKey]) acc[dateKey] = [];
-        acc[dateKey].push(task);
-        return acc;
-      }, {} as Record<string, Task[]>);
-
-      setTasksByDate(grouped);
-      saveTasksToStorage(grouped);
-    },
     getTasksForDate,
-    getDaysWithTasksInMonth: getMemoizedDaysWithTasksInMonthRange,
+    setCurrentDayTasks,
+    calculateTotalMinutes,
+    getDaysWithTasksInMonth :getMemoizedDaysWithTasksInMonthRange,
   };
-}
+};

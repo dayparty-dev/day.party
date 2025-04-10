@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { FaUser, FaTasks, FaTimes } from 'react-icons/fa';
 import useKeyboardShortcut from 'app/_hooks/useKeyboardShortcut';
 import { toast } from 'react-toastify';
-import useTasks from 'app/_hooks/useTasks';
+import { useTasks } from 'app/_hooks/useTasks';
 import { Task } from 'app/_models/Task';
 import SearchBar from './SearchBar';
 import Section from './Section';
@@ -28,7 +28,7 @@ export interface MenuOption {
 
 export default function AdminPanel() {
   const {
-    tasks,
+    currentDayTasks,
     addTask,
     updateTask,
     deleteTask,
@@ -39,7 +39,6 @@ export default function AdminPanel() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const [dayTasks, setDayTasks] = useState<Task[]>([]);
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [visibleSections, setVisibleSections] = useState<string[]>([
     'users',
@@ -73,17 +72,17 @@ export default function AdminPanel() {
     setSelectedSection(sectionId); // Actualiza el estado con la sección seleccionada
   };
 
-  useEffect(() => {
-    const newTasks = getTasksForDate(selectedDay);
+  // useEffect(() => {
+  //   const newTasks = getTasksForDate(selectedDay);
 
-    // Comparación profunda para evitar actualizaciones innecesarias
-    setDayTasks(prev => {
-      const prevIds = prev.map(task => task._id).join(',');
-      const newIds = newTasks.map(task => task._id).join(',');
+  //   // Comparación profunda para evitar actualizaciones innecesarias
+  //   setDayTasks(prev => {
+  //     const prevIds = prev.map(task => task._id).join(',');
+  //     const newIds = newTasks.map(task => task._id).join(',');
 
-      return prevIds === newIds ? prev : newTasks;
-    });
-  }, [getTasksForDate, selectedDay]); // Añade selectedDay como dependencia
+  //     return prevIds === newIds ? prev : newTasks;
+  //   });
+  // }, [getTasksForDate, selectedDay]); // Añade selectedDay como dependencia
 
 
   // Filtrar opciones y secciones basadas en la búsqueda
@@ -113,20 +112,20 @@ export default function AdminPanel() {
   // Manejador para añadir una nueva tarea
   const handleTaskCreated = (task: Task) => {
     addTask(task);
-    setDayTasks([...dayTasks, task]);
+    // setDayTasks([...dayTasks, task]);
     toast.success(`Task "${task.title}" created successfully`);
   };
 
   // Manejador para añadir una nueva tarea
   const handleTaskUpdated = (task: Task) => {
     updateTask(task._id, task);
-    setDayTasks((prevTasks) => {
-      const newTasks = prevTasks.map((t) => {
-        return t._id === task._id ? task : t;
-      });
+    // setDayTasks((prevTasks) => {
+    //   const newTasks = prevTasks.map((t) => {
+    //     return t._id === task._id ? task : t;
+    //   });
 
-      return newTasks;
-    });
+    //   return newTasks;
+    // });
 
     toast.success(`Task "${task.title}" updated successfully`);
   };
@@ -142,7 +141,7 @@ export default function AdminPanel() {
   // Manejador para borrar todas las tareas de hoy
   const handleDeleteTodaysTasks = (date: Date = new Date()) => {
     deleteAllDayTasks(date);
-    setDayTasks([]);
+    //setDayTasks([]);
 
     toast.success(`Deleted tasks from today`);
   };
@@ -153,10 +152,10 @@ export default function AdminPanel() {
 
   // Mostrar mensaje de cuántas tareas activas hay
   useEffect(() => {
-    if (dayTasks.length > 0 && isExpanded) {
-      toast.info(`You have ${dayTasks.length} active task(s)`);
+    if (currentDayTasks.length > 0 && isExpanded) {
+      toast.info(`You have ${currentDayTasks.length} active task(s)`);
     }
-  }, [isExpanded, dayTasks.length]);
+  }, [isExpanded, currentDayTasks.length]);
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -211,7 +210,7 @@ export default function AdminPanel() {
                 isSelected={selectedSection === 'tasks'}
               >
                 <TaskManagement
-                  dayTasks={dayTasks}
+                  dayTasks={currentDayTasks}
                   visibleActions={visibleActions}
                   selectedAction={selectedOption && selectedOption.section == "tasks" ? selectedOption.form as TaskFormAction : "NONE"}
                   onTaskCreated={handleTaskCreated}

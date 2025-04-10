@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaCalendarTimes, FaCheckCircle } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { nanoid } from 'nanoid';
-import useTasks from 'app/_hooks/useTasks';
+import { useTasks } from 'app/_hooks/useTasks';
 import { Task } from 'app/_models/Task';
 import DayNavigator from 'app/rundown/components/DayNavigator';
 import navTo from 'app/_utils/navTo';
@@ -54,8 +54,13 @@ export default function TaskManagement({
   onTasksDeleted,
   onDateChanged
 }: TaskManagementProps) {
-  const [date, setDate] = useState(new Date());
-  const [taskData, setTaskData] = useState<Task>(getDefaultTask(date));
+  const {
+    currentDate,
+    setCurrentDate,
+  } = useTasks();
+
+  // const [date, setDate] = useState(new Date());
+  const [taskData, setTaskData] = useState<Task>(getDefaultTask(currentDate));
 
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   // const [tasks, setTasks] = useState(getTasksForDate(date));
@@ -65,7 +70,7 @@ export default function TaskManagement({
 
   const changeDate = (date: Date) => {
     onDateChanged(date);
-    setDate(date);
+    // setDate(currentDate);
     setTaskData((prevTask) => ({
       ...prevTask, // Mantén las demás propiedades de la tarea
       scheduledAt: date, // Actualiza "scheduledAt" con la nueva fecha
@@ -75,13 +80,11 @@ export default function TaskManagement({
   // Función para resetear el formulario
   const resetForm = () => {
     const id = nanoid(3);
-    setTaskData(getDefaultTask(date));
+    setTaskData(getDefaultTask(currentDate));
   };
 
   useEffect(() => {
-    console.log("ACTION", selectedAction);
     setFormMode(() => selectedAction);
-    console.log("FORM MODE", formMode);
   }, [selectedAction]);
 
   // Función para cambiar el modo del formulario
@@ -158,10 +161,9 @@ export default function TaskManagement({
   // };
 
   const handleDeleteSelectedDayTasks = () => {
-    console.log("OK");
-    toast.success(`All of ${date.toISOString().split('T')[0]} tasks have been deleted`);
+    toast.success(`All of ${currentDate} tasks have been deleted`);
     if (onTasksDeleted) {
-      onTasksDeleted(date);
+      onTasksDeleted(new Date(currentDate));
     }
   };
 
@@ -185,13 +187,13 @@ export default function TaskManagement({
             <input
               type="date"
               className="input input-bordered input-sm mb-2"
-              value={date.toISOString().split('T')[0]}
+              value={currentDate.toISOString().split('T')[0]}
               onChange={(e) => {
                 setTaskData({
                   ...taskData,
                   scheduledAt: new Date(e.target.value),
                 });
-                setDate(new Date(e.target.value));
+                // setCurrentDate(new Date(e.target.value));
               }
               }
             />
