@@ -39,7 +39,6 @@ export default function AdminPanel() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [visibleSections, setVisibleSections] = useState<string[]>([
     'users',
     'tasks',
@@ -132,8 +131,6 @@ export default function AdminPanel() {
 
   // Manejador para eliminae una tarea
   const handleDeleteTask = (id: string) => {
-    // TODO remove task with id
-    //setDayTasks([...dayTasks, task]);
     deleteTask(id);
     toast.success(`Task "${id}" deleted successfully`);
   };
@@ -217,7 +214,6 @@ export default function AdminPanel() {
                   onTaskUpdated={handleTaskUpdated}
                   deleteTask={handleDeleteTask}
                   onTasksDeleted={handleDeleteTodaysTasks}
-                  onDateChanged={(date) => setSelectedDay(date)}
                 />
               </Section>
             </div>

@@ -99,10 +99,12 @@ export const useTaskStore = create<State & Actions>()(
           get().setCurrentDayTasks(); // Actualiza las tareas para la fecha actual
         },
 
-
         // Establece la capacidad del día en horas
-        setDayCapacity: (capacity) => set({ dayCapacity: capacity }),
-
+        setDayCapacity: (capacity) => {
+          set({ dayCapacity: capacity });
+          get().calculateTotalMinutes(); // Añadir esto si necesitas lógica adicional
+        },
+        
         // Obtiene las tareas para una fecha específica
         getTasksForDate: (date) => {
           const dateKey = getDateKey(date);
@@ -147,55 +149,128 @@ export const useTaskStore = create<State & Actions>()(
           const currentDateKey = getDateKey(get().currentDate);
           const updatedTasks = tasksByDate[currentDateKey] || [];
           set({ currentDayTasks: updatedTasks });
+          get().calculateTotalMinutes();
           localStorage.setItem('tasks', JSON.stringify(tasksByDate));
 
           if (isCloudSyncEnabled) await addTaskServer(task);
         },
 
         // Actualiza una tarea existente
+        // updateTask: async (id, updates, options) => {
+        //   const tasksByDate = structuredClone(get().tasksByDate);
+
+        //   let dateKey: string | null = null;
+        //   let targetTask: Task | null = null;
+
+        //   for (const [key, dateTasks] of Object.entries(tasksByDate)) {
+        //     const task = dateTasks.find(t => t._id === id);
+        //     if (task) {
+        //       dateKey = key;
+        //       targetTask = task;
+        //       break;
+        //     }
+        //   }
+
+        //   if (!dateKey || !targetTask) return;
+
+        //   const dateTasks = tasksByDate[dateKey];
+
+        //   if ('status' in updates && updates.status === 'ongoing' && !options.disableAutoPause) {
+        //     for (const t of dateTasks) {
+        //       if (t._id !== id && t.status === 'ongoing') {
+        //         t.status = 'paused';
+        //         t.updatedAt = new Date();
+        //       }
+        //     }
+        //   }
+
+        //   Object.assign(targetTask, { ...updates, updatedAt: new Date() });
+
+        //   // Ordenar tareas
+        //   dateTasks.sort((a, b) => {
+        //     const statusOrder = { ongoing: 0, paused: 1, pending: 2, done: 3 };
+        //     return (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
+        //   });
+
+        //   dateTasks.forEach((task, index) => {
+        //     task.order = index;
+        //   });
+
+        //   set({ tasksByDate });
+        //   // Actualizamos currentDayTasks
+        //   const currentDateKey = getDateKey(get().currentDate);
+        //   const updatedTasks = tasksByDate[currentDateKey] || [];
+        //   set({ currentDayTasks: updatedTasks });
+        //   localStorage.setItem('tasks', JSON.stringify(tasksByDate));
+
+        //   if (isCloudSyncEnabled) await updateTaskServer(id, updates);
+        // },
         updateTask: async (id, updates, options) => {
           const tasksByDate = structuredClone(get().tasksByDate);
-
-          let dateKey: string | null = null;
+          let originalDateKey: string | null = null;
           let targetTask: Task | null = null;
-
+        
+          // 1. Encontrar la tarea y su fecha original
           for (const [key, dateTasks] of Object.entries(tasksByDate)) {
-            const task = dateTasks.find(t => t._id === id);
-            if (task) {
-              dateKey = key;
-              targetTask = task;
+            const taskIndex = dateTasks.findIndex(t => t._id === id);
+            if (taskIndex > -1) {
+              originalDateKey = key;
+              targetTask = dateTasks[taskIndex];
               break;
             }
           }
-
-          if (!dateKey || !targetTask) return;
-
-          const dateTasks = tasksByDate[dateKey];
-
-          if ('status' in updates && updates.status === 'ongoing' && !options.disableAutoPause) {
-            for (const t of dateTasks) {
-              if (t._id !== id && t.status === 'ongoing') {
-                t.status = 'paused';
-                t.updatedAt = new Date();
-              }
-            }
+        
+          if (!originalDateKey || !targetTask) return;
+        
+          // 2. Remover de la fecha original
+          const originalTasks = tasksByDate[originalDateKey].filter(t => t._id !== id);
+          if (originalTasks.length > 0) {
+            tasksByDate[originalDateKey] = originalTasks;
+          } else {
+            delete tasksByDate[originalDateKey];
           }
-
-          Object.assign(targetTask, { ...updates, updatedAt: new Date() });
-
-          // Ordenar tareas
-          dateTasks.sort((a, b) => {
+        
+          // 3. Determinar nueva fecha
+          const newScheduledAt = updates.scheduledAt ? new Date(updates.scheduledAt) : targetTask.scheduledAt;
+          const newDateKey = getDateKey(newScheduledAt);
+        
+          // 4. Añadir a la nueva fecha
+          if (!tasksByDate[newDateKey]) {
+            tasksByDate[newDateKey] = [];
+          }
+          
+          // 5. Aplicar actualizaciones
+          const updatedTask = {
+            ...targetTask,
+            ...updates,
+            updatedAt: new Date()
+          };
+          
+          tasksByDate[newDateKey].push(updatedTask);
+        
+          // 6. Ordenar y actualizar estado
+          tasksByDate[newDateKey].sort((a, b) => {
             const statusOrder = { ongoing: 0, paused: 1, pending: 2, done: 3 };
             return (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
           });
-
-          dateTasks.forEach((task, index) => {
+        
+          tasksByDate[newDateKey].forEach((task, index) => {
             task.order = index;
           });
-
+        
+          // 7. Actualizar estado global
           set({ tasksByDate });
+        
+          // 8. Actualizar currentDayTasks si es necesario
+          const currentDateKey = getDateKey(get().currentDate);
+          const updatedTasks = tasksByDate[currentDateKey] || [];
+          set({ currentDayTasks: updatedTasks });
+          // if (currentDateKey === newDateKey) {
+          //   set({ currentDayTasks: tasksByDate[newDateKey] });
+          // }
+          get().calculateTotalMinutes();
           localStorage.setItem('tasks', JSON.stringify(tasksByDate));
-
+          
           if (isCloudSyncEnabled) await updateTaskServer(id, updates);
         },
 
@@ -216,7 +291,9 @@ export const useTaskStore = create<State & Actions>()(
           // Actualizamos currentDayTasks
           const currentDateKey = getDateKey(get().currentDate);
           const updatedTasks = tasksByDate[currentDateKey] || [];
-          set({ currentDayTasks: updatedTasks });          localStorage.setItem('tasks', JSON.stringify(tasksByDate));
+          set({ currentDayTasks: updatedTasks });
+          localStorage.setItem('tasks', JSON.stringify(tasksByDate));
+          get().calculateTotalMinutes();
 
           if (isCloudSyncEnabled) await deleteTaskServer(id);
         },
@@ -231,6 +308,7 @@ export const useTaskStore = create<State & Actions>()(
             set({ tasksByDate });
             set({ currentDayTasks: [] });
             localStorage.setItem('tasks', JSON.stringify(tasksByDate));
+            get().calculateTotalMinutes();
         
             if (isCloudSyncEnabled) {
               await deleteAllDayTasksServer(dayToDelete);
@@ -242,13 +320,19 @@ export const useTaskStore = create<State & Actions>()(
         setCurrentDayTasks: () => {
           const tasks = get().getTasksForDate(get().currentDate);
           set({ currentDayTasks: tasks });
+          get().calculateTotalMinutes(); // Añadir esto
         },
 
         // Calcula el total de minutos de tareas del día seleccionado
+        // calculateTotalMinutes: () => {
+        //   const total = get().currentDayTasks.reduce((sum, task) => sum + task.duration, 0);
+        //   set({ totalMinutes: total });
+        // },
         calculateTotalMinutes: () => {
-          const total = get().currentDayTasks.reduce((sum, task) => sum + task.duration, 0);
+          const total = get().currentDayTasks.reduce((sum, task) => sum + (task.duration || 0), 0);
           set({ totalMinutes: total });
         },
+        
       };
     },
     {

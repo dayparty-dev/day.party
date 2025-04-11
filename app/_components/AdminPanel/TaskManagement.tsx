@@ -24,7 +24,6 @@ interface TaskManagementProps {
   onTaskUpdated: (task: Task) => void;
   deleteTask: (id: string) => void;
   onTasksDeleted: (date?: Date) => void;
-  onDateChanged: (date: Date) => void;
 }
 
 const getDefaultTask = (date) => {
@@ -52,12 +51,13 @@ export default function TaskManagement({
   onTaskUpdated,
   deleteTask,
   onTasksDeleted,
-  onDateChanged
 }: TaskManagementProps) {
   const {
     currentDate,
-    setCurrentDate,
+    // setCurrentDate,
   } = useTasks();
+
+  console.log('dayTals', dayTasks);
 
   // const [date, setDate] = useState(new Date());
   const [taskData, setTaskData] = useState<Task>(getDefaultTask(currentDate));
@@ -69,12 +69,11 @@ export default function TaskManagement({
   const titleInputRef = useRef<HTMLInputElement>(null);
 
   const changeDate = (date: Date) => {
-    onDateChanged(date);
-    // setDate(currentDate);
     setTaskData((prevTask) => ({
       ...prevTask, // Mantén las demás propiedades de la tarea
-      scheduledAt: date, // Actualiza "scheduledAt" con la nueva fecha
+      scheduledAt: new Date(date), // Actualiza "scheduledAt" con la nueva fecha
     }));
+    // setDate(currentDate);
   }
 
   // Función para resetear el formulario
@@ -137,6 +136,7 @@ export default function TaskManagement({
         break;
       case 'EDIT':
         // toast.success('Task updated successfully');
+        console.log('Task updated successfully', taskData);
         if (onTaskUpdated) {
           onTaskUpdated(taskData);
         }
@@ -187,12 +187,13 @@ export default function TaskManagement({
             <input
               type="date"
               className="input input-bordered input-sm mb-2"
-              value={currentDate.toISOString().split('T')[0]}
+              defaultValue={new Date(currentDate).toISOString().split('T')[0]}
               onChange={(e) => {
-                setTaskData({
-                  ...taskData,
-                  scheduledAt: new Date(e.target.value),
-                });
+                changeDate(new Date(e.target.value));
+                // setTaskData({
+                //   ...taskData,
+                //   scheduledAt: new Date(e.target.value),
+                // });
                 // setCurrentDate(new Date(e.target.value));
               }
               }
