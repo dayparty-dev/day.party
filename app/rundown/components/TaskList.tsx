@@ -59,7 +59,8 @@ const TaskList: React.FC<TaskListProps> = ({
   const dndSensors = useDndSensors();
 
   const { ensureOneOngoingTask } = useTaskUtils({ tasksByDate, setTasks, updateTask, currentDayTasks });
-  const { handleDragEnd, handleStatusChange, handleTaskResize } = useTaskHandlers({ tasksByDate, setTasks, updateTask, currentDate, setCurrentDate, currentDayTasks, dayCapacity });
+  // const { handleDragEnd, handleStatusChange, handleTaskResize } = useTaskHandlers({ tasksByDate, setTasks, updateTask, currentDate, setCurrentDate, currentDayTasks, dayCapacity });
+  const { handleDragEnd, handleStatusChange, handleTaskResize } = useTaskHandlers();
 
   // Only check for multiple ongoing tasks on initial load
   useEffect(() => {
