@@ -54,6 +54,8 @@ export const useTasks = () => {
   // Calcular el total de minutos de las tareas
   const calculateTotalMinutes = useTaskStore(state => state.calculateTotalMinutes);
 
+  const forceSync = useTaskStore(state => state.forceSync);
+
     // Helper function moved outside the hook order to avoid issues
   // This is now a regular function, not a hook
   const getDaysWithTasksInMonthRange = (
@@ -106,6 +108,7 @@ export const useTasks = () => {
   }, [isInitialized, tasksByDate]);
 
   return {
+    isInitialized,
     tasksByDate,
     currentDayTasks,
     dayCapacity,
@@ -123,5 +126,6 @@ export const useTasks = () => {
     setCurrentDayTasks,
     calculateTotalMinutes,
     getDaysWithTasksInMonth :getMemoizedDaysWithTasksInMonthRange,
+    forceSync
   };
 };

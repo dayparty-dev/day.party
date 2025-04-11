@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import DayCapacity from 'app/rundown/components/DayCapacity';
 import DayNavigator from 'app/rundown/components/DayNavigator';
@@ -10,18 +10,24 @@ import TaskList from './components/TaskList';
 // import { TaskProvider } from '../_contexts/TaskContext';
 import { useAuthGuard } from 'app/auth/_hooks/useAuthGuard';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
-
+import { useTasks } from 'app/_hooks/useTasks';
 import './styles.scss';
 
 export default function Rundown() {
   const { t } = useAppTranslation();
-
+  const { isInitialized, initialize } = useTasks();
   // UI state
   const [isEditMode, setIsEditMode] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskSize, setNewTaskSize] = useState(1);
 
   const { authGuard } = useAuthGuard();
+
+  useEffect(() => {
+    if (!isInitialized) {
+      initialize();
+    }
+  }, [isInitialized]);
 
   return authGuard(
     // <TaskProvider>

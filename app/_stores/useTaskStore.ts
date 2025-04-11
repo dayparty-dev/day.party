@@ -2,11 +2,12 @@ import { create } from 'zustand';
 import { Task ,TaskStatus } from 'app/_models/Task';
 import { nanoid } from 'nanoid';
 import { persist } from 'zustand/middleware';
-import { fetchTasksServer, addTaskServer, updateTaskServer, deleteTaskServer, deleteAllDayTasksServer } from 'app/_actions/tasks';
+import { fetchTasksServer, addTaskServer, updateTaskServer, deleteTaskServer, deleteAllDayTasksServer, syncTasksToServer } from 'app/_actions/tasks';
 // import { useAuth } from 'app/auth/_hooks/useAuth';
 
 interface State {
   tasksByDate: Record<string, Task[]>;
+  deletedTasks: { [taskId: string]: Task };
   currentDate: Date;
   dayCapacity: number; // capacidad por día (en horas)
   isInitialized: boolean;
@@ -28,6 +29,7 @@ interface Actions {
   getTasksForDate: (date: Date) => Task[];
   setCurrentDayTasks: () => void;
   calculateTotalMinutes: () => void;
+  forceSync: () => Promise<void>;
 }
 
 export const useTaskStore = create<State & Actions>()(
@@ -44,6 +46,7 @@ export const useTaskStore = create<State & Actions>()(
 
       return {
         tasksByDate: {},
+        deletedTasks: {},
         currentDate: new Date(),
         dayCapacity: 8, // capacidad por día, por ejemplo 8 horas
         isInitialized: false,
@@ -51,46 +54,101 @@ export const useTaskStore = create<State & Actions>()(
         totalMinutes: 0,
 
         // Inicializa las tareas desde el almacenamiento local o servidor
+        // initialize: async () => {
+        //   const stored = localStorage.getItem('tasks');
+        //   let tasks: Record<string, Task[]> = {};
+
+        //   if (stored) {
+        //     try {
+        //       tasks = JSON.parse(stored, (key, value) =>
+        //         key.endsWith('At') ? new Date(value) : value
+        //       );
+        //     } catch (e) {
+        //       console.error('Failed to parse tasks from storage:', e);
+        //     }
+        //   }
+
+        //   set({ tasksByDate: tasks, isInitialized: true });
+
+        //   // Cargar tareas desde el servidor si es necesario
+        //   if (isCloudSyncEnabled) {
+        //     try {
+        //       const cloudTasks = await fetchTasksServer();
+        //       if (cloudTasks?.length) {
+        //         const grouped = cloudTasks.reduce((acc, task) => {
+        //           const dateKey = getDateKey(new Date(task.scheduledAt));
+        //           acc[dateKey] = acc[dateKey] || [];
+        //           acc[dateKey].push(task);
+        //           return acc;
+        //         }, {} as Record<string, Task[]>);
+
+        //         for (const dateTasks of Object.values(grouped)) {
+        //           dateTasks.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        //         }
+
+        //         set({ tasksByDate: grouped });
+        //         localStorage.setItem('tasks', JSON.stringify(grouped));
+        //       }
+        //     } catch (error) {
+        //       console.error('Error fetching tasks from server:', error);
+        //     }
+        //   }
+        // },
         initialize: async () => {
+          console.log('🛠️ Initializing task store...');
+          console.log('isCloudSyncEnabled', isCloudSyncEnabled);
           const stored = localStorage.getItem('tasks');
           let tasks: Record<string, Task[]> = {};
-
+        
           if (stored) {
             try {
               tasks = JSON.parse(stored, (key, value) =>
                 key.endsWith('At') ? new Date(value) : value
               );
             } catch (e) {
-              console.error('Failed to parse tasks from storage:', e);
+              console.error('❌ Error parsing local tasks:', e);
             }
           }
-
+        
           set({ tasksByDate: tasks, isInitialized: true });
-
-          // Cargar tareas desde el servidor si es necesario
-          if (isCloudSyncEnabled) {
-            try {
-              const cloudTasks = await fetchTasksServer();
-              if (cloudTasks?.length) {
-                const grouped = cloudTasks.reduce((acc, task) => {
-                  const dateKey = getDateKey(new Date(task.scheduledAt));
-                  acc[dateKey] = acc[dateKey] || [];
-                  acc[dateKey].push(task);
-                  return acc;
-                }, {} as Record<string, Task[]>);
-
-                for (const dateTasks of Object.values(grouped)) {
-                  dateTasks.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-                }
-
-                set({ tasksByDate: grouped });
-                localStorage.setItem('tasks', JSON.stringify(grouped));
-              }
-            } catch (error) {
-              console.error('Error fetching tasks from server:', error);
+        
+          if (!isCloudSyncEnabled) return;
+        
+          try {
+            // 1. Subir solo tareas "dirty"
+            const allLocalTasks = Object.values(tasks).flat();
+            const dirtyTasks = allLocalTasks.filter(t => t.isDirty);
+            if (dirtyTasks.length > 0) {
+              await syncTasksToServer(dirtyTasks);
             }
+        
+            // 2. Descargar tareas del servidor
+            const cloudTasks = await fetchTasksServer();
+        
+            if (cloudTasks?.length) {
+              const grouped = cloudTasks.reduce((acc, task) => {
+                const dateKey = getDateKey(new Date(task.scheduledAt));
+                acc[dateKey] = acc[dateKey] || [];
+                acc[dateKey].push({
+                  ...task,
+                  isSynced: true,
+                  isDirty: false,
+                  lastSyncedAt: new Date(),
+                });
+                return acc;
+              }, {} as Record<string, Task[]>);
+        
+              for (const dateTasks of Object.values(grouped)) {
+                dateTasks.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+              }
+        
+              set({ tasksByDate: grouped });
+              localStorage.setItem('tasks', JSON.stringify(grouped));
+            }
+          } catch (error) {
+            console.error('🌩 Error during cloud sync:', error);
           }
-        },
+        },      
 
         // Establece la fecha seleccionada
         // setCurrentDate: (date) => set({ currentDate: date }),
@@ -135,11 +193,13 @@ export const useTaskStore = create<State & Actions>()(
             status: 'pending',
             duration: size * 15,
             createdAt: currentDate,
-            updatedAt: currentDate,
             scheduledAt: normalizedDate,
             order: maxOrder + 1,
             userId: nanoid() || 'local',
-            // userId: user?.id || 'local',
+            updatedAt: new Date(),
+
+            isDirty: true,
+            isSynced: false,
           };
 
           const updatedDateTasks = [...dateTasks, task].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -156,61 +216,11 @@ export const useTaskStore = create<State & Actions>()(
         },
 
         // Actualiza una tarea existente
-        // updateTask: async (id, updates, options) => {
-        //   const tasksByDate = structuredClone(get().tasksByDate);
-
-        //   let dateKey: string | null = null;
-        //   let targetTask: Task | null = null;
-
-        //   for (const [key, dateTasks] of Object.entries(tasksByDate)) {
-        //     const task = dateTasks.find(t => t._id === id);
-        //     if (task) {
-        //       dateKey = key;
-        //       targetTask = task;
-        //       break;
-        //     }
-        //   }
-
-        //   if (!dateKey || !targetTask) return;
-
-        //   const dateTasks = tasksByDate[dateKey];
-
-        //   if ('status' in updates && updates.status === 'ongoing' && !options.disableAutoPause) {
-        //     for (const t of dateTasks) {
-        //       if (t._id !== id && t.status === 'ongoing') {
-        //         t.status = 'paused';
-        //         t.updatedAt = new Date();
-        //       }
-        //     }
-        //   }
-
-        //   Object.assign(targetTask, { ...updates, updatedAt: new Date() });
-
-        //   // Ordenar tareas
-        //   dateTasks.sort((a, b) => {
-        //     const statusOrder = { ongoing: 0, paused: 1, pending: 2, done: 3 };
-        //     return (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
-        //   });
-
-        //   dateTasks.forEach((task, index) => {
-        //     task.order = index;
-        //   });
-
-        //   set({ tasksByDate });
-        //   // Actualizamos currentDayTasks
-        //   const currentDateKey = getDateKey(get().currentDate);
-        //   const updatedTasks = tasksByDate[currentDateKey] || [];
-        //   set({ currentDayTasks: updatedTasks });
-        //   localStorage.setItem('tasks', JSON.stringify(tasksByDate));
-
-        //   if (isCloudSyncEnabled) await updateTaskServer(id, updates);
-        // },
         updateTask: async (id, updates, options) => {
           const tasksByDate = structuredClone(get().tasksByDate);
           let originalDateKey: string | null = null;
           let targetTask: Task | null = null;
         
-          // 1. Encontrar la tarea y su fecha original
           for (const [key, dateTasks] of Object.entries(tasksByDate)) {
             const taskIndex = dateTasks.findIndex(t => t._id === id);
             if (taskIndex > -1) {
@@ -222,7 +232,7 @@ export const useTaskStore = create<State & Actions>()(
         
           if (!originalDateKey || !targetTask) return;
         
-          // 2. Remover de la fecha original
+          // 1. Eliminar de la fecha original
           const originalTasks = tasksByDate[originalDateKey].filter(t => t._id !== id);
           if (originalTasks.length > 0) {
             tasksByDate[originalDateKey] = originalTasks;
@@ -230,25 +240,26 @@ export const useTaskStore = create<State & Actions>()(
             delete tasksByDate[originalDateKey];
           }
         
-          // 3. Determinar nueva fecha
+          // 2. Nueva fecha
           const newScheduledAt = updates.scheduledAt ? new Date(updates.scheduledAt) : targetTask.scheduledAt;
           const newDateKey = getDateKey(newScheduledAt);
         
-          // 4. Añadir a la nueva fecha
           if (!tasksByDate[newDateKey]) {
             tasksByDate[newDateKey] = [];
           }
-          
-          // 5. Aplicar actualizaciones
+        
+          // 3. Actualizar tarea
           const updatedTask = {
             ...targetTask,
             ...updates,
-            updatedAt: new Date()
+            updatedAt: new Date(),
+            isDirty: true,
+            isSynced: false,
           };
-          
+        
           tasksByDate[newDateKey].push(updatedTask);
         
-          // 6. Ordenar y actualizar estado
+          // 4. Ordenar
           tasksByDate[newDateKey].sort((a, b) => {
             const statusOrder = { ongoing: 0, paused: 1, pending: 2, done: 3 };
             return (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
@@ -258,61 +269,71 @@ export const useTaskStore = create<State & Actions>()(
             task.order = index;
           });
         
-          // 7. Actualizar estado global
           set({ tasksByDate });
         
-          // 8. Actualizar currentDayTasks si es necesario
           const currentDateKey = getDateKey(get().currentDate);
           const updatedTasks = tasksByDate[currentDateKey] || [];
           set({ currentDayTasks: updatedTasks });
-          // if (currentDateKey === newDateKey) {
-          //   set({ currentDayTasks: tasksByDate[newDateKey] });
-          // }
+        
           get().calculateTotalMinutes();
           localStorage.setItem('tasks', JSON.stringify(tasksByDate));
-          
-          if (isCloudSyncEnabled) await updateTaskServer(id, updates);
         },
-
-        // Elimina una tarea
+        
         deleteTask: async (id) => {
           const tasksByDate = structuredClone(get().tasksByDate);
-
+          const deletedTasks = structuredClone(get().deletedTasks || {});
+        
+          let deletedTask: Task | null = null;
+        
           for (const [key, dateTasks] of Object.entries(tasksByDate)) {
             const index = dateTasks.findIndex(t => t._id === id);
             if (index !== -1) {
+              deletedTask = dateTasks[index];
               dateTasks.splice(index, 1);
               if (dateTasks.length === 0) delete tasksByDate[key];
               break;
             }
           }
-
-          set({ tasksByDate });
-          // Actualizamos currentDayTasks
+        
+          if (deletedTask) {
+            deletedTasks[deletedTask._id] = {
+              ...deletedTask,
+              deletedAt: new Date(),
+            };
+          }
+        
+          set({ tasksByDate, deletedTasks });
+        
           const currentDateKey = getDateKey(get().currentDate);
           const updatedTasks = tasksByDate[currentDateKey] || [];
           set({ currentDayTasks: updatedTasks });
-          localStorage.setItem('tasks', JSON.stringify(tasksByDate));
+        
           get().calculateTotalMinutes();
-
-          if (isCloudSyncEnabled) await deleteTaskServer(id);
+          localStorage.setItem('tasks', JSON.stringify(tasksByDate));
+          localStorage.setItem('deletedTasks', JSON.stringify(deletedTasks));
         },
-
+        
         deleteAllDayTasks: async (dayToDelete: Date) => {
-          const tasksByDate = { ...get().tasksByDate };
+          const tasksByDate = structuredClone(get().tasksByDate);
+          const deletedTasks = structuredClone(get().deletedTasks || {});
           const dateKey = getDateKey(dayToDelete);
         
           if (tasksByDate[dateKey]) {
+            for (const task of tasksByDate[dateKey]) {
+              deletedTasks[task._id] = {
+                ...task,
+                deletedAt: new Date(),
+              };
+            }
+        
             delete tasksByDate[dateKey];
         
-            set({ tasksByDate });
+            set({ tasksByDate, deletedTasks });
             set({ currentDayTasks: [] });
-            localStorage.setItem('tasks', JSON.stringify(tasksByDate));
-            get().calculateTotalMinutes();
         
-            if (isCloudSyncEnabled) {
-              await deleteAllDayTasksServer(dayToDelete);
-            }
+            get().calculateTotalMinutes();
+            localStorage.setItem('tasks', JSON.stringify(tasksByDate));
+            localStorage.setItem('deletedTasks', JSON.stringify(deletedTasks));
           }
         },
 
@@ -332,6 +353,47 @@ export const useTaskStore = create<State & Actions>()(
           const total = get().currentDayTasks.reduce((sum, task) => sum + (task.duration || 0), 0);
           set({ totalMinutes: total });
         },
+
+        forceSync: async () => {
+          console.log('🔄 Force sync triggered');
+        
+          const allTasks = Object.values(get().tasksByDate).flat();
+          const deletedTasksObj = get().deletedTasks || {};
+          const deletedTasks = Object.values(deletedTasksObj);
+        
+          const dirtyTasks = allTasks.filter(t => t.isDirty);
+          const tasksToSync = [...dirtyTasks, ...deletedTasks];
+        
+          console.log(`📦 Dirty: ${dirtyTasks.length}, Deleted: ${deletedTasks.length}`);
+        
+          if (tasksToSync.length > 0 && isCloudSyncEnabled) {
+          // if (tasksToSync.length > 0) {
+            await syncTasksToServer(tasksToSync);
+        
+            const updatedTasksByDate = structuredClone(get().tasksByDate);
+        
+            for (const task of dirtyTasks) {
+              const key = getDateKey(task.scheduledAt);
+              const index = updatedTasksByDate[key]?.findIndex(t => t._id === task._id);
+              if (index !== undefined && index > -1) {
+                updatedTasksByDate[key][index] = {
+                  ...task,
+                  isDirty: false,
+                  isSynced: true,
+                  lastSyncedAt: new Date(),
+                };
+              }
+            }
+        
+            set({ tasksByDate: updatedTasksByDate });
+            localStorage.setItem('tasks', JSON.stringify(updatedTasksByDate));
+        
+            // Limpieza local de eliminadas
+            set({ deletedTasks: {} });
+            localStorage.removeItem('deletedTasks');
+          }
+        }
+        
         
       };
     },
