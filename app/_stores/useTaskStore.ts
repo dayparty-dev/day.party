@@ -29,7 +29,7 @@ interface Actions {
   getTasksForDate: (date: Date) => Task[];
   setCurrentDayTasks: () => void;
   calculateTotalMinutes: () => void;
-  forceSync: () => Promise<void>;
+  syncTasks: () => Promise<void>;
 }
 
 export const useTaskStore = create<State & Actions>()(
@@ -115,14 +115,12 @@ export const useTaskStore = create<State & Actions>()(
           if (!isCloudSyncEnabled) return;
         
           try {
-            // 1. Subir solo tareas "dirty"
             const allLocalTasks = Object.values(tasks).flat();
             const dirtyTasks = allLocalTasks.filter(t => t.isDirty);
             if (dirtyTasks.length > 0) {
               await syncTasksToServer(dirtyTasks);
             }
         
-            // 2. Descargar tareas del servidor
             const cloudTasks = await fetchTasksServer();
         
             if (cloudTasks?.length) {
@@ -354,7 +352,7 @@ export const useTaskStore = create<State & Actions>()(
           set({ totalMinutes: total });
         },
 
-        forceSync: async () => {
+        syncTasks: async () => {
           console.log('🔄 Force sync triggered');
         
           const allTasks = Object.values(get().tasksByDate).flat();
