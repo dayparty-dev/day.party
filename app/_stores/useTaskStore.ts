@@ -21,7 +21,7 @@ interface Actions {
   setCurrentDate: (date: Date) => void;
   setDayCapacity: (capacity: number) => void;
   setTasks: (tasks: Record<string, Task[]>) => void;
-  addTask: (task: Task) => Promise<void>;
+  addTask: (task: Partial<Task>) => Promise<void>;
   updateTask: (id: string, updates: Partial<Task>, options?: { disableAutoPause?: boolean }) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   deleteAllDayTasks: (dayToDelete: Date) => Promise<void>;

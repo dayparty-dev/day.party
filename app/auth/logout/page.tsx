@@ -5,15 +5,15 @@ import { useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { useAuth } from '../_hooks/useAuth';
-import { saveTasksToStorage } from 'app/_hooks/useTasks';
+// import { saveTasksToStorage } from 'app/_hooks/useTasks';
 
 function LogoutComponent() {
   const { logout } = useAuth();
   const router = useRouter();
 
-  function clearTasks() {
-    saveTasksToStorage({});
-  }
+  // function clearTasks() {
+  //   saveTasksToStorage({});
+  // }
 
   useEffect(() => {
     const handleLogout = async () => {
@@ -23,7 +23,7 @@ function LogoutComponent() {
         console.error('Error during logout:', error);
       }
 
-      clearTasks();
+      // clearTasks();
       router.push('/auth/login');
     };
 
