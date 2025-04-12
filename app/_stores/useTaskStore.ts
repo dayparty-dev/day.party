@@ -102,7 +102,7 @@ export const useTaskStore = create<State & Actions>()(
         // Establece la capacidad del día en horas
         setDayCapacity: (capacity) => {
           set({ dayCapacity: capacity });
-          get().calculateTotalMinutes(); // Añadir esto si necesitas lógica adicional
+          // get().calculateTotalMinutes(); // Añadir esto si necesitas lógica adicional
         },
         
         // Obtiene las tareas para una fecha específica
@@ -249,9 +249,17 @@ export const useTaskStore = create<State & Actions>()(
           tasksByDate[newDateKey].push(updatedTask);
         
           // 6. Ordenar y actualizar estado
+          // tasksByDate[newDateKey].sort((a, b) => {
+          //   const statusOrder = { ongoing: 0, paused: 1, pending: 2, done: 3 };
+          //   return (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
+          // });
           tasksByDate[newDateKey].sort((a, b) => {
-            const statusOrder = { ongoing: 0, paused: 1, pending: 2, done: 3 };
-            return (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
+            // Priorizar ongoing primero
+            if (a.status === 'ongoing' && b.status !== 'ongoing') return -1;
+            if (b.status === 'ongoing' && a.status !== 'ongoing') return 1;
+            
+            // Mantener orden original para los demás estados
+            return a.order - b.order;
           });
         
           tasksByDate[newDateKey].forEach((task, index) => {
@@ -330,6 +338,7 @@ export const useTaskStore = create<State & Actions>()(
         // },
         calculateTotalMinutes: () => {
           const total = get().currentDayTasks.reduce((sum, task) => sum + (task.duration || 0), 0);
+          console.log('Total minutes:', total); // Debugging line
           set({ totalMinutes: total });
         },
         
