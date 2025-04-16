@@ -1,16 +1,14 @@
 'use client';
-import { useState, useCallback, useEffect } from 'react';
-import { FaUser, FaTasks, FaTimes } from 'react-icons/fa';
 import useKeyboardShortcut from 'app/_hooks/useKeyboardShortcut';
-import { toast } from 'react-toastify';
 import { useTasks } from 'app/_hooks/useTasks';
 import { Task } from 'app/_models/Task';
+import { useEffect, useState } from 'react';
+import { FaTasks, FaTimes, FaUser } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import SearchBar from './SearchBar';
 import Section from './Section';
-import UserManagement from './UserManagement';
-import TaskManagement from './TaskManagement';
-import { UserFormAction } from './UserManagement';
-import { TaskFormAction } from './TaskManagement';
+import TaskManagement, { TaskFormAction } from './TaskManagement';
+import UserManagement, { UserFormAction } from './UserManagement';
 // Definición de tipos
 // interface AdminSection {
 //   id: string;
@@ -34,7 +32,8 @@ export default function AdminPanel() {
     deleteTask,
     deleteAllDayTasks,
     getTasksForDate,
-    syncTasks
+    syncTasks,
+    initialize
   } = useTasks();
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -184,6 +183,9 @@ export default function AdminPanel() {
           <div className="p-4 h-full flex flex-col gap-4">
             <button onClick={() => syncTasks()}>
               🔁 Forzar sincronización
+            </button>
+            <button onClick={() => initialize()}>
+              🔁 Initialize
             </button>
             <SearchBar
               onSearch={setSearchQuery}
