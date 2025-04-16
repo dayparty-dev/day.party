@@ -31,7 +31,7 @@ const ClientInitializer = () => {
 
     // Check if the user is an admin
     const isAdminPanelEnabled =
-        user.role === 'admin';
+        user?.role === 'admin';
 
     return isAdminPanelEnabled && <AdminPanel />;
 };
