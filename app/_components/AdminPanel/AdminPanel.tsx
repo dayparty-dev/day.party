@@ -34,6 +34,7 @@ export default function AdminPanel() {
     deleteTask,
     deleteAllDayTasks,
     getTasksForDate,
+    syncTasks
   } = useTasks();
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -181,6 +182,9 @@ export default function AdminPanel() {
         )}
         {isExpanded && (
           <div className="p-4 h-full flex flex-col gap-4">
+            <button onClick={() => syncTasks()}>
+              🔁 Forzar sincronización
+            </button>
             <SearchBar
               onSearch={setSearchQuery}
               menuOptions={menuOptions}

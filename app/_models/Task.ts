@@ -9,6 +9,11 @@ export interface Task {
   scheduledAt: Date;
   order: number;
   userId: string;
+  
+  deletedAt?: Date;
+  isSynced?: boolean;
+  lastSyncedAt?: Date;
+  isDirty?: boolean;
 }
 
 export type TaskStatus = 'ongoing' | 'paused' | 'pending' | 'done';
