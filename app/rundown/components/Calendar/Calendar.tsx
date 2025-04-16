@@ -2,17 +2,18 @@ import { useState, useMemo } from 'react';
 import { addMonths, isSameMonth, isSameDay } from 'date-fns';
 import { DayPicker, DayProps } from 'react-day-picker';
 
-import useTasks from 'app/_hooks/useTasks';
+import { useTasks } from 'app/_hooks/useTasks';
 import 'react-day-picker/style.css';
 import './calendar.scss';
 
 interface CalendarProps {
-  selectedDate: Date;
   onSelectDate: (date: Date) => void;
 }
 
 function CustomDayCell(props: DayProps) {
-  const { getTasksForDate } = useTasks();
+  const {
+    getTasksForDate,
+  } = useTasks();
   const { day, modifiers } = props;
 
   // Only fetch tasks if the day has the 'withTasks' modifier
@@ -36,9 +37,8 @@ function CustomDayCell(props: DayProps) {
   // Prepare title attribute for days with tasks
   let titleAttr = '';
   if (tasksForDay.length > 0) {
-    titleAttr = `${tasksForDay.length} task${
-      tasksForDay.length > 1 ? 's' : ''
-    }`;
+    titleAttr = `${tasksForDay.length} task${tasksForDay.length > 1 ? 's' : ''
+      }`;
   }
 
   // Simplified rendering - just show the day number with the CSS dot indicator if there are tasks
@@ -50,24 +50,28 @@ function CustomDayCell(props: DayProps) {
 }
 
 export default function Calendar({
-  selectedDate,
   onSelectDate,
 }: CalendarProps) {
   const today = new Date();
-  const { getDaysWithTasksInMonth } = useTasks();
+  const {
+    getDaysWithTasksInMonth,
+    currentDate,
+  } = useTasks();
 
   const [month, setMonth] = useState(today);
 
   // Get the days with tasks for the current month range (including prev/next month days)
   // This is memoized internally in the useTasks hook for better performance
+  console.log("daysWithTasks called for", month);
   const daysWithTasks = getDaysWithTasksInMonth(month);
-
+  console.log("DAYS WITH TASKS", daysWithTasks);
   // Create a memoized modifiers object that includes days with tasks
   const modifiers = useMemo(() => {
     const modifiersObj: Record<string, Date[]> = {
       today: [today],
       withTasks: daysWithTasks,
     };
+    console.log("MODIFIERS", modifiersObj);
     return modifiersObj;
   }, [today, daysWithTasks]);
 
@@ -75,7 +79,7 @@ export default function Calendar({
   const isCurrentMonth = isSameMonth(month, today);
 
   // Check if the selected date is today
-  const isTodaySelected = isSameDay(selectedDate, today);
+  const isTodaySelected = isSameDay(new Date(currentDate), today);
 
   // Show the Today button if either:
   // 1. We're not in the current month, OR
@@ -93,7 +97,7 @@ export default function Calendar({
       <DayPicker
         mode="single"
         month={month}
-        selected={selectedDate}
+        selected={new Date(currentDate)}
         onSelect={(date) => date && onSelectDate(date)}
         onMonthChange={setMonth}
         weekStartsOn={1}

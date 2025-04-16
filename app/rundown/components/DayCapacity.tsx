@@ -1,15 +1,24 @@
 'use client';
 
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
-import { useTaskContext } from '../../_contexts/TaskContext';
+import { useTasks } from 'app/_hooks/useTasks';
+// import { useTaskContext } from '../../_contexts/TaskContext';
 
 export default function DayCapacity() {
   const { t } = useAppTranslation();
-  const { tasks,
+  // const { tasks,
+  //   dayCapacity,
+  //   setDayCapacity,
+  //   totalMinutes,
+  // } = useTaskContext();
+
+  const {
     dayCapacity,
     setDayCapacity,
     totalMinutes,
-  } = useTaskContext();
+  } = useTasks();
+
+  console.log("Total minutes:", totalMinutes);
 
   const percentageUsed = (totalMinutes / (dayCapacity * 60)) * 100;
   const isOverCapacity = totalMinutes > dayCapacity * 60;

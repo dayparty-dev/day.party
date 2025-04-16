@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import useTasks from '../_hooks/useTasks';
+import { useTasks } from '../_hooks/useTasks';
 // import TaskCard, { Task } from '@/components/TaskCard';
 // import TaskCard, { Task } from '../components/TaskCard';
 import TaskCard from '../_components/TaskCard';
@@ -15,29 +15,29 @@ import './styles.scss';
 import { Task } from 'app/_models/Task';
 
 const TaskPage: React.FC = () => {
-  const { tasks, updateTask, getTasksForDate } = useTasks();
+  const { currentDayTasks, updateTask, getTasksForDate } = useTasks();
 
   useEffect(() => {
-    if (tasks.length > 0) {
+    if (currentDayTasks.length > 0) {
       // Actualizar currentTask con la primera tarea si existen tareas
-      setCurrentTask(tasks[0]);
+      setCurrentTask(currentDayTasks[0]);
     }
-    if (tasks.length > 1) {
+    if (currentDayTasks.length > 1) {
       // Actualizar currentTask con la primera tarea si existen tareas
-      setNextTask(tasks[1]);
+      setNextTask(currentDayTasks[1]);
     }
     console.log('current task', currentTask);
     console.log('next task', nextTask);
-  }, [tasks]);
+  }, [currentDayTasks]);
 
   const [currentDate, setCurrentDate] = useState(new Date());
-  const currentDayTasks = getTasksForDate(currentDate);
+  // const currentDayTasks = getTasksForDate(currentDate);
   // const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [currentTask, setCurrentTask] = useState<Task | null>(
-    tasks.length >= 0 ? tasks[0] : null
+    currentDayTasks.length >= 0 ? currentDayTasks[0] : null
   );
   const [nextTask, setNextTask] = useState<Task | null>(
-    tasks.length >= 1 ? tasks[1] : null
+    currentDayTasks.length >= 1 ? currentDayTasks[1] : null
   ); // La siguiente tarea
 
   return (

@@ -1,8 +1,8 @@
 'use client';
 
+import { useTasks } from 'app/_hooks/useTasks';
 import Calendar from './Calendar/Calendar';
 import { useState } from 'react';
-import { useTaskContext } from '../../_contexts/TaskContext';
 
 export default function DayNavigator() {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -10,7 +10,7 @@ export default function DayNavigator() {
   const {
     currentDate,
     setCurrentDate,
-  } = useTaskContext();
+  } = useTasks();
 
   // Modificado para aceptar tanto número como Date
   const goToDay = (offsetOrDate: number | Date) => {
@@ -43,7 +43,7 @@ export default function DayNavigator() {
           onClick={() => setShowCalendar(!showCalendar)}
           style={{ cursor: 'pointer' }}
         >
-          {currentDate.toLocaleDateString('en-US', {
+          {new Date(currentDate).toLocaleDateString('en-US', {
             weekday: 'long',
             month: 'long',
             day: 'numeric',
@@ -55,7 +55,6 @@ export default function DayNavigator() {
       </div>
       {showCalendar && (
         <Calendar
-          selectedDate={currentDate}
           onSelectDate={handleCalendarSelect}
         />
       )}

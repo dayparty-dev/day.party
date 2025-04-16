@@ -11,7 +11,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import SortableTask from './SortableTask';
-import { useTaskContext } from '../../_contexts/TaskContext';
+// import { useTaskContext } from '../../_contexts/TaskContext';
+import { useTasks } from 'app/_hooks/useTasks';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 import { useTaskUtils } from '../hooks/useTaskUtils';
 import { useDndSensors } from '../hooks/useDndSensors';
@@ -43,8 +44,9 @@ const TaskList: React.FC<TaskListProps> = ({
   setIsEditMode,
 }) => {
   const { t } = useAppTranslation();
-  const { tasks,
-    addTask,
+
+  const {
+    tasksByDate,
     updateTask,
     deleteTask,
     setTasks,
@@ -52,12 +54,13 @@ const TaskList: React.FC<TaskListProps> = ({
     setCurrentDate,
     dayCapacity,
     currentDayTasks,
-  } = useTaskContext();
+  } = useTasks();
 
   const dndSensors = useDndSensors();
 
-  const { ensureOneOngoingTask } = useTaskUtils({ tasks, setTasks, updateTask, currentDayTasks });
-  const { handleDragEnd, handleStatusChange, handleTaskResize } = useTaskHandlers({ tasks, setTasks, updateTask, currentDate, setCurrentDate, currentDayTasks, dayCapacity });
+  const { ensureOneOngoingTask } = useTaskUtils({ tasksByDate, setTasks, updateTask, currentDayTasks });
+  // const { handleDragEnd, handleStatusChange, handleTaskResize } = useTaskHandlers({ tasksByDate, setTasks, updateTask, currentDate, setCurrentDate, currentDayTasks, dayCapacity });
+  const { handleDragEnd, handleStatusChange, handleTaskResize } = useTaskHandlers();
 
   // Only check for multiple ongoing tasks on initial load
   useEffect(() => {
@@ -78,7 +81,7 @@ const TaskList: React.FC<TaskListProps> = ({
       }}
     >
       <SortableContext
-        items={tasks.map((t) => t._id)}
+        items={currentDayTasks.map((t) => t._id)}
         strategy={verticalListSortingStrategy}
       >
         <div className="flex flex-col gap-4">

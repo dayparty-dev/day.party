@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
-import { useTaskContext } from '../../_contexts/TaskContext';
+import { useTasks } from 'app/_hooks/useTasks';
+// import { useTaskContext } from '../../_contexts/TaskContext';
 
 interface TaskFormProps {
   newTaskTitle: string;
@@ -23,13 +24,21 @@ const TaskForm: React.FC<TaskFormProps> = ({
   setNewTaskSize,
 }) => {
   const { t } = useAppTranslation();
+  // const {
+  //   addTask,
+  //   currentDate,
+  //   setCurrentDate,
+  //   dayCapacity,
+  //   totalMinutes,
+  // } = useTaskContext();
+
   const {
     addTask,
     currentDate,
     setCurrentDate,
     dayCapacity,
     totalMinutes,
-  } = useTaskContext();
+  } = useTasks();
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {

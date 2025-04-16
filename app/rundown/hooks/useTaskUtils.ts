@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { TaskStatus } from '../../_models/Task';
 
-export function useTaskUtils({ tasks, setTasks, updateTask, currentDayTasks }) {
+export function useTaskUtils({ tasksByDate, setTasks, updateTask, currentDayTasks }) {
 
 //   useEffect(() => {
 //     ensureOneOngoingTask();
@@ -29,7 +29,7 @@ export function useTaskUtils({ tasks, setTasks, updateTask, currentDayTasks }) {
       }
 
       // Update local state
-      const updatedTasks = tasks.map((task) =>
+      const updatedTasks = tasksByDate.map((task) =>
         othersOngoing.some((t) => t._id === task._id)
           ? { ...task, status: 'paused' as TaskStatus }
           : task
