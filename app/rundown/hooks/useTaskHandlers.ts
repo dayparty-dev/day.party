@@ -232,7 +232,7 @@ export function useTaskHandlers() {
   }, [tasksByDate, currentDate, currentDayTasks, setTasks, updateTask]);
 
   const handleStatusChange = useCallback(async (taskId: string, newStatus: TaskStatus) => {
-    const dateKey = new Date(currentDate.setHours(0, 0, 0, 0)).getTime().toString();
+    const dateKey = new Date(new Date(currentDate).setHours(0, 0, 0, 0)).getTime().toString();
     const otherDayTasks = Object.entries(tasksByDate)
       .filter(([key]) => key !== dateKey)
       .flatMap(([_, tasks]) => tasks);
@@ -293,13 +293,13 @@ export function useTaskHandlers() {
       if (confirm('Esto excede tu capacidad diaria. ¿Mover a otro día?')) {
         const nextDay = new Date(currentDate);
         nextDay.setDate(nextDay.getDate() + 1);
-        await updateTask(id, { size, scheduledAt: nextDay });
+        await updateTask(id, { size, duration: newTaskMinutes, scheduledAt: nextDay });
         setCurrentDate(nextDay);
         return;
       }
     }
 
-    await updateTask(id, { size });
+    await updateTask(id, { size, duration: newTaskMinutes });
   }, [currentDayTasks, currentDate, dayCapacity, updateTask, setCurrentDate]);
 
   return { handleDragEnd, handleStatusChange, handleTaskResize };
