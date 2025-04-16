@@ -1,3 +1,4 @@
+import { UserRole } from 'app/user/_models/User';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { jwtDecode } from 'jwt-decode';
 import { useCallback, useEffect, useState } from 'react';
@@ -7,6 +8,7 @@ import { createAuthSessionServer, deleteAuthSessionServer, verifyAuthSessionServ
 
 interface UseAuthUser {
   id: string;
+  role: UserRole;
 }
 
 const useSessionIdState = createPersistedState('day.party.auth.sessionId');
@@ -47,6 +49,7 @@ export function useAuth(): UseAuth {
 
         const newUser: UseAuthUser = {
           id: decodedToken.userId,
+          role: decodedToken.role ?? UserRole.Standard,
         };
 
         setUser(newUser);
