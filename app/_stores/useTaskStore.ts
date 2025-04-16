@@ -256,7 +256,9 @@ export const useTaskStore = create<State & Actions>()(
           tasksByDate[newDateKey].sort((a, b) => {
             // Priorizar ongoing primero
             if (a.status === 'ongoing' && b.status !== 'ongoing') return -1;
-            if (b.status === 'ongoing' && a.status !== 'ongoing') return 1;
+            if (b.status === 'ongoing' && a.status !== 'ongoing') return 1;            
+            if (a.status === 'done' && b.status !== 'done') return 1;
+            if (b.status === 'done' && a.status !== 'done') return -1;
             
             // Mantener orden original para los demás estados
             return a.order - b.order;
