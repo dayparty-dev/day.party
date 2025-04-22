@@ -1,5 +1,11 @@
 {
   "delete": "Eliminar",
+  "theme": {
+    "dark": "Oscuro",
+    "light": "Claro",
+    "system": "Sistema",
+    "auto": "Automático"
+  },
     "LandingPage": {
       "greeting": "¡Hola, {name}!",
       "welcome": "Bienvenido a nuestro sitio web."
