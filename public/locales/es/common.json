@@ -1,4 +1,5 @@
 {
+  "delete": "Eliminar",
     "LandingPage": {
       "greeting": "¡Hola, {name}!",
       "welcome": "Bienvenido a nuestro sitio web."
@@ -28,6 +29,15 @@
     "taskForm": {
       "placeholder": "Título de la nueva tarea",
       "addButton": "Agregar tarea"
+    },
+    "tags": {
+      "work": "Trabajo",
+      "home": "Casa",
+      "personal": "Personal",
+      "study": "Estudio",
+      "custom": "Personalizado",
+      "add_placeholder": "Nombre de la etiqueta",
+      "add": "Crar"
     },
     "dayCapacity": {
       "label": "Capacidad diaria",

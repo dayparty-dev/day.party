@@ -26,12 +26,13 @@ export default function Rundown() {
     <div className={`rundown ${isEditMode ? 'edit-mode' : ''} min-h-screen`}>
       <div className='w-full h-full sm:w-3/5 p-4 sm:p-0 mx-auto flex flex-col gap-4'>
         {isEditMode && (
-          <TaskForm
-            newTaskTitle={newTaskTitle}
-            setNewTaskTitle={setNewTaskTitle}
-            newTaskSize={newTaskSize}
-            setNewTaskSize={setNewTaskSize}
-          />
+          // <TaskForm
+          //   newTaskTitle={newTaskTitle}
+          //   setNewTaskTitle={setNewTaskTitle}
+          //   newTaskSize={newTaskSize}
+          //   setNewTaskSize={setNewTaskSize}
+          // />
+          <TaskForm />
         )}
 
         <DayNavigator />
