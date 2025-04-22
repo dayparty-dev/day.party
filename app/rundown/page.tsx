@@ -45,7 +45,7 @@ export default function Rundown() {
         />
 
         {isEditMode && (
-          <button className="btn btn-primary fixed bottom-2.5 left-1/2 -translate-x-1/2 rounded-2xl z-50" onClick={() => setIsEditMode(false)}>
+          <button className="btn btn-primary fixed bottom-2.5 left-1/2 -translate-x-1/2 rounded-2xl z-50 active:translate-0" onClick={() => setIsEditMode(false)}>
             Done
           </button>
         )}
