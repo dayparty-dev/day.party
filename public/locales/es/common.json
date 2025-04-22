@@ -31,7 +31,9 @@
       "verifying": "Verificando...",
       "loading": "Cargando..."
     },
-
+    "rundownPage":{
+      "done": "Hecho"
+    },
     "taskForm": {
       "placeholder": "Título de la nueva tarea",
       "addButton": "Agregar tarea"

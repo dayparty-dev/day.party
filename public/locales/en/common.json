@@ -31,7 +31,9 @@
       "verifying": "Verifying...",
       "loading": "Loading..."
     },
-    
+    "rundownPage":{
+      "done": "Done"
+    },
     "taskForm": {
       "placeholder": "New task title",
       "addButton": "Add Task"
