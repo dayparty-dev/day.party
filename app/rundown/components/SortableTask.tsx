@@ -98,7 +98,7 @@ const SortableTask = ({
           }
         }}
       >
-        <div className={`relative group task-content bg-base-100 h-full shadow-md p-4 rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}>
+        <div className={`relative group task-content bg-base-100 h-full shadow-md rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}>
           {/* <div className={`task-content card bg-base-100 h-full shadow-md p-4 rounded-md border ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}> */}
           {isEditMode && (
             <button
@@ -110,7 +110,7 @@ const SortableTask = ({
             </button>
           )}
 
-          <div className="flex flex-col gap-2" {...(isEditMode ? listeners : longPressBinding())}>
+          <div className="flex flex-col gap-2 h-full p-4" {...(isEditMode ? listeners : longPressBinding())}>
             {/* <div
               className="action"
               {...(isEditMode ? listeners : longPressBinding())}
