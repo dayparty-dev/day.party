@@ -95,8 +95,6 @@ export const useTaskStore = create<State & Actions>()(
         //   }
         // },
         initialize: async () => {
-          console.log('🛠️ Initializing task store...');
-          console.log('isCloudSyncEnabled', isCloudSyncEnabled);
           const stored = localStorage.getItem('tasks');
           let tasks: Record<string, Task[]> = {};
 
@@ -158,7 +156,7 @@ export const useTaskStore = create<State & Actions>()(
         // Establece la capacidad del día en horas
         setDayCapacity: (capacity) => {
           set({ dayCapacity: capacity });
-          get().calculateTotalMinutes(); // Añadir esto si necesitas lógica adicional
+          // get().calculateTotalMinutes(); // Añadir esto si necesitas lógica adicional
         },
 
         // Obtiene las tareas para una fecha específica
@@ -174,7 +172,8 @@ export const useTaskStore = create<State & Actions>()(
         },
 
         // Agrega una nueva tarea
-        addTask: async ({ title, size, scheduledAt }) => {
+        addTask: async ({ title, size, tagKey, scheduledAt }) => {
+          console.log('taskkey', tagKey);
           const currentDate = new Date();
           const normalizedDate = scheduledAt ? new Date(scheduledAt) : new Date();
           normalizedDate.setHours(0, 0, 0, 0);
@@ -188,6 +187,7 @@ export const useTaskStore = create<State & Actions>()(
             _id: nanoid(),
             title,
             size,
+            tagKey,
             status: 'pending',
             duration: size * 15,
             createdAt: currentDate,
@@ -256,11 +256,15 @@ export const useTaskStore = create<State & Actions>()(
           };
 
           tasksByDate[newDateKey].push(updatedTask);
-
-          // 4. Ordenar
           tasksByDate[newDateKey].sort((a, b) => {
-            const statusOrder = { ongoing: 0, paused: 1, pending: 2, done: 3 };
-            return (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
+            // Priorizar ongoing primero
+            if (a.status === 'ongoing' && b.status !== 'ongoing') return -1;
+            if (b.status === 'ongoing' && a.status !== 'ongoing') return 1;
+            if (a.status === 'done' && b.status !== 'done') return 1;
+            if (b.status === 'done' && a.status !== 'done') return -1;
+
+            // Mantener orden original para los demás estados
+            return a.order - b.order;
           });
 
           tasksByDate[newDateKey].forEach((task, index) => {
@@ -349,20 +353,17 @@ export const useTaskStore = create<State & Actions>()(
         // },
         calculateTotalMinutes: () => {
           const total = get().currentDayTasks.reduce((sum, task) => sum + (task.duration || 0), 0);
+          console.log('Total minutes:', total); // Debugging line
           set({ totalMinutes: total });
         },
 
         syncTasks: async () => {
-          console.log('🔄 Force sync triggered');
-
           const allTasks = Object.values(get().tasksByDate).flat();
           const deletedTasksObj = get().deletedTasks || {};
           const deletedTasks = Object.values(deletedTasksObj);
 
           const dirtyTasks = allTasks.filter((t) => t.isDirty);
           const tasksToSync = [...dirtyTasks, ...deletedTasks];
-
-          console.log(`📦 Dirty: ${dirtyTasks.length}, Deleted: ${deletedTasks.length}`);
 
           if (tasksToSync.length > 0 && isCloudSyncEnabled) {
             // if (tasksToSync.length > 0) {

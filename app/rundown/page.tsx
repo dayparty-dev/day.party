@@ -26,12 +26,13 @@ export default function Rundown() {
     <div className={`rundown ${isEditMode ? 'edit-mode' : ''} min-h-screen`}>
       <div className='w-full h-full sm:w-3/5 p-4 sm:p-0 mx-auto flex flex-col gap-4'>
         {isEditMode && (
-          <TaskForm
-            newTaskTitle={newTaskTitle}
-            setNewTaskTitle={setNewTaskTitle}
-            newTaskSize={newTaskSize}
-            setNewTaskSize={setNewTaskSize}
-          />
+          // <TaskForm
+          //   newTaskTitle={newTaskTitle}
+          //   setNewTaskTitle={setNewTaskTitle}
+          //   newTaskSize={newTaskSize}
+          //   setNewTaskSize={setNewTaskSize}
+          // />
+          <TaskForm />
         )}
 
         <DayNavigator />
@@ -44,8 +45,8 @@ export default function Rundown() {
         />
 
         {isEditMode && (
-          <button className="btn btn-primary fixed bottom-2.5 left-1/2 -translate-x-1/2 rounded-2xl z-50" onClick={() => setIsEditMode(false)}>
-            Done
+          <button className="btn btn-primary fixed bottom-2.5 left-1/2 -translate-x-1/2 rounded-2xl z-50 active:!-translate-x-1/2" onClick={() => setIsEditMode(false)}>
+            {t("rundownPage.done")}
           </button>
         )}
       </div>

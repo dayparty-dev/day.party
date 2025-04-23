@@ -1,14 +1,8 @@
-import React, { useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 import { useTasks } from 'app/_hooks/useTasks';
-// import { useTaskContext } from '../../_contexts/TaskContext';
-
-interface TaskFormProps {
-  newTaskTitle: string;
-  setNewTaskTitle: (title: string) => void;
-  newTaskSize: number;
-  setNewTaskSize: (size: number) => void;
-}
+import TagSelector from './TagSelector';
+import { useTags } from 'app/_hooks/useTags';
 
 const timeOptions = [
   { value: 1, label: '15 min' },
@@ -17,21 +11,8 @@ const timeOptions = [
   { value: 4, label: '60 min' },
 ];
 
-const TaskForm: React.FC<TaskFormProps> = ({
-  newTaskTitle,
-  setNewTaskTitle,
-  newTaskSize,
-  setNewTaskSize,
-}) => {
+const TaskForm: React.FC = () => {
   const { t } = useAppTranslation();
-  // const {
-  //   addTask,
-  //   currentDate,
-  //   setCurrentDate,
-  //   dayCapacity,
-  //   totalMinutes,
-  // } = useTaskContext();
-
   const {
     addTask,
     currentDate,
@@ -39,70 +20,71 @@ const TaskForm: React.FC<TaskFormProps> = ({
     dayCapacity,
     totalMinutes,
   } = useTasks();
+  const { selectedTagKey, setSelectedTagKey } = useTags();
+
+  const titleRef = useRef<HTMLInputElement>(null);
+  const sizeRef = useRef<HTMLSelectElement>(null);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      if (newTaskTitle.trim()) {
-        const newTaskMinutes = newTaskSize * 15;
-        if (totalMinutes + newTaskMinutes > dayCapacity * 60) {
-          if (
-            confirm('This will exceed your daily capacity. Move to next day?')
-          ) {
-            const nextDay = new Date(currentDate);
-            nextDay.setDate(nextDay.getDate() + 1);
-            addTask({
-              title: newTaskTitle,
-              size: newTaskSize,
-              scheduledAt: nextDay,
-            });
-            setCurrentDate(nextDay);
-          }
-          return;
+
+      const title = titleRef.current?.value.trim() || '';
+      const size = Number(sizeRef.current?.value || 1);
+      const newTaskMinutes = size * 15;
+
+      if (!title) return;
+
+      console.log("selectedTagKey", selectedTagKey);
+      if (totalMinutes + newTaskMinutes > dayCapacity * 60) {
+        if (
+          confirm('This will exceed your daily capacity. Move to next day?')
+        ) {
+          const nextDay = new Date(currentDate);
+          nextDay.setDate(nextDay.getDate() + 1);
+          addTask({ title, size, scheduledAt: nextDay, tagKey: selectedTagKey });
+          setCurrentDate(nextDay);
         }
-        addTask({
-          title: newTaskTitle,
-          size: newTaskSize,
-          scheduledAt: currentDate,
-        });
-        setNewTaskTitle('');
-        setNewTaskSize(1);
+        return;
       }
+
+      addTask({ title, size, scheduledAt: currentDate, tagKey: selectedTagKey });
+      if (titleRef.current) titleRef.current.value = '';
+      if (sizeRef.current) sizeRef.current.value = '1';
+      // setSelectedTagKey(null);
     },
-    [newTaskTitle, newTaskSize, addTask, currentDate, totalMinutes, dayCapacity]
+    [addTask, currentDate, totalMinutes, dayCapacity, setCurrentDate]
   );
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className="task-form flex flex-col max-w-sm mx-auto sm:flex-row gap-2">
-        <div className="flex w-full gap-2">
-          <input
-            type="text"
-            value={newTaskTitle}
-            onChange={(e) => setNewTaskTitle(e.target.value)}
-            placeholder={t('taskForm.placeholder')}
-            className="input input-bordered w-3/5 sm:w-full"
-          />
+    <form onSubmit={handleSubmit} className="task-form flex flex-col max-w-sm mx-auto gap-2">
+      <div className="flex w-full gap-2">
+        <input
+          type="text"
+          ref={titleRef}
+          placeholder={t('taskForm.placeholder')}
+          className="input input-bordered w-3/5 sm:w-full"
+        />
 
-          <select
-            value={newTaskSize}
-            onChange={(e) => setNewTaskSize(Number(e.target.value))}
-            className="select select-bordered w-2/5 sm:w-auto"
-          >
-            {timeOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          ref={sizeRef}
+          defaultValue="1"
+          className="select select-bordered w-2/5 sm:w-auto"
+        >
+          {timeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
-        <button type="submit" className="btn btn-primary w-full sm:w-auto sm:btn-md btn-sm">
-          {t('taskForm.addButton')}
-        </button>
-      </form>
+      <TagSelector />
 
-    </>
+      <button type="submit" className="btn btn-primary w-full sm:w-auto sm:btn-md btn-sm">
+        {t('taskForm.addButton')}
+      </button>
+    </form>
   );
 };
 

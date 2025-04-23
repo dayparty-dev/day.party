@@ -1,4 +1,11 @@
 {
+  "delete": "Delete",
+  "theme":{
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System",
+    "auto": "Auto"
+  },
     "LandingPage": {
       "greeting": "Hello, {name}!",
       "welcome": "Welcome to our website."
@@ -24,11 +31,22 @@
       "verifying": "Verifying...",
       "loading": "Loading..."
     },
-    
+    "rundownPage":{
+      "done": "Done"
+    },
     "taskForm": {
       "placeholder": "New task title",
       "addButton": "Add Task"
     },
+    "tags": {
+      "work": "Work",
+      "home": "Home",
+      "personal": "Personal",
+      "study": "Study",
+      "custom": "Custom",
+      "add_placeholder": "Custom tag name",
+            "add": "Add"
+    },    
     "dayCapacity": {
       "label": "Daily Capacity",
       "hours": "{{hours}} hours"
