@@ -13,15 +13,13 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey, onSelect }) => {
     const {
         tags,
         customTags,
-        selectedTagKey,
-        setSelectedTagKey,
         addCustomTag,
         removeCustomTag,
     } = useTags();
 
     const [customLabel, setCustomLabel] = useState('');
     const [customColor, setCustomColor] = useState('#888888');
-
+    const [selectedTagKey, setSelectedTagKey] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     // Si recibimos selectedKey desde fuera
@@ -69,10 +67,9 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey, onSelect }) => {
     // const isDefaultTag = (key: string) => tags.some((tag) => tag.key === key);
 
     const handleClickTag = (key: string) => {
+        console.log('handleClickTag', key);
         if (onSelect)
             onSelect(key);
-        else
-            setSelectedTagKey(key);
     };
 
     return (

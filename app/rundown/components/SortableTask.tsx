@@ -122,13 +122,13 @@ const SortableTask = ({
                   ref={tagRef}
                   className={`badge badge-sm ${isEditMode ? 'cursor-pointer' : 'cursor-default'}`}
                   style={{
-                    backgroundColor: tag.color,
+                    backgroundColor: tag?.color,
                     color: '#fff',
                   }}
 
                   onClick={isEditMode ? () => setEditing(true) : undefined}
                 >
-                  {tag.label}
+                  {tag?.label}
                 </span>
               )}
             </h3>
