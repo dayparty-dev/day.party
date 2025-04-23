@@ -6,7 +6,7 @@ import { TaskStatus } from '../../_models/Task';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 import TagPopoverEditor from './TagPopoverEditor';
 import { useTags } from 'app/_hooks/useTags';
-
+import { useTasks } from 'app/_hooks/useTasks';
 interface SortableTaskProps {
   task: any; // Replace with proper Task type
   isEditMode: boolean;
@@ -25,7 +25,7 @@ const SortableTask = ({
   onLongPress,
 }: SortableTaskProps) => {
   const { t } = useAppTranslation();
-
+  const { updateTask } = useTasks();
   const [tempSize, setTempSize] = useState<number | null>(null);
 
   const {
@@ -45,9 +45,8 @@ const SortableTask = ({
   const tagRef = useRef<HTMLSpanElement>(null);
   const [editing, setEditing] = useState(false);
 
-  const handleUpdateTag = (taskId: string, newKey: string) => {
-    // Aquí deberías actualizar la tarea, por ejemplo:
-    // updateTask(taskId, { category: tags.find(tag => tag.key === newKey) });
+  const handleUpdateTag = (newKey: string) => {
+    updateTask(task._id, { tagKey: newKey });
   };
 
   const longPressBinding = useLongPress(
@@ -72,7 +71,6 @@ const SortableTask = ({
     cursor: isEditMode ? 'grab' : 'default',
   } as React.CSSProperties;
 
-  // console.log('SortableTask', task);
   return (
 
     <div
@@ -80,6 +78,7 @@ const SortableTask = ({
       style={style}
       {...attributes}
       data-is-dragging={isDragging}
+      className='relative'
     >
       <Resizable
         size={{ width: '100%', height: 62 + (task.size * 30) }}
@@ -120,26 +119,19 @@ const SortableTask = ({
               {task.tagKey && (
                 <span
                   ref={tagRef}
-                  className="badge badge-sm cursor-pointer"
+                  className={`badge badge-sm ${isEditMode ? 'cursor-pointer' : 'cursor-default'}`}
                   style={{
                     backgroundColor: tag.color,
                     color: '#fff',
                   }}
-                  onClick={() => setEditing(true)}
+
+                  onClick={isEditMode ? () => setEditing(true) : undefined}
                 >
                   {tag.label}
                 </span>
               )}
             </h3>
 
-            {editing && (
-              <TagPopoverEditor
-                selectedKey={task.tagKey ?? null}
-                anchorRef={tagRef}
-                onSelect={handleUpdateTag}
-                onClose={() => setEditing(false)}
-              />
-            )}
             <p className="text-sm text-gray-500">{t('task.duration', { minutes: (tempSize ?? task.size) * 15 })}</p>
 
             <div className="absolute right-1.5 bottom-1.5 flex justify-end items-center gap-2 mt-auto">
@@ -174,6 +166,14 @@ const SortableTask = ({
           )}
         </div>
       </Resizable>
+      {editing && (
+        <TagPopoverEditor
+          selectedKey={task.tagKey ?? null}
+          anchorRef={tagRef}
+          onSelect={handleUpdateTag}
+          onClose={() => setEditing(false)}
+        />
+      )}
     </div >
   );
 };
