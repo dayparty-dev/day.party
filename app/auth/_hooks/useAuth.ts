@@ -1,4 +1,5 @@
-import { clientCookies, CookieName } from 'app/_services/cookieService';
+import { CookieName } from 'app/_services/cookieNames';
+import { clientCookies } from 'app/_services/cookieService';
 import { UserRole } from 'app/user/_models/User';
 import { jwtDecode } from 'jwt-decode';
 import { useCallback, useEffect, useState } from 'react';

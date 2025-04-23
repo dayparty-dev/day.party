@@ -1,4 +1,5 @@
-import { CookieName, serverCookies } from 'app/_services/cookieService';
+import { CookieName } from 'app/_services/cookieNames';
+import { serverCookies } from 'app/_services/serverCookieService';
 import { UserRole } from 'app/user/_models/User';
 import { redirect } from 'next/navigation';
 import { JsonWebTokenAuthTokenService } from '../_services/JsonWebTokenAuthTokenService';
