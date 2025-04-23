@@ -1,11 +1,11 @@
-import { useState, useRef } from 'react';
-import { Resizable } from 're-resizable';
 import { useSortable } from '@dnd-kit/sortable';
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
+import { useTags } from 'app/_hooks/useTags';
+import { Resizable } from 're-resizable';
+import { useRef, useState } from 'react';
 import { useLongPress } from 'use-long-press';
 import { TaskStatus } from '../../_models/Task';
-import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 import TagPopoverEditor from './TagPopoverEditor';
-import { useTags } from 'app/_hooks/useTags';
 
 interface SortableTaskProps {
   task: any; // Replace with proper Task type
@@ -111,7 +111,7 @@ const SortableTask = ({
             </button>
           )}
 
-          <div className="flex flex-col gap-2" {...(isEditMode ? listeners : longPressBinding())}>
+          <div className="flex flex-col gap-2 h-full p-4" {...(isEditMode ? listeners : longPressBinding())}>
             {/* <div
               className="action"
               {...(isEditMode ? listeners : longPressBinding())}
