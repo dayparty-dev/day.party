@@ -13,10 +13,10 @@ const ClientInitializer = () => {
     const { isInitialized, initialize, syncTasks } = useTasks();
 
     useEffect(() => {
-        if (!isInitialized) {
+        if (isLoggedIn && !isInitialized) {
             initialize();
         }
-    }, [isInitialized, initialize]);
+    }, [isLoggedIn, isInitialized, initialize]);
 
     useEffect(() => {
         if (!isLoggedIn || !isCloudSyncEnabled || !isInitialized) return;
