@@ -1,11 +1,11 @@
-import { useState, useRef } from 'react';
-import { Resizable } from 're-resizable';
 import { useSortable } from '@dnd-kit/sortable';
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
+import { useTags } from 'app/_hooks/useTags';
+import { Resizable } from 're-resizable';
+import { useRef, useState } from 'react';
 import { useLongPress } from 'use-long-press';
 import { TaskStatus } from '../../_models/Task';
-import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 import TagPopoverEditor from './TagPopoverEditor';
-import { useTags } from 'app/_hooks/useTags';
 
 interface SortableTaskProps {
   task: any; // Replace with proper Task type
@@ -84,21 +84,22 @@ const SortableTask = ({
       <Resizable
         size={{ width: '100%', height: 62 + (task.size * 30) }}
         enable={isEditMode ? { top: false, right: false, bottom: true, left: false } : {}}
-        grid={[1, 60]}
-        minHeight={60}
+        grid={[1, 30]} // ← importante: usar 30, que es tu unidad visual real
+        minHeight={62 + 30} // mínimo de size = 1
         onResize={(_e, _direction, _ref, d) => {
-          const newSize = Math.max(1, Math.round((task.size * 60 + d.height) / 60));
+          const newSize = Math.max(1, Math.round((62 + task.size * 30 + d.height - 62) / 30));
           setTempSize(newSize);
         }}
         onResizeStop={(_e, _direction, _ref, d) => {
-          const newSize = Math.max(1, Math.round((task.size * 60 + d.height) / 60));
+          const newSize = Math.max(1, Math.round((62 + task.size * 30 + d.height - 62) / 30));
           setTempSize(null);
           if (newSize !== task.size) {
             onResize(task._id, newSize);
           }
         }}
       >
-        <div className={`relative group task-content bg-base-100 h-full shadow-md rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}>
+
+        <div className={`relative group task-content bg-base-100 h-full shadow-md p-4 rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}>
           {/* <div className={`task-content card bg-base-100 h-full shadow-md p-4 rounded-md border ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}> */}
           {isEditMode && (
             <button
