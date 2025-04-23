@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Resizable } from 're-resizable';
 import { useSortable } from '@dnd-kit/sortable';
 import { useLongPress } from 'use-long-press';
 import { TaskStatus } from '../../_models/Task';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
-
+import TagPopoverEditor from './TagPopoverEditor';
+import { useTags } from 'app/_hooks/useTags';
 
 interface SortableTaskProps {
   task: any; // Replace with proper Task type
@@ -38,6 +39,17 @@ const SortableTask = ({
     id: task._id,
   });
 
+  const { getTagByKey } = useTags();
+  const tag = task.tagKey ? getTagByKey(task.tagKey) : null;
+
+  const tagRef = useRef<HTMLSpanElement>(null);
+  const [editing, setEditing] = useState(false);
+
+  const handleUpdateTag = (taskId: string, newKey: string) => {
+    // Aquí deberías actualizar la tarea, por ejemplo:
+    // updateTask(taskId, { category: tags.find(tag => tag.key === newKey) });
+  };
+
   const longPressBinding = useLongPress(
     () => {
       onLongPress();
@@ -60,6 +72,7 @@ const SortableTask = ({
     cursor: isEditMode ? 'grab' : 'default',
   } as React.CSSProperties;
 
+  // console.log('SortableTask', task);
   return (
 
     <div
@@ -103,7 +116,31 @@ const SortableTask = ({
               className="action"
               {...(isEditMode ? listeners : longPressBinding())}
             > */}
-            <h3 className="text-lg font-semibold">{task.title}</h3>
+            <h3 className="text-lg font-semibold flex items-center gap-2 flex-wrap">
+              {task.title}
+              {task.tagKey && (
+                <span
+                  ref={tagRef}
+                  className="badge badge-sm cursor-pointer"
+                  style={{
+                    backgroundColor: tag.color,
+                    color: '#fff',
+                  }}
+                  onClick={() => setEditing(true)}
+                >
+                  {tag.label}
+                </span>
+              )}
+            </h3>
+
+            {editing && (
+              <TagPopoverEditor
+                selectedKey={task.tagKey ?? null}
+                anchorRef={tagRef}
+                onSelect={handleUpdateTag}
+                onClose={() => setEditing(false)}
+              />
+            )}
             <p className="text-sm text-gray-500">{t('task.duration', { minutes: (tempSize ?? task.size) * 15 })}</p>
 
             <div className="absolute right-1.5 bottom-1.5 flex justify-end items-center gap-2 mt-auto">

@@ -95,8 +95,6 @@ export const useTaskStore = create<State & Actions>()(
         //   }
         // },
         initialize: async () => {
-          console.log('🛠️ Initializing task store...');
-          console.log('isCloudSyncEnabled', isCloudSyncEnabled);
           const stored = localStorage.getItem('tasks');
           let tasks: Record<string, Task[]> = {};
         
@@ -174,7 +172,8 @@ export const useTaskStore = create<State & Actions>()(
         },
 
         // Agrega una nueva tarea
-        addTask: async ({ title, size, scheduledAt }) => {
+        addTask: async ({ title, size, tagKey, scheduledAt }) => {
+          console.log("taskkey", tagKey);
           const currentDate = new Date();
           const normalizedDate = scheduledAt ? new Date(scheduledAt) : new Date();
           normalizedDate.setHours(0, 0, 0, 0);
@@ -188,6 +187,7 @@ export const useTaskStore = create<State & Actions>()(
             _id: nanoid(),
             title,
             size,
+            tagKey,
             status: 'pending',
             duration: size * 15,
             createdAt: currentDate,
@@ -360,7 +360,6 @@ export const useTaskStore = create<State & Actions>()(
         },
 
         syncTasks: async () => {
-          console.log('🔄 Force sync triggered');
         
           const allTasks = Object.values(get().tasksByDate).flat();
           const deletedTasksObj = get().deletedTasks || {};
@@ -368,8 +367,6 @@ export const useTaskStore = create<State & Actions>()(
         
           const dirtyTasks = allTasks.filter(t => t.isDirty);
           const tasksToSync = [...dirtyTasks, ...deletedTasks];
-        
-          console.log(`📦 Dirty: ${dirtyTasks.length}, Deleted: ${deletedTasks.length}`);
         
           if (tasksToSync.length > 0 && isCloudSyncEnabled) {
           // if (tasksToSync.length > 0) {
