@@ -1,5 +1,5 @@
+import { CookieName, serverCookies } from 'app/_services/cookieService';
 import { UserRole } from 'app/user/_models/User';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { JsonWebTokenAuthTokenService } from '../_services/JsonWebTokenAuthTokenService';
 
@@ -28,10 +28,9 @@ export function withAuth<T extends (ctx: AuthContext, ...args: any[]) => Promise
 ): (...args: OmitFirstParam<Parameters<T>>) => Promise<ReturnType<T>> {
   return async (...args: OmitFirstParam<Parameters<T>>): Promise<ReturnType<T>> => {
     const { redirectToLogin = false } = options;
-    const cookieStore = await cookies();
 
     // Get authentication token from cookies
-    const token = cookieStore.get('day_party_auth_token')?.value;
+    const token = await serverCookies.get(CookieName.AuthToken);
 
     if (!token) {
       if (redirectToLogin) {

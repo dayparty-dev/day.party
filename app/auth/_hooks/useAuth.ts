@@ -1,5 +1,5 @@
+import { clientCookies, CookieName } from 'app/_services/cookieService';
 import { UserRole } from 'app/user/_models/User';
-import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { jwtDecode } from 'jwt-decode';
 import { useCallback, useEffect, useState } from 'react';
 import createPersistedState from 'use-persisted-state';
@@ -15,13 +15,9 @@ const useSessionIdState = createPersistedState('day.party.auth.sessionId');
 const useIsLoggedInState = createPersistedState('day.party.auth.isLoggedIn');
 const useUserState = createPersistedState('day.party.auth.user');
 
-const AUTH_TOKEN_COOKIE = 'day_party_auth_token';
-const COOKIE_OPTIONS = {
-  maxAge: 30 * 24 * 60 * 60, // 30 days
-  path: '/',
-  sameSite: 'strict' as const,
-  secure: process.env.NODE_ENV === 'production',
-};
+const getAuthToken = () => clientCookies.get(CookieName.AuthToken);
+const setAuthToken = (token: string) => clientCookies.set(CookieName.AuthToken, token);
+const deleteAuthToken = () => clientCookies.delete(CookieName.AuthToken);
 
 export interface UseAuth {
   isLoggedIn: boolean;
@@ -36,7 +32,7 @@ export interface UseAuth {
 export function useAuth(): UseAuth {
   const [sessionId, setSessionId] = useSessionIdState<string | null>(null);
   const [token, setToken] = useState<string | null>(() => {
-    return typeof window !== 'undefined' ? (getCookie(AUTH_TOKEN_COOKIE) as string) || null : null;
+    return typeof window !== 'undefined' ? getAuthToken() || null : null;
   });
 
   const [isLoggedIn, setIsLoggedIn] = useIsLoggedInState<boolean>(false);
@@ -56,7 +52,7 @@ export function useAuth(): UseAuth {
         setIsLoggedIn(true);
       } catch (error) {
         setToken(null);
-        deleteCookie(AUTH_TOKEN_COOKIE);
+        deleteAuthToken();
       }
     } else {
       setUser(null);
@@ -78,7 +74,7 @@ export function useAuth(): UseAuth {
       });
 
       // Store token in cookies for server access
-      setCookie(AUTH_TOKEN_COOKIE, token, COOKIE_OPTIONS);
+      setAuthToken(token);
 
       setToken(token);
       setSessionId(candidateSessionId);
@@ -90,7 +86,7 @@ export function useAuth(): UseAuth {
 
   const clearState = useCallback(() => {
     setSessionId(null);
-    deleteCookie(AUTH_TOKEN_COOKIE);
+    deleteAuthToken();
     setToken(null);
     setIsLoggedIn(false);
     setUser(null);
