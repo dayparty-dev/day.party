@@ -1,65 +1,114 @@
-// components/TagPopoverEditor.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import TagSelector from './TagSelector';
+import { Task } from 'app/_models/Task';
 
 interface TagPopoverEditorProps {
   selectedKey: string | null;
-  onSelect: (taskId: string, selectedKey: string) => void;
-  onClose: () => void;
   anchorRef: React.RefObject<HTMLElement>;
+  onSelect: (key: string) => void;
+  onClose: () => void;
+  needEdditingStyles?: boolean;
 }
 
 const TagPopoverEditor: React.FC<TagPopoverEditorProps> = ({
   selectedKey,
+  anchorRef,
   onSelect,
   onClose,
-  anchorRef,
+  needEdditingStyles = false,
 }) => {
   const popoverRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState<'top' | 'bottom'>('bottom');
+  const [popoverStyles, setPopoverStyles] = useState<React.CSSProperties>({});
 
-  useEffect(() => {
-    const anchor = anchorRef.current;
-    const popover = popoverRef.current;
+  // const updatePosition = () => {
+  //   if (!anchorRef.current || !popoverRef.current) return;
 
-    if (anchor && popover) {
-      const rect = anchor.getBoundingClientRect();
-      const screenHeight = window.innerHeight;
+  //   const anchorRect = anchorRef.current.getBoundingClientRect();
+  //   const popoverRect = popoverRef.current.getBoundingClientRect();
 
-      const fitsBelow = rect.bottom + popover.offsetHeight < screenHeight;
-      setPosition(fitsBelow ? 'bottom' : 'top');
-    }
-  }, []);
+  //   const spaceAbove = anchorRect.top;
+  //   const spaceBelow = window.innerHeight - anchorRect.bottom;
 
-  // Cerrar si haces click fuera
+  //   const shouldShowAbove = spaceAbove > popoverRect.height + 8;
+
+  //   const top = shouldShowAbove
+  //     ? anchorRect.top + window.scrollY - popoverRect.height - 8
+  //     : anchorRect.bottom + window.scrollY + 8;
+
+  //   const left =
+  //     anchorRect.left +
+  //     anchorRect.width / 2 -
+  //     popoverRect.width / 2 +
+  //     window.scrollX;
+
+  //   const maxWidth = anchorRect.width;
+
+  //   setPopoverStyles({
+  //     position: 'absolute',
+  //     top,
+  //     left,
+  //     maxWidth,
+  //     zIndex: 900,
+  //   });
+  // };
+
+  // // Update position on mount and on scroll/resize
+  // useEffect(() => {
+  //   updatePosition();
+
+  //   const handleResizeOrScroll = () => {
+  //     updatePosition();
+  //   };
+
+  //   window.addEventListener('scroll', handleResizeOrScroll, true);
+  //   window.addEventListener('resize', handleResizeOrScroll);
+
+  //   return () => {
+  //     window.removeEventListener('scroll', handleResizeOrScroll, true);
+  //     window.removeEventListener('resize', handleResizeOrScroll);
+  //   };
+  // }, [anchorRef]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         popoverRef.current &&
         !popoverRef.current.contains(event.target as Node) &&
-        !anchorRef.current?.contains(event.target as Node)
+        anchorRef.current &&
+        !anchorRef.current.contains(event.target as Node)
       ) {
         onClose();
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [onClose]);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [popoverRef, anchorRef]);
+
+  const handleSelect = (key: string) => {
+    onSelect(key);
+    onClose();
+  };
 
   return (
-    <div
-      ref={popoverRef}
-      className="absolute z-50 bg-white border rounded shadow-md"
-      style={{
-        top: position === 'bottom'
-          ? anchorRef.current?.getBoundingClientRect().bottom! + window.scrollY + 8
-          : anchorRef.current?.getBoundingClientRect().top! + window.scrollY - 120,
-        left: anchorRef.current?.getBoundingClientRect().left! + window.scrollX,
-      }}
-    >
-      <TagSelector
-        selectedKey={selectedKey}
-      />
+    // <div ref={ref} style={style} className="bg-white border rounded shadow-lg">
+    <div ref={popoverRef} className="absolute bg-white border shadow-lg rounded-2xl bottom-full">
+      <div className='relative p-4'>
+
+        <TagSelector
+          selectedKey={selectedKey}
+          onSelect={handleSelect}
+        />
+
+        <button
+          className="absolute top-0 right-0 h-auto text-gray-500 hover:text-black"
+          onClick={onClose}
+        >
+          ×
+        </button>
+      </div>
     </div>
   );
 };

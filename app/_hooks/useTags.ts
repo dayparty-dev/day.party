@@ -7,7 +7,7 @@ export const useTags = () => {
   const customTags = useTagStore(state => state.customTags);
 
   // Obtener tareas para el día seleccionado
-  const selectedTagKey = useTagStore(state => state.selectedTagKey);
+  // const selectedTagKey = useTagStore(state => state.selectedTagKey);
 
   // Obtener la capacidad del día
   const getAllTags = useTagStore(state => state.getAllTags);
@@ -19,7 +19,7 @@ export const useTags = () => {
   const removeCustomTag = useTagStore(state => state.removeCustomTag);
 
   // Inicialización del store
-  const setSelectedTagKey = useTagStore(state => state.setSelectedTagKey);
+  // const setSelectedTagKey = useTagStore(state => state.setSelectedTagKey);
 
   // Actualizar fecha actual
   const resetTags = useTagStore(state => state.resetTags);
@@ -30,11 +30,11 @@ export const useTags = () => {
   return {
     tags,
     customTags,
-    selectedTagKey,
+    // selectedTagKey,
     getAllTags,
     addCustomTag,
     removeCustomTag,
-    setSelectedTagKey,
+    // setSelectedTagKey,
     resetTags,
     getTagByKey
   };

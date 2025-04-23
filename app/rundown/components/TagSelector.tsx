@@ -1,4 +1,3 @@
-// components/TagSelector.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 import { FaTimes } from 'react-icons/fa';
@@ -6,22 +5,21 @@ import { useTags } from 'app/_hooks/useTags';
 
 interface TagSelectorProps {
     selectedKey?: string | null;
+    onSelect?: (key: string) => void;
 }
 
-const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey }) => {
+const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey, onSelect }) => {
     const { t } = useAppTranslation();
     const {
         tags,
         customTags,
-        selectedTagKey,
-        setSelectedTagKey,
         addCustomTag,
         removeCustomTag,
     } = useTags();
 
     const [customLabel, setCustomLabel] = useState('');
     const [customColor, setCustomColor] = useState('#888888');
-
+    const [selectedTagKey, setSelectedTagKey] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     // Si recibimos selectedKey desde fuera
@@ -60,8 +58,6 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey }) => {
                 color: customColor,
             });
             setSelectedTagKey(normalizedKey);
-            console.log("key", normalizedKey);
-            console.log("added custom tag", selectedTagKey);
         }
 
         setCustomLabel('');
@@ -70,17 +66,20 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey }) => {
 
     // const isDefaultTag = (key: string) => tags.some((tag) => tag.key === key);
 
+    const handleClickTag = (key: string) => {
+        console.log('handleClickTag', key);
+        if (onSelect)
+            onSelect(key);
+    };
+
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col w-full gap-2" >
             <div className="flex gap-2 overflow-x-auto">
                 {tags.map((tag) => (
                     <button
                         key={tag.key}
                         type="button"
-                        onClick={() => {
-                            console.log("tag", tag.key);
-                            setSelectedTagKey(tag.key);
-                        }}
+                        onClick={() => handleClickTag(tag.key)}
                         className={`badge badge-lg cursor-pointer transition-all border-2 ${selectedTagKey === tag.key ? 'border-black' : 'border-transparent'}`}
                         style={{ backgroundColor: tag.color, color: 'white' }}
                     >
@@ -103,7 +102,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey }) => {
                         key={tag.key}
                         className={`badge badge-lg cursor-pointer transition-all border-2 text-nowrap relative group ${selectedTagKey === tag.key ? 'border-black' : 'border-transparent'}`}
                         style={{ backgroundColor: tag.color, color: 'white' }}
-                        onClick={() => setSelectedTagKey(tag.key)}
+                        onClick={() => handleClickTag(tag.key)}
                         role="button"
                         tabIndex={0}
                         onKeyDown={(e) => e.key === 'Enter' && setSelectedTagKey(tag.key)}
@@ -129,28 +128,30 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey }) => {
 
             </div>
 
-            {selectedTagKey === 'custom' && (
-                <div className="flex items-center gap-2 mt-2">
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        placeholder={t('tags.add_placeholder')}
-                        className="input input-bordered"
-                        value={customLabel}
-                        onChange={(e) => setCustomLabel(e.target.value)}
-                    />
-                    <input
-                        type="color"
-                        value={customColor}
-                        onChange={(e) => setCustomColor(e.target.value)}
-                        className="w-10 h-10 rounded-full border-2 border-gray-300 cursor-pointer"
-                    />
-                    <button onClick={handleAddCustomTag} className="btn btn-primary">
-                        {t('tags.add')}
-                    </button>
-                </div>
-            )}
-        </div>
+            {
+                selectedTagKey === 'custom' && (
+                    <div className="flex items-center gap-2 mt-2">
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            placeholder={t('tags.add_placeholder')}
+                            className="input input-bordered"
+                            value={customLabel}
+                            onChange={(e) => setCustomLabel(e.target.value)}
+                        />
+                        <input
+                            type="color"
+                            value={customColor}
+                            onChange={(e) => setCustomColor(e.target.value)}
+                            className="w-10 h-10 rounded-full border-2 border-gray-300 cursor-pointer"
+                        />
+                        <button onClick={handleAddCustomTag} className="btn btn-primary">
+                            {t('tags.add')}
+                        </button>
+                    </div>
+                )
+            }
+        </div >
     );
 };
 
