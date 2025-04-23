@@ -2,7 +2,6 @@ import { useCallback, useRef, useState } from 'react';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 import { useTasks } from 'app/_hooks/useTasks';
 import TagSelector from './TagSelector';
-import { useTags } from 'app/_hooks/useTags';
 
 const timeOptions = [
   { value: 1, label: '15 min' },
@@ -20,8 +19,7 @@ const TaskForm: React.FC = () => {
     dayCapacity,
     totalMinutes,
   } = useTasks();
-  const { selectedTagKey, setSelectedTagKey } = useTags();
-
+  const [selectedTagKey, setSelectedTagKey] = useState<string | null>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const sizeRef = useRef<HTMLSelectElement>(null);
 
@@ -53,8 +51,13 @@ const TaskForm: React.FC = () => {
       if (sizeRef.current) sizeRef.current.value = '1';
       // setSelectedTagKey(null);
     },
-    [addTask, currentDate, totalMinutes, dayCapacity, setCurrentDate]
+    [addTask, currentDate, totalMinutes, dayCapacity, selectedTagKey, setCurrentDate]
   );
+
+  const handleTagSelect = (key: string | null) => {
+    console.log('selectedTagKey', key);
+    setSelectedTagKey(() => key);
+  };
 
   return (
     <form onSubmit={handleSubmit} className="task-form flex flex-col max-w-sm mx-auto gap-2">
@@ -79,7 +82,7 @@ const TaskForm: React.FC = () => {
         </select>
       </div>
 
-      <TagSelector />
+      <TagSelector onSelect={handleTagSelect} />
 
       <button type="submit" className="btn btn-primary w-full sm:w-auto sm:btn-md btn-sm">
         {t('taskForm.addButton')}

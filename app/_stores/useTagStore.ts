@@ -10,14 +10,14 @@ export interface TagOption {
 interface State {
     tags: TagOption[];
     customTags: TagOption[];
-    selectedTagKey: string | null;
+    // selectedTagKey: string | null;
 }
 interface Actions {
     getAllTags: () => TagOption[];
     addCustomTag: (tag: TagOption) => void;
     removeCustomTag: (key: string) => void;
     // setTags: (tags: TagOption[]) => void;
-    setSelectedTagKey: (key: string | null) => void;
+    // setSelectedTagKey: (key: string | null) => void;
     resetTags: () => void;
     getTagByKey: (key: string) => TagOption | undefined;
 }
@@ -49,12 +49,12 @@ export const useTagStore = create<State & Actions>()(
         
             // setTags: (tags) => set({ tags }),
         
-            setSelectedTagKey: (key) => {
-                console.log('setSelectedTagKey', key);
-                set({ selectedTagKey: key })
-            },
+            // setSelectedTagKey: (key) => {
+            //     console.log('setSelectedTagKey', key);
+            //     set({ selectedTagKey: key })
+            // },
         
-            resetTags: () => set({ tags: [], customTags: [], selectedTagKey: null }),
+            resetTags: () => set({ tags: [], customTags: [] }),
         
             getAllTags: () => {
                 const { tags, customTags } = get();
