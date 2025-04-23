@@ -1,5 +1,11 @@
 {
   "delete": "Delete",
+  "theme":{
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System",
+    "auto": "Auto"
+  },
     "LandingPage": {
       "greeting": "Hello, {name}!",
       "welcome": "Welcome to our website."
