@@ -58,12 +58,18 @@
     "task": {
       "delete": "Eliminar tarea",
       "duration": "{{minutes}} min",
-      "markDone": "Marcar como completada",
+      "minutes": "minutos",
       "status": {
         "pending": "Pendiente",
         "ongoing": "En curso",
         "paused": "Pausada",
         "done": "Completada"
+      },
+      "endTaskModal": {
+      "finishedConfirm": "¿Has terminado esta tarea?",
+        "markDone": "Marcar como completada",
+        "customMinutes": "Añadir minutos personalizados",
+        "addMinutes": "Añadir {{count}} minutos"
       }
     }
   }
