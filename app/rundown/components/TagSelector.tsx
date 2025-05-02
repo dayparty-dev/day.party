@@ -14,6 +14,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey, onSelect }) => {
         tags,
         customTags,
         addCustomTag,
+        removeTag,
         removeCustomTag,
     } = useTags();
 
@@ -67,7 +68,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey, onSelect }) => {
     // const isDefaultTag = (key: string) => tags.some((tag) => tag.key === key);
 
     const handleClickTag = (key: string) => {
-        console.log('handleClickTag', key);
+        setSelectedTagKey(key);
         if (onSelect)
             onSelect(key);
     };
@@ -80,22 +81,25 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey, onSelect }) => {
                         key={tag.key}
                         type="button"
                         onClick={() => handleClickTag(tag.key)}
-                        className={`badge badge-lg cursor-pointer transition-all border-2 ${selectedTagKey === tag.key ? 'border-black' : 'border-transparent'}`}
+                        className={`flex flex-row badge badge-lg cursor-pointer transition-all border-2 ${selectedTagKey === tag.key ? 'border-black' : 'border-transparent'}`}
                         style={{ backgroundColor: tag.color, color: 'white' }}
                     >
                         {t(`tags.${tag.key}`)}
+                        <span
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                removeTag(tag.key);
+                            }}
+                            className="bg-white text-black rounded-full p-1 text-xs shadow hover:bg-gray-100 transition-colors cursor-pointer"
+                            title={t('delete')}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && removeCustomTag(tag.key)}
+                        >
+                            <FaTimes size={10} />
+                        </span>
                     </button>
                 ))}
-
-                <button
-                    key="custom"
-                    type="button"
-                    onClick={() => setSelectedTagKey('custom')}
-                    className={`badge badge-lg cursor-pointer transition-all border-2 ${selectedTagKey === 'custom' ? 'border-black' : 'border-transparent'}`}
-                    style={{ backgroundColor: '#AAAAAA', color: 'white' }}
-                >
-                    {t('tags.custom')}
-                </button>
 
                 {customTags.map((tag) => (
                     <div
@@ -109,13 +113,12 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey, onSelect }) => {
                     >
                         {tag.label}
 
-                        {/* Botón de eliminar independiente */}
                         <span
                             onClick={(e) => {
-                                e.stopPropagation(); // Evita que el click se propague al contenedor
+                                e.stopPropagation();
                                 removeCustomTag(tag.key);
                             }}
-                            className="absolute -top-2 -right-2 bg-white text-black rounded-full p-1 text-xs shadow hover:bg-gray-100 transition-colors cursor-pointer"
+                            className="bg-white text-black rounded-full p-1 text-xs shadow hover:bg-gray-100 transition-colors cursor-pointer"
                             title={t('delete')}
                             role="button"
                             tabIndex={0}
@@ -126,6 +129,15 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedKey, onSelect }) => {
                     </div>
                 ))}
 
+                <button
+                    key="custom"
+                    type="button"
+                    onClick={() => setSelectedTagKey('custom')}
+                    className={`badge badge-lg cursor-pointer transition-all border-2 ${selectedTagKey === 'custom' ? 'border-black' : 'border-transparent'}`}
+                    style={{ backgroundColor: '#AAAAAA', color: 'white' }}
+                >
+                    {t('tags.custom')}
+                </button>
             </div>
 
             {
