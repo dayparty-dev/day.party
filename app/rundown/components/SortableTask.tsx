@@ -227,7 +227,7 @@ const SortableTask = ({
           <div className="flex flex-col gap-2 h-full p-4 z-10 relative" {...(isEditMode ? listeners : longPressBinding())}>
             <h3 className="text-lg font-semibold flex items-center gap-2 flex-wrap mix-blend-difference">
               {task.title}
-              {task.tagKey && (
+              {task.tagKey ? (
                 <span
                   ref={tagRef}
                   className={`badge badge-sm ${isEditMode ? 'cursor-pointer' : 'cursor-default'}`}
@@ -238,6 +238,13 @@ const SortableTask = ({
                   onClick={isEditMode ? () => setEditing(true) : undefined}
                 >
                   {tag?.label}
+                </span>
+              ) : (
+                <span
+                  className={`badge badge-sm bg-base-200 text-base-content ${isEditMode ? 'cursor-pointer' : 'cursor-default'}`}
+                  onClick={isEditMode ? () => setEditing(true) : undefined}
+                >
+                  +
                 </span>
               )}
             </h3>
