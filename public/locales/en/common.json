@@ -46,7 +46,7 @@
     "custom": "Custom",
     "add_placeholder": "Custom tag name",
           "add": "Add"
-  },    
+  },
   "dayCapacity": {
     "label": "Daily Capacity",
     "hours": "{{hours}} hours"
@@ -58,12 +58,18 @@
   "task": {
     "delete": "Delete task",
     "duration": "{{minutes}} mins",
-    "markDone": "Mark as done",
+    "minutes": "minutes",
     "status": {
       "pending": "Pending",
       "ongoing": "Ongoing",
       "paused": "Paused",
       "done": "Done"
+      },
+      "endTaskModal": {
+        "finishedConfirm": "Have you finished this task?",
+        "markDone": "Mark as done",
+        "customMinutes": "Add custom minutes",
+        "addMinutes": "Add {{count}} minutes"
     }
   }
 }

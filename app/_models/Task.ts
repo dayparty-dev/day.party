@@ -5,6 +5,7 @@ export interface Task {
   tagKey?: string;
   
   duration: number;
+  elapsed: number;
   status: TaskStatus;
   createdAt: Date;
   updatedAt: Date;
