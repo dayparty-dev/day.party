@@ -6,64 +6,64 @@
     "system": "Sistema",
     "auto": "Automático"
   },
-    "LandingPage": {
-      "greeting": "¡Hola, {name}!",
-      "welcome": "Bienvenido a nuestro sitio web."
+  "LandingPage": {
+    "greeting": "¡Hola, {name}!",
+    "welcome": "Bienvenido a nuestro sitio web."
+  },
+  "NotFoundPage": {
+    "title": "Página no encontrada"
+  },
+  "Error": {
+    "title": "Error",
+    "retry": "Reintentar"
+  },
+  "LoginPage": {
+    "steps": {
+      "email": "Correo electrónico",
+      "check": "Revisar",
+      "verify": "Verificar"
     },
-    "NotFoundPage": {
-      "title": "Página no encontrada"
-    },
-    "Error": {
-      "title": "Error",
-      "retry": "Reintentar"
-    },
-    "LoginPage": {
-      "steps": {
-        "email": "Correo electrónico",
-        "check": "Revisar",
-        "verify": "Verificar"
-      },
-      "welcome": "¡Bienvenido a day.party! Tu agenda menos agenda",
-      "emailLabel": "Tu correo electrónico",
-      "emailPlaceholder": "pepe@day.party",
-      "nextButton": "Siguiente",
-      "codeSent": "Hemos enviado un código a {email}. Por favor, revisa tu spam",
-      "verifying": "Verificando...",
-      "loading": "Cargando..."
-    },
-    "rundownPage":{
-      "done": "Hecho"
-    },
-    "taskForm": {
-      "placeholder": "Título de la nueva tarea",
-      "addButton": "Agregar tarea"
-    },
-    "tags": {
-      "work": "Trabajo",
-      "home": "Casa",
-      "personal": "Personal",
-      "study": "Estudio",
-      "custom": "Personalizado",
-      "add_placeholder": "Nombre de la etiqueta",
-      "add": "Crar"
-    },
-    "dayCapacity": {
-      "label": "Capacidad diaria",
-      "hours": "{{hours}} horas"
-    },
-    "taskList": {
-      "emptyMessage": "No hay tareas programadas para este día",
-      "createTask": "Crear tarea"
-    },
-    "task": {
-      "delete": "Eliminar tarea",
-      "duration": "{{minutes}} min",
-      "markDone": "Marcar como completada",
-      "status": {
-        "pending": "Pendiente",
-        "ongoing": "En curso",
-        "paused": "Pausada",
-        "done": "Completada"
-      }
+    "welcome": "¡Bienvenido a day.party! Tu agenda menos agenda",
+    "emailLabel": "Tu correo electrónico",
+    "emailPlaceholder": "pepe@day.party",
+    "nextButton": "Siguiente",
+    "codeSent": "Hemos enviado un código a {{email}}. Por favor, revisa tu spam",
+    "verifying": "Verificando...",
+    "loading": "Cargando..."
+  },
+  "rundownPage":{
+    "done": "Hecho"
+  },
+  "taskForm": {
+    "placeholder": "Título de la nueva tarea",
+    "addButton": "Agregar tarea"
+  },
+  "tags": {
+    "work": "Trabajo",
+    "home": "Casa",
+    "personal": "Personal",
+    "study": "Estudio",
+    "custom": "Personalizado",
+    "add_placeholder": "Nombre de la etiqueta",
+    "add": "Crar"
+  },
+  "dayCapacity": {
+    "label": "Capacidad diaria",
+    "hours": "{{hours}} horas"
+  },
+  "taskList": {
+    "emptyMessage": "No hay tareas programadas para este día",
+    "createTask": "Crear tarea"
+  },
+  "task": {
+    "delete": "Eliminar tarea",
+    "duration": "{{minutes}} min",
+    "markDone": "Marcar como completada",
+    "status": {
+      "pending": "Pendiente",
+      "ongoing": "En curso",
+      "paused": "Pausada",
+      "done": "Completada"
     }
   }
+}
