@@ -117,7 +117,7 @@ const SortableTask = ({
             > */}
             <h3 className="text-lg font-semibold flex items-center gap-2 flex-wrap">
               {task.title}
-              {task.tagKey && (
+              {task.tagKey ? (
                 <span
                   ref={tagRef}
                   className={`badge badge-sm ${isEditMode ? 'cursor-pointer' : 'cursor-default'}`}
@@ -125,10 +125,16 @@ const SortableTask = ({
                     backgroundColor: tag?.color,
                     color: '#fff',
                   }}
-
                   onClick={isEditMode ? () => setEditing(true) : undefined}
                 >
                   {tag?.label}
+                </span>
+              ) : (
+                <span
+                  className={`badge badge-sm bg-base-200 text-base-content ${isEditMode ? 'cursor-pointer' : 'cursor-default'}`}
+                  onClick={isEditMode ? () => setEditing(true) : undefined}
+                >
+                  +
                 </span>
               )}
             </h3>
