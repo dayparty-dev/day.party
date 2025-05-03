@@ -15,6 +15,7 @@ interface State {
 interface Actions {
     getAllTags: () => TagOption[];
     addCustomTag: (tag: TagOption) => void;
+    removeTag: (key: string) => void;
     removeCustomTag: (key: string) => void;
     // setTags: (tags: TagOption[]) => void;
     // setSelectedTagKey: (key: string | null) => void;
@@ -42,6 +43,11 @@ export const useTagStore = create<State & Actions>()(
                 }))
             },
         
+            removeTag: (key) =>
+                set((state) => ({
+                    tags: state.tags.filter((tag) => tag.key !== key),
+                })),
+                
             removeCustomTag: (key) =>
                 set((state) => ({
                     customTags: state.customTags.filter((tag) => tag.key !== key),
