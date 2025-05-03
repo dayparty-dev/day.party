@@ -33,6 +33,7 @@ const getDefaultTask = (date) => {
     title: generateRandomTitle(id),
     createdAt: new Date(),
     duration: 15,
+    elapsed: 0,
     size: 2,
     status: 'pending',
     userId: '', // The userId is handled by the server actions

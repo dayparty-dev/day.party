@@ -190,12 +190,12 @@ export const useTaskStore = create<State & Actions>()(
             tagKey,
             status: 'pending',
             duration: size * 15,
+            elapsed: 0,
             createdAt: currentDate,
             scheduledAt: normalizedDate,
             order: maxOrder + 1,
             userId: nanoid() || 'local',
             updatedAt: new Date(),
-
             isDirty: true,
             isSynced: false,
           };
