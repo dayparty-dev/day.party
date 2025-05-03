@@ -1,13 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
-import { get } from 'http';
+import { CookieName } from 'app/_services/cookieNames';
+import { useEffect, useState } from 'react';
 
 const ThemeToggle = ({ initialTheme }: { initialTheme: string }) => {
     const { t } = useAppTranslation();
-    const [theme, setTheme] = useState(initialTheme);
-    const [autoTheme, setAutoTheme] = useState(true);
+    // Check if initialTheme is the 'auto' mode indicator
+    const isAutoMode = initialTheme === 'auto';
+    // Set actual theme to a valid theme value
+    const defaultTheme = (new Date().getHours() >= 6 && new Date().getHours() < 18) ? 'latte' : 'coffee';
+    const [theme, setTheme] = useState(isAutoMode ? defaultTheme : initialTheme);
+    const [autoTheme, setAutoTheme] = useState(isAutoMode);
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
     // AutoTheme detection based on location
@@ -143,8 +147,18 @@ const ThemeToggle = ({ initialTheme }: { initialTheme: string }) => {
     // Theme cookie management
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
-        document.cookie = `theme=${theme}; path=/; max-age=${365 * 24 * 60 * 60}`;
-    }, [theme]);
+        // Only save the theme to cookie if we're not in auto mode
+        if (!autoTheme) {
+            document.cookie = `${CookieName.Theme}=${theme}; path=/; max-age=${365 * 24 * 60 * 60}`;
+        }
+    }, [theme, autoTheme]);
+
+    // Save auto theme preference separately
+    useEffect(() => {
+        if (autoTheme) {
+            document.cookie = `${CookieName.Theme}=auto; path=/; max-age=${365 * 24 * 60 * 60}`;
+        }
+    }, [autoTheme]);
 
     // System theme detection
     useEffect(() => {
@@ -152,7 +166,7 @@ const ThemeToggle = ({ initialTheme }: { initialTheme: string }) => {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
             const applySystemTheme = () => {
-                const systemPref = mediaQuery.matches ? 'dark' : 'light';
+                const systemPref = mediaQuery.matches ? 'coffee' : 'latte';
                 document.documentElement.setAttribute('data-theme', systemPref);
             };
 
@@ -170,6 +184,9 @@ const ThemeToggle = ({ initialTheme }: { initialTheme: string }) => {
 
         if (selectedTheme === 'auto') {
             setAutoTheme(true);
+            // When switching to auto, set a theme based on current time as initial value
+            const defaultTheme = (new Date().getHours() >= 6 && new Date().getHours() < 18) ? 'latte' : 'coffee';
+            setTheme(defaultTheme);
         } else {
             setAutoTheme(false);
             setTheme(selectedTheme);
@@ -181,7 +198,6 @@ const ThemeToggle = ({ initialTheme }: { initialTheme: string }) => {
             }
         }
 
-        document.cookie = `theme=${selectedTheme}; path=/; max-age=${365 * 24 * 60 * 60}`;
         // Hide the dropdown after selection
         setIsDropdownVisible(false);
     };
