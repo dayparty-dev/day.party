@@ -1,6 +1,6 @@
 {
   "delete": "Delete",
-  "theme":{
+  "theme": {
     "dark": "Dark",
     "light": "Light",
     "system": "System",
@@ -27,11 +27,11 @@
     "emailLabel": "Your email",
     "emailPlaceholder": "pepe@day.party",
     "nextButton": "Next",
-    "codeSent": "We have sent a code to {{email}}. Please check your spam",
+    "codeSent": "We have sent a code to {email}. Please check your spam",
     "verifying": "Verifying...",
     "loading": "Loading..."
   },
-  "rundownPage":{
+  "rundownPage": {
     "done": "Done"
   },
   "taskForm": {
@@ -45,7 +45,7 @@
     "study": "Study",
     "custom": "Custom",
     "add_placeholder": "Custom tag name",
-          "add": "Add"
+    "add": "Add"
   },
   "dayCapacity": {
     "label": "Daily Capacity",
@@ -64,12 +64,12 @@
       "ongoing": "Ongoing",
       "paused": "Paused",
       "done": "Done"
-      },
-      "endTaskModal": {
-        "finishedConfirm": "Have you finished this task?",
-        "markDone": "Mark as done",
-        "customMinutes": "Add custom minutes",
-        "addMinutes": "Add {{count}} minutes"
+    },
+    "endTaskModal": {
+      "finishedConfirm": "Have you finished this task?",
+      "markDone": "Mark as done",
+      "customMinutes": "Add custom minutes",
+      "addMinutes": "Add {{count}} minutes"
     }
   }
 }
