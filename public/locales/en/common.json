@@ -6,32 +6,63 @@
     "system": "System",
     "auto": "Auto"
   },
-    "LandingPage": {
-      "greeting": "Hello, {name}!",
-      "welcome": "Welcome to our website."
+  "LandingPage": {
+    "greeting": "Hello, {name}!",
+    "welcome": "Welcome to our website."
+  },
+  "NotFoundPage": {
+    "title": "Page not found"
+  },
+  "Error": {
+    "title": "Error",
+    "retry": "Reintentar"
+  },
+  "LoginPage": {
+    "steps": {
+      "email": "Email",
+      "check": "Check",
+      "verify": "Verify"
     },
-    "NotFoundPage": {
-      "title": "Page not found"
-    },
-    "Error": {
-      "title": "Error",
-      "retry": "Reintentar"
-    },
-    "LoginPage": {
-      "steps": {
-        "email": "Email",
-        "check": "Check",
-        "verify": "Verify"
-      },
-      "welcome": "Welcome to day.party! Your less-agenda agenda",
-      "emailLabel": "Your email",
-      "emailPlaceholder": "pepe@day.party",
-      "nextButton": "Next",
-      "codeSent": "We have sent a code to {email}. Please check your spam",
-      "verifying": "Verifying...",
-      "loading": "Loading..."
-    },
-    "rundownPage":{
+    "welcome": "Welcome to day.party! Your less-agenda agenda",
+    "emailLabel": "Your email",
+    "emailPlaceholder": "pepe@day.party",
+    "nextButton": "Next",
+    "codeSent": "We have sent a code to {{email}}. Please check your spam",
+    "verifying": "Verifying...",
+    "loading": "Loading..."
+  },
+  "rundownPage":{
+    "done": "Done"
+  },
+  "taskForm": {
+    "placeholder": "New task title",
+    "addButton": "Add Task"
+  },
+  "tags": {
+    "work": "Work",
+    "home": "Home",
+    "personal": "Personal",
+    "study": "Study",
+    "custom": "Custom",
+    "add_placeholder": "Custom tag name",
+          "add": "Add"
+  },
+  "dayCapacity": {
+    "label": "Daily Capacity",
+    "hours": "{{hours}} hours"
+  },
+  "taskList": {
+    "emptyMessage": "No tasks scheduled for this day",
+    "createTask": "Create Task"
+  },
+  "task": {
+    "delete": "Delete task",
+    "duration": "{{minutes}} mins",
+    "markDone": "Mark as done",
+    "status": {
+      "pending": "Pending",
+      "ongoing": "Ongoing",
+      "paused": "Paused",
       "done": "Done"
     },
     "taskForm": {
@@ -46,7 +77,7 @@
       "custom": "Custom",
       "add_placeholder": "Custom tag name",
             "add": "Add"
-    },    
+    },
     "dayCapacity": {
       "label": "Daily Capacity",
       "hours": "{{hours}} hours"
@@ -73,3 +104,4 @@
       }
     }
   }
+}

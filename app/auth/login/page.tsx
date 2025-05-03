@@ -5,12 +5,8 @@ import { useAuth } from '../_hooks/useAuth';
 import { useAuthGuard } from '../_hooks/useAuthGuard';
 import './styles.scss';
 
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { GetStaticProps } from 'next';
-import a from "../../i18n"; // Importa la inicialización
-import { useTranslation } from 'next-i18next';
-
 import React, { useState, useEffect, Suspense, useRef } from 'react';
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 
 enum LoginState {
   Email = 'EMAIL',
@@ -19,7 +15,7 @@ enum LoginState {
 }
 
 function LoginForm(): React.ReactElement {
-  const { t } = useTranslation("", { "i18n": a });
+  const { t } = useAppTranslation();
 
   const { sendLoginLink, verifyLoginLink } = useAuth();
   const searchParams = useSearchParams();
@@ -57,7 +53,9 @@ function LoginForm(): React.ReactElement {
     <div className="login-container">
       <div>
         <ul className="steps my-4 w-full">
-          <li className="step step-secondary">Email</li>
+          <li className="step step-secondary">
+            {t("LoginPage.steps.email")}
+          </li>
           <li
             className={
               'step ' +
@@ -67,7 +65,7 @@ function LoginForm(): React.ReactElement {
                 : '')
             }
           >
-            Check
+            {t("LoginPage.steps.check")}
           </li>
           <li
             className={
@@ -75,32 +73,32 @@ function LoginForm(): React.ReactElement {
               (loginState === LoginState.Processing ? 'step-secondary' : '')
             }
           >
-            Verify
+            {t("LoginPage.steps.verify")}
           </li>
         </ul>
       </div>
       <div>
         {loginState === LoginState.Email && (
           <div className="step-container bg-secondary">
-            <p>Welcome to day.party! Your less-agenda agenda</p>
+            <p className="text-secondary-content">{t("LoginPage.welcome")}</p>
             <form className="flex gap-4" onSubmit={handleSubmit}>
               <label className="input">
-                <span className="label">Your email</span>
+                <span className="label">{t("LoginPage.emailLabel")}</span>
                 <input type="text" placeholder="pepe@day.party" name="email" />
               </label>
               <button className="btn btn-primary" type="submit">
-                Next
+                {t("LoginPage.nextButton")}
               </button>
             </form>
           </div>
         )}
         {loginState === LoginState.Code && (
           <div className="step-container bg-secondary">
-            <p>We have sent a code to {email}. Please check your spam</p>
+            <p className="text-secondary-content">{t("LoginPage.codeSent", { email: email })}</p>
           </div>
         )}
         {loginState === LoginState.Processing && (
-          <div className="step-container bg-secondary">Verifying...</div>
+          <div className="step-container bg-secondary text-secondary-content">{t("LoginPage.verifying")}</div>
         )}
       </div>
     </div>
@@ -108,8 +106,10 @@ function LoginForm(): React.ReactElement {
 }
 
 export default function LoginPage() {
+  const { t } = useAppTranslation();
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="text-secondary-content">{t("LoginPage.loading")}</div>}>
       <LoginForm />
     </Suspense>
   );
