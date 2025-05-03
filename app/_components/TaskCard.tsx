@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface TaskCardProps {
   task: any; // Se usa "any" porque Task no se importa
 }

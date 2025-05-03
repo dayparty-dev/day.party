@@ -1,6 +1,6 @@
-import React from 'react';
-import ThemeToggle from './ThemeToggle';
 import { cookies } from 'next/headers';
+import { CookieName } from '../_services/cookieNames';
+import ThemeToggle from './ThemeToggle';
 
 const getDefaultTheme = () => {
     const hour = new Date().getHours();
@@ -9,13 +9,11 @@ const getDefaultTheme = () => {
 
 const ThemeSwitcher = async () => {
     const cookieStore = cookies();
-    const savedTheme = (await cookieStore).get('theme')?.value || 'coffee';
-    const theme = savedTheme || getDefaultTheme();
-    // const theme = getDefaultTheme();
+    const savedTheme = (await cookieStore).get(CookieName.Theme)?.value || getDefaultTheme();
 
     return (
         <div className="absolute top-4 left-4">
-            <ThemeToggle initialTheme={theme} />
+            <ThemeToggle initialTheme={savedTheme} />
         </div>
     );
 };

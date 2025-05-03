@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface PictureInPictureButtonProps {
   onActivate: () => void;
   isActive: boolean;

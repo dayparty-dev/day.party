@@ -1,12 +1,13 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useRef, useState } from 'react';
+
+import { useAppTranslation } from 'app/_hooks/useAppTranslation';
 import { useAuth } from '../_hooks/useAuth';
 import { useAuthGuard } from '../_hooks/useAuthGuard';
-import './styles.scss';
 
-import React, { useState, useEffect, Suspense, useRef } from 'react';
-import { useAppTranslation } from 'app/_hooks/useAppTranslation';
+import './styles.scss';
 
 enum LoginState {
   Email = 'EMAIL',
