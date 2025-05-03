@@ -1,8 +1,6 @@
-import React, { useEffect } from 'react';
 import {
-  DndContext,
   closestCenter,
-  DragEndEvent,
+  DndContext,
   MeasuringStrategy,
   Modifier,
 } from '@dnd-kit/core';
@@ -10,13 +8,14 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { useEffect } from 'react';
 import SortableTask from './SortableTask';
 // import { useTaskContext } from '../../_contexts/TaskContext';
-import { useTasks } from 'app/_hooks/useTasks';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
-import { useTaskUtils } from '../hooks/useTaskUtils';
+import { useTasks } from 'app/_hooks/useTasks';
 import { useDndSensors } from '../hooks/useDndSensors';
 import { useTaskHandlers } from '../hooks/useTaskHandlers';
+import { useTaskUtils } from '../hooks/useTaskUtils';
 
 interface TaskListProps {
   isEditMode: boolean;

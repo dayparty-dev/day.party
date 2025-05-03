@@ -5,12 +5,10 @@ import { useAuth } from '../_hooks/useAuth';
 import { useAuthGuard } from '../_hooks/useAuthGuard';
 import './styles.scss';
 
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { GetStaticProps } from 'next';
-import a from "../../i18n"; // Importa la inicialización
 import { useTranslation } from 'next-i18next';
+import a from "../../i18n"; // Importa la inicialización
 
-import React, { useState, useEffect, Suspense, useRef } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 
 enum LoginState {
   Email = 'EMAIL',

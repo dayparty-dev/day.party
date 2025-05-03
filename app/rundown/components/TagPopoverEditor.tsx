@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TagSelector from './TagSelector';
-import { Task } from 'app/_models/Task';
 
 interface TagPopoverEditorProps {
   selectedKey: string | null;

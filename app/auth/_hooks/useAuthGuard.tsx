@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ReactElement, useEffect, useState } from 'react';
 import { useAuth } from './useAuth';
-import { ReactElement } from 'react';
 
 export interface useAuthGuardArgs {
   redirectUrl?: string;

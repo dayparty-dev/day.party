@@ -1,18 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useTasks } from '../_hooks/useTasks';
-// import TaskCard, { Task } from '@/components/TaskCard';
-// import TaskCard, { Task } from '../components/TaskCard';
+import { Task } from 'app/_models/Task';
+import { useEffect, useState } from 'react';
 import TaskCard from '../_components/TaskCard';
 import TimeSlider from '../_components/TimeSlider';
-import FeedbackForm from '../_components/FeedbackForm';
 import UpcomingTask from '../_components/UpcomingTask';
-import { submitFeedback } from '../_actions/feedbackActions';
-//import { ToastContainer } from 'react-toastify';
+import { useTasks } from '../_hooks/useTasks';
 
 import './styles.scss';
-import { Task } from 'app/_models/Task';
 
 const TaskPage: React.FC = () => {
   const { currentDayTasks, updateTask, getTasksForDate } = useTasks();

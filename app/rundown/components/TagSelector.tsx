@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
-import { FaTimes } from 'react-icons/fa';
 import { useTags } from 'app/_hooks/useTags';
+import { useEffect, useRef, useState } from 'react';
+import { FaTimes } from 'react-icons/fa';
 
 interface TagSelectorProps {
     selectedKey?: string | null;
