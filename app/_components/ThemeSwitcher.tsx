@@ -1,7 +1,6 @@
-import React from 'react';
-import ThemeToggle from './ThemeToggle';
 import { cookies } from 'next/headers';
 import { CookieName } from '../_services/cookieNames';
+import ThemeToggle from './ThemeToggle';
 
 const getDefaultTheme = () => {
     const hour = new Date().getHours();
