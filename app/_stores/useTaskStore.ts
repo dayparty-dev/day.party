@@ -5,6 +5,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 // import { useAuth } from 'app/auth/_hooks/useAuth';
 
+//TODO DONDE COÑO VA ESTO?
+type DragOverTarget = {
+  type: 'task' | 'group';
+  id: string;
+} | null;
+
 interface State {
   tasksByDate: Record<string, Task[]>;
   deletedTasks: { [taskId: string]: Task };
@@ -13,8 +19,10 @@ interface State {
   isInitialized: boolean;
   currentDayTasks: Task[];
   totalMinutes: number;
-
-  // Métodos
+  dragOverTarget: DragOverTarget,
+  
+  hoverTarget: DragOverTarget,
+  hoverStartTime: number,
 }
 
 interface Actions {
@@ -30,9 +38,15 @@ interface Actions {
   setCurrentDayTasks: () => void;
   calculateTotalMinutes: () => void;
   syncTasks: () => Promise<void>;
+  setDragOverTarget: (target: DragOverTarget) => void,
+  setHoverTarget: (target: DragOverTarget | null) => void,
 }
 
-export const useTaskStore = create<State & Actions>()(
+interface Selectors {
+  isReadyToGroup: () => boolean;
+}
+
+export const useTaskStore = create<State & Actions & Selectors>()(
   persist(
     (set, get) => {
       // const { user } = useAuth(); // aún puedes usar hooks de React si lo sacas a parte
@@ -45,6 +59,7 @@ export const useTaskStore = create<State & Actions>()(
       };
 
       return {
+        // STATES
         tasksByDate: {},
         deletedTasks: {},
         currentDate: new Date(),
@@ -52,7 +67,12 @@ export const useTaskStore = create<State & Actions>()(
         isInitialized: false,
         currentDayTasks: [],
         totalMinutes: 0,
+        dragOverTarget: null,
 
+        hoverTarget: null,
+        hoverStartTime: null,
+
+        // ACTIONS
         // Inicializa las tareas desde el almacenamiento local o servidor
         // initialize: async () => {
         //   const stored = localStorage.getItem('tasks');
@@ -345,55 +365,73 @@ export const useTaskStore = create<State & Actions>()(
           set({ currentDayTasks: tasks });
           get().calculateTotalMinutes(); // Añadir esto
         },
-
+ 
         // Calcula el total de minutos de tareas del día seleccionado
         // calculateTotalMinutes: () => {
-        //   const total = get().currentDayTasks.reduce((sum, task) => sum + task.duration, 0);
-        //   set({ totalMinutes: total });
+          //   const total = get().currentDayTasks.reduce((sum, task) => sum + task.duration, 0);
+          //   set({ totalMinutes: total });
         // },
         calculateTotalMinutes: () => {
           const total = get().currentDayTasks.reduce((sum, task) => sum + (task.duration || 0), 0);
           console.log('Total minutes:', total); // Debugging line
           set({ totalMinutes: total });
         },
-
+        
         syncTasks: async () => {
           const allTasks = Object.values(get().tasksByDate).flat();
           const deletedTasksObj = get().deletedTasks || {};
           const deletedTasks = Object.values(deletedTasksObj);
-
+          
           const dirtyTasks = allTasks.filter((t) => t.isDirty);
           const tasksToSync = [...dirtyTasks, ...deletedTasks];
 
           if (tasksToSync.length > 0 && isCloudSyncEnabled) {
             // if (tasksToSync.length > 0) {
-            await syncTasksToServer(tasksToSync);
-
-            const updatedTasksByDate = structuredClone(get().tasksByDate);
-
-            for (const task of dirtyTasks) {
-              const key = getDateKey(task.scheduledAt);
-              const index = updatedTasksByDate[key]?.findIndex((t) => t._id === task._id);
-              if (index !== undefined && index > -1) {
-                updatedTasksByDate[key][index] = {
-                  ...task,
-                  isDirty: false,
-                  isSynced: true,
-                  lastSyncedAt: new Date(),
-                };
+              await syncTasksToServer(tasksToSync);
+              
+              const updatedTasksByDate = structuredClone(get().tasksByDate);
+              
+              for (const task of dirtyTasks) {
+                const key = getDateKey(task.scheduledAt);
+                const index = updatedTasksByDate[key]?.findIndex((t) => t._id === task._id);
+                if (index !== undefined && index > -1) {
+                  updatedTasksByDate[key][index] = {
+                    ...task,
+                    isDirty: false,
+                    isSynced: true,
+                    lastSyncedAt: new Date(),
+                  };
+                }
               }
+              
+              set({ tasksByDate: { ...updatedTasksByDate } });
+              localStorage.setItem('tasks', JSON.stringify(updatedTasksByDate));
+              
+              // Limpieza local de eliminadas
+              set({ deletedTasks: {} });
+              localStorage.removeItem('deletedTasks');
             }
-
-            set({ tasksByDate: { ...updatedTasksByDate } });
-            localStorage.setItem('tasks', JSON.stringify(updatedTasksByDate));
-
-            // Limpieza local de eliminadas
-            set({ deletedTasks: {} });
-            localStorage.removeItem('deletedTasks');
-          }
         },
-      };
-    },
+
+        setDragOverTarget: (target: DragOverTarget) => set({ dragOverTarget: target }),
+
+        setHoverTarget: (target: DragOverTarget | null) => {
+          const now = Date.now();
+          set({ 
+            hoverTarget: target,
+            hoverStartTime: target ? now : null
+          });
+        },
+
+        
+        // SELECTORS
+        isReadyToGroup: () => {
+          const { hoverStartTime } = get();
+          return !!hoverStartTime && (Date.now() - hoverStartTime > 800);
+        }
+
+        };
+      },
     {
       name: 'task-store',
     },

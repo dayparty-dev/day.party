@@ -17,6 +17,11 @@ export interface Task {
   isSynced?: boolean;
   lastSyncedAt?: Date;
   isDirty?: boolean;
+
+  // Task groups
+  isGroup?: boolean;
+  subtasks?: string[];
+  parentId?: string;
 }
 
 export type TaskStatus = 'ongoing' | 'paused' | 'pending' | 'done';

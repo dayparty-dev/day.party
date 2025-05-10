@@ -1,4 +1,3 @@
-'use client';
 import useKeyboardShortcut from 'app/_hooks/useKeyboardShortcut';
 import { useTasks } from 'app/_hooks/useTasks';
 import { Task } from 'app/_models/Task';
@@ -9,13 +8,6 @@ import SearchBar from './SearchBar';
 import Section from './Section';
 import TaskManagement, { TaskFormAction } from './TaskManagement';
 import UserManagement, { UserFormAction } from './UserManagement';
-// Definición de tipos
-// interface AdminSection {
-//   id: string;
-//   label: string;
-//   section: string;
-//   isVisible?: boolean;
-// }
 
 export interface MenuOption {
   id: string;
@@ -45,6 +37,8 @@ export default function AdminPanel() {
   ]);
   const [visibleActions, setVisibleOptions] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<MenuOption | null>(null);
+
+  const [hasMounted, setHasMounted] = useState(false);
 
   // Definir opciones del menú
   const menuOptions: MenuOption[] = [
@@ -82,7 +76,6 @@ export default function AdminPanel() {
   //     return prevIds === newIds ? prev : newTasks;
   //   });
   // }, [getTasksForDate, selectedDay]); // Añade selectedDay como dependencia
-
 
   // Filtrar opciones y secciones basadas en la búsqueda
   useEffect(() => {
@@ -153,6 +146,12 @@ export default function AdminPanel() {
       toast.info(`You have ${currentDayTasks.length} active task(s)`);
     }
   }, [isExpanded, currentDayTasks.length]);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-50">

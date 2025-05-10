@@ -8,7 +8,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import SortableTask from './SortableTask';
 // import { useTaskContext } from '../../_contexts/TaskContext';
 import { useAppTranslation } from 'app/_hooks/useAppTranslation';
@@ -16,6 +16,8 @@ import { useTasks } from 'app/_hooks/useTasks';
 import { useDndSensors } from '../hooks/useDndSensors';
 import { useTaskHandlers } from '../hooks/useTaskHandlers';
 import { useTaskUtils } from '../hooks/useTaskUtils';
+import SortableTaskGroup from './SortableTaskGroup';
+import { Task } from 'app/_models/Task';
 
 interface TaskListProps {
   isEditMode: boolean;
@@ -59,19 +61,27 @@ const TaskList: React.FC<TaskListProps> = ({
 
   const { ensureOneOngoingTask } = useTaskUtils({ tasksByDate, setTasks, updateTask, currentDayTasks });
   // const { handleDragEnd, handleStatusChange, handleTaskResize } = useTaskHandlers({ tasksByDate, setTasks, updateTask, currentDate, setCurrentDate, currentDayTasks, dayCapacity });
-  const { handleDragEnd, handleStatusChange, handleTaskResize } = useTaskHandlers();
+  const { handleDragEnd, handleDragOver, handleStatusChange, handleTaskResize } = useTaskHandlers();
 
   // Only check for multiple ongoing tasks on initial load
   useEffect(() => {
     ensureOneOngoingTask();
   }, []); // Empty dependency array means it only runs once on mount
 
+  const currentDayTasksById = useMemo(() => {
+    const map: Record<string, Task> = {};
+    currentDayTasks.forEach(t => {
+      map[t._id] = t;
+    });
+    return map;
+  }, [currentDayTasks]);
 
   return (
     <DndContext
       sensors={dndSensors}
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
       modifiers={[preventScaleModifier]}
       measuring={{
         droppable: {
@@ -84,17 +94,35 @@ const TaskList: React.FC<TaskListProps> = ({
         strategy={verticalListSortingStrategy}
       >
         <div className="flex flex-col gap-4">
-          {currentDayTasks.map((task) => (
-            <SortableTask
-              key={task._id}
-              task={task}
-              isEditMode={isEditMode}
-              onDelete={deleteTask}
-              onResize={handleTaskResize}
-              onStatusChange={handleStatusChange}
-              onLongPress={onLongPress}
-            />
-          ))}
+          {currentDayTasks.map((task) => {
+            const subtaskObjects = task.subtasks
+              ? task.subtasks.map(id => currentDayTasksById[id]).filter(Boolean)
+              : [];
+
+            return task.subtasks?.length > 0 ? (
+              <SortableTaskGroup
+                key={task._id}
+                task={task}
+                subtasks={subtaskObjects}
+                isEditMode={isEditMode}
+                onDelete={deleteTask}
+                onResize={handleTaskResize}
+                onStatusChange={handleStatusChange}
+                onLongPress={onLongPress}
+              />
+            ) : (
+              <SortableTask
+                key={task._id}
+                task={task}
+                isEditMode={isEditMode}
+                onDelete={deleteTask}
+                onResize={handleTaskResize}
+                onStatusChange={handleStatusChange}
+                onLongPress={onLongPress}
+              />
+            )
+          })}
+
 
           {/* Estado vacío con botón para crear tarea */}
           {currentDayTasks.length === 0 && !isEditMode && (

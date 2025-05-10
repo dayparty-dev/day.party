@@ -11,6 +11,9 @@ import { Task } from '../../_models/Task';
 import EndTaskModal from './EndTaskModal';
 import { useTaskStore } from 'app/_stores/useTaskStore';
 import { useTasks } from 'app/_hooks/useTasks';
+
+import "./Task.scss";
+
 interface SortableTaskProps {
   task: Task;
   isEditMode: boolean;
@@ -36,6 +39,9 @@ const SortableTask = ({
   const [elapsed, setElapsed] = useState<number>(task.elapsed ?? 0);
   const [showEndModal, setShowEndModal] = useState(false);
 
+  const dragOverTarget = useTaskStore((s) => s.dragOverTarget);
+  const isReadyToGroup = useTaskStore(s => s.isReadyToGroup);
+
   const {
     attributes,
     listeners,
@@ -43,7 +49,7 @@ const SortableTask = ({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task._id });
+  } = useSortable({ id: task._id, data: task, });
 
   const { getTagByKey } = useTags();
   const tag = task.tagKey ? getTagByKey(task.tagKey) : null;
@@ -187,10 +193,14 @@ const SortableTask = ({
   return (
     <div
       ref={setNodeRef}
+      id={`task-${task._id}`}
       style={style}
       {...attributes}
       data-is-dragging={isDragging}
-      className="relative"
+      className={`relative task-card 
+        ${isReadyToGroup && dragOverTarget?.type === 'task' && dragOverTarget.id === task._id ? 'drag-over-create-group' :
+          isReadyToGroup && dragOverTarget?.type === 'group' && dragOverTarget.id === task._id ? 'drag-over-add-group' : ''
+        }`}
     >
       <Resizable
         size={{ width: '100%', height: BASE_HEIGHT + ((task.duration - 15) * 2) }}
@@ -209,6 +219,12 @@ const SortableTask = ({
           }
         }}
       >
+        {/* <div
+            className={clsx("relative task-card", {
+              "drag-over-create-group": isReadyToGroup && dragOverTarget?.type === 'task' && dragOverTarget.id === task._id,
+              "drag-over-add-group": isReadyToGroup && dragOverTarget?.type === 'group' && dragOverTarget.id === task._id,
+            })}
+          > */}
         {/* <div onDoubleClick={task.status === "ongoing" ? handleElapsedTime : undefined} className={`relative group task-content z-10 bg-base-100 h-full shadow-md rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}> */}
         <div className={`relative group task-content z-10 bg-base-100 h-full shadow-md rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}>
           {/* Background progress bar */}
