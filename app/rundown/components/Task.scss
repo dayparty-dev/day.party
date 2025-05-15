@@ -1,10 +1,178 @@
 .task-card.drag-over-create-group {
-    outline: 2px dashed #64b5f6;
-    background-color: rgba(100, 200, 255, 0.1);
+  outline: 2px dashed #64b5f6;
+  background-color: rgba(100, 200, 255, 0.1);
+}
+
+.task-group-card.drag-over-add-group {
+  outline: 2px solid #4caf50;
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* New styles for task indicators system */
+.task-list.is-dragging * {
+  cursor: grabbing;
+  user-select: none; /* Prevent text selection during dragging */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.task-list.is-dragging .task-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.task-list.is-dragging .task-card:hover {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Task indicator enhancements */
+.task-card .indicator-line {
+  height: 3px;
+  background-color: #3b82f6;
+  border-radius: 9999px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  transform: scaleX(0);
+  transition: transform 0.15s ease-in-out;
+}
+
+.task-card .indicator-line.visible {
+  transform: scaleX(1);
+}
+
+.task-card .indicator-line.before {
+  top: -2px;
+}
+
+.task-card .indicator-line.after {
+  bottom: -2px;
+}
+
+.task-card .indicator-inside {
+  position: absolute;
+  inset: 0;
+  border: 2px dashed #3b82f6;
+  border-radius: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+  pointer-events: none;
+}
+
+.task-card .indicator-inside.visible {
+  opacity: 1;
+}
+
+/* Group task enhancements */
+.task-group-card {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: rgba(245, 247, 250, 0.3);
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.task-group-card:hover {
+  background-color: rgba(245, 247, 250, 0.6);
+}
+
+.task-group-card.indicator-active {
+  background-color: rgba(220, 230, 255, 0.3);
+  transform: scale(1.01);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.task-group-card.group-hover {
+  background-color: rgba(220, 240, 255, 0.4);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.task-list.is-dragging .task-group-card:hover {
+  background-color: rgba(220, 230, 255, 0.3);
+}
+
+/* Additional styles for subtasks */
+.task-group-card .task-card {
+  transition: transform 0.2s ease;
+}
+
+.task-group-card .task-card:hover {
+  transform: translateX(2px);
+}
+
+/* Make it clearer when dragging that a task can be dropped into a group */
+.task-list.is-dragging .task-group-card {
+  border: 1px dashed transparent;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.task-list.is-dragging .task-group-card:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Animation improvements */
+.task-card {
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+  opacity: 1; /* Ensure tasks default to fully visible */
+}
+
+.task-card.drag-hover {
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+  transform: scale(1.01);
+}
+
+/* Dragged task state - add !important to prevent stuck states */
+.task-card.opacity-50 {
+  opacity: 0.5 !important;
+}
+
+/* Reset state after dragging */
+.task-list:not(.is-dragging) .task-card {
+  opacity: 1 !important;
+}
+
+/* Drag feedback improvements */
+body.is-dragging-task {
+  cursor: grabbing !important;
+}
+
+body.is-dragging-task * {
+  cursor: grabbing !important;
+}
+
+/* Hide text selection during drag */
+body.is-dragging-task ::selection {
+  background: transparent;
+}
+
+/* Additional subtask styling */
+.task-group-card .subtasks-container {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Clear feedback for drag targets */
+.task-group-card.indicator-target {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  transform: scale(1.015);
+}
+
+.task-group-card .indicator-inside.visible {
+  border-width: 3px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
   }
-  
-  .task-group-card.drag-over-add-group {
-    outline: 2px solid #4caf50;
-    background-color: rgba(76, 175, 80, 0.1);
+  70% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
   }
-  
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}

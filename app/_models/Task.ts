@@ -3,7 +3,7 @@ export interface Task {
   title: string;
   size: number;
   tagKey?: string;
-  
+
   duration: number;
   elapsed: number;
   status: TaskStatus;
@@ -12,7 +12,7 @@ export interface Task {
   scheduledAt: Date;
   order: number;
   userId: string;
-  
+
   deletedAt?: Date;
   isSynced?: boolean;
   lastSyncedAt?: Date;
@@ -20,7 +20,7 @@ export interface Task {
 
   // Task groups
   isGroup?: boolean;
-  subtasks?: string[];
+  subtasks?: Task[];
   parentId?: string;
 }
 
