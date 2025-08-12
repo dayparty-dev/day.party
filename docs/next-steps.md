@@ -1,0 +1,9 @@
+- rework ui + basic customisation (aunq sea colores y algunos estilos básicos tipo flat/gaming/soft-pastel/etc)
+- notas/expandir tareas con markdown
+- historial de cambios
+- rework data/sync layer
+- marketplace de recompensas
+- mvp integración física con la máquina de caramelos que tengo, imprimir tokens en 3d = recompensas, motorizar el mecanismo para que pueda funcionar automáticamente con la app o con “monedas” (nfc)
+- empezar a pensar en sistema de extensiones/integraciones
+- empezar a pensar en abstraer core de tareas (a lo tipo onepam era? la api central de datos en ing vaya) y componentes reutilizables de cara a ofrecer varias cosas: day.party para focus más en lo personal/vital, great.day para focus más profesional/B2B y incluso una tercera opción white label que puede evolucionar a algo tipo retool de cara a B2B también, incluso core para otras apps tipo webintra)
+- otra idea chula: hacer un mvp de dispositivo físico con la gameboy está que me compré en aliexpress, es linux así q debería ser kind of possible hacerlo.
