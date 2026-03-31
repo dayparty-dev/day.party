@@ -32,7 +32,7 @@
 #    - Handles agent-specific file paths and naming conventions
 #    - Supports: Claude, Gemini, Copilot, Cursor, Qwen, opencode, Codex, Windsurf, Junie, Kilo Code, Auggie CLI, Roo Code, CodeBuddy CLI, Qoder CLI, Amp, SHAI, Tabnine CLI, Kiro CLI, Mistral Vibe, Kimi Code, Pi Coding Agent, iFlow CLI, Antigravity or Generic
 #    - Can update single agents or all existing agent files
-#    - Creates default Claude file if no agent files exist
+#    - Creates default AGENTS.md file if no agent files exist
 #
 # Usage: ./update-agent-context.sh [agent_type]
 # Agent types: claude|gemini|copilot|cursor-agent|qwen|opencode|codex|windsurf|junie|kilocode|auggie|roo|codebuddy|amp|shai|tabnine|kiro-cli|agy|bob|vibe|qodercli|kimi|trae|pi|iflow|generic
@@ -60,7 +60,9 @@ unset _paths_output
 NEW_PLAN="$IMPL_PLAN"  # Alias for compatibility with existing code
 AGENT_TYPE="${1:-}"
 
-# Agent-specific file paths  
+# Agent-specific file paths
+# AGENTS.md is canonical for this repository. Legacy aliases (for example
+# CLAUDE.md and .github/agents/copilot-instructions.md) may symlink to AGENTS.md.
 CLAUDE_FILE="$REPO_ROOT/CLAUDE.md"
 GEMINI_FILE="$REPO_ROOT/GEMINI.md"
 COPILOT_FILE="$REPO_ROOT/.github/agents/copilot-instructions.md"
@@ -401,11 +403,11 @@ update_existing_agent_file() {
     local new_change_entry=""
     
     # Prepare new technology entries
-    if [[ -n "$tech_stack" ]] && ! grep -q "$tech_stack" "$target_file"; then
+    if [[ -n "$tech_stack" ]] && ! grep -Fq -- "$tech_stack" "$target_file"; then
         new_tech_entries+=("- $tech_stack ($CURRENT_BRANCH)")
     fi
     
-    if [[ -n "$NEW_DB" ]] && [[ "$NEW_DB" != "N/A" ]] && [[ "$NEW_DB" != "NEEDS CLARIFICATION" ]] && ! grep -q "$NEW_DB" "$target_file"; then
+    if [[ -n "$NEW_DB" ]] && [[ "$NEW_DB" != "N/A" ]] && [[ "$NEW_DB" != "NEEDS CLARIFICATION" ]] && ! grep -Fq -- "$NEW_DB" "$target_file"; then
         new_tech_entries+=("- $NEW_DB ($CURRENT_BRANCH)")
     fi
     
@@ -414,6 +416,11 @@ update_existing_agent_file() {
         new_change_entry="- $CURRENT_BRANCH: Added $tech_stack"
     elif [[ -n "$NEW_DB" ]] && [[ "$NEW_DB" != "N/A" ]] && [[ "$NEW_DB" != "NEEDS CLARIFICATION" ]]; then
         new_change_entry="- $CURRENT_BRANCH: Added $NEW_DB"
+    fi
+
+    # Avoid duplicate "Recent Changes" entries when running the updater repeatedly.
+    if [[ -n "$new_change_entry" ]] && grep -Fq -- "$new_change_entry" "$target_file"; then
+        new_change_entry=""
     fi
     
     # Check if sections exist in the file
@@ -616,7 +623,11 @@ update_specific_agent() {
     
     case "$agent_type" in
         claude)
-            update_agent_file "$CLAUDE_FILE" "Claude Code" || return 1
+            if [[ -f "$AGENTS_FILE" ]]; then
+                update_agent_file "$AGENTS_FILE" "Claude Code" || return 1
+            else
+                update_agent_file "$CLAUDE_FILE" "Claude Code" || return 1
+            fi
             ;;
         gemini)
             update_agent_file "$GEMINI_FILE" "Gemini CLI" || return 1
@@ -734,12 +745,12 @@ update_all_existing_agents() {
     _updated_paths=()
     local _all_ok=true
 
+    _update_if_new "$AGENTS_FILE" "Codex/opencode"         || _all_ok=false
     _update_if_new "$CLAUDE_FILE" "Claude Code"           || _all_ok=false
     _update_if_new "$GEMINI_FILE" "Gemini CLI"             || _all_ok=false
     _update_if_new "$COPILOT_FILE" "GitHub Copilot"        || _all_ok=false
     _update_if_new "$CURSOR_FILE" "Cursor IDE"             || _all_ok=false
     _update_if_new "$QWEN_FILE" "Qwen Code"                || _all_ok=false
-    _update_if_new "$AGENTS_FILE" "Codex/opencode"         || _all_ok=false
     _update_if_new "$AMP_FILE" "Amp"                       || _all_ok=false
     _update_if_new "$KIRO_FILE" "Kiro CLI"                 || _all_ok=false
     _update_if_new "$BOB_FILE" "IBM Bob"                   || _all_ok=false
@@ -758,10 +769,10 @@ update_all_existing_agents() {
     _update_if_new "$TRAE_FILE" "Trae"                     || _all_ok=false
     _update_if_new "$IFLOW_FILE" "iFlow CLI"               || _all_ok=false
 
-    # If no agent files exist, create a default Claude file
+    # If no agent files exist, create a default AGENTS.md file
     if [[ "$_found_agent" == false ]]; then
-        log_info "No existing agent files found, creating default Claude file..."
-        update_agent_file "$CLAUDE_FILE" "Claude Code" || return 1
+        log_info "No existing agent files found, creating default AGENTS.md file..."
+        update_agent_file "$AGENTS_FILE" "Codex/opencode" || return 1
     fi
 
     [[ "$_all_ok" == true ]]

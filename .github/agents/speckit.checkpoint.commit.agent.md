@@ -41,7 +41,7 @@ The agent should use judgment — the goal is to produce commits that are meanin
 
 ## Workflow
 
-1. Read repository instruction files (`AGENTS.md`, then `.github/agents/copilot-instructions.md` and `CLAUDE.md` as fallback) and apply commit conventions from them
+1. Read `AGENTS.md` at the repository root and apply its commit conventions
 2. Determine a clear, concise commit message based on the work just completed
 3. Stage all current changes (`git add -A`)
 4. Commit with the message (`git commit -m "<message>"`)

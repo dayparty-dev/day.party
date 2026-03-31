@@ -5,14 +5,8 @@ Last updated: 2026-03-31
 
 ## Active Technologies
 
-- TypeScript 5.x (strict mode goal, incremental migration)
-- Turborepo
-- pnpm 10
-- Hono
-- NativeScript 9 + Vite
-- React 19
-- Zod
-- mongodb driver
+- TypeScript 5.x (strict mode goal, incremental migration) + Turborepo, pnpm 10, Hono, NativeScript 9 + Vite, React 19, Zod, mongodb driver (001-monorepo-restructure)
+- MongoDB 6 (existing instance, no migration) (001-monorepo-restructure)
 
 ## Project Structure
 
@@ -56,3 +50,16 @@ specs/
 
 - If multiple instruction files exist, this file is authoritative
 - Other instruction files should symlink here
+
+<!-- MANUAL ADDITIONS START -->
+
+## Manual Additions
+
+- Commit messages MUST use gitmoji format: `<emoji> (<scope>): <description lowercase>`
+- Use a narrow scope tied to the changed area (for example: `api-client`, `agents`, `domain`)
+- For non-trivial commits, include a body with what changed, why, and validation commands
+<!-- MANUAL ADDITIONS END -->
+
+## Recent Changes
+
+- 001-monorepo-restructure: Added TypeScript 5.x (strict mode goal, incremental migration) + Turborepo, pnpm 10, Hono, NativeScript 9 + Vite, React 19, Zod, mongodb driver

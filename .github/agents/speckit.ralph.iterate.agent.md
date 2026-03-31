@@ -36,8 +36,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    ```
 
 2. **Load repository instructions**:
-   - Read `AGENTS.md` from repo root if present
-   - If `AGENTS.md` is absent, read `.github/agents/copilot-instructions.md` and `CLAUDE.md` when present
+   - Read `AGENTS.md` from repo root
    - Treat repository commit conventions as authoritative over generic examples in this prompt
 
 3. **Read context first**:
