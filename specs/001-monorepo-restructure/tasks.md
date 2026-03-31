@@ -14,11 +14,11 @@
 
 **Purpose**: Monorepo scaffolding and workspace configuration
 
-- [ ] T001 [US1] Create root `pnpm-workspace.yaml` defining `packages/*` and `apps/*` workspaces
-- [ ] T002 [US1] Create root `turbo.json` with `build`, `dev`, and `clean` pipelines
-- [ ] T003 [US1] Create root `.npmrc` with `shamefully-hoist=true`
-- [ ] T004 [US1] Update root `package.json`: name `@dayparty/root`, add turbo scripts (`build`, `dev`, `clean`), remove app-level deps
-- [ ] T005 [US1] Move existing app to `apps/web-legacy/`: relocate `app/`, `lib/`, `public/`, `next.config.js`, `tsconfig.json`, `postcss.config.mjs`, `next-i18next.config.js`, `next-env.d.ts`, `tailwind.config.ts` and adjust `apps/web-legacy/package.json` (name `@dayparty/web-legacy`)
+- [x] T001 [US1] Create root `pnpm-workspace.yaml` defining `packages/*` and `apps/*` workspaces
+- [x] T002 [US1] Create root `turbo.json` with `build`, `dev`, and `clean` pipelines
+- [x] T003 [US1] Create root `.npmrc` with `shamefully-hoist=true`
+- [x] T004 [US1] Update root `package.json`: name `@dayparty/root`, add turbo scripts (`build`, `dev`, `clean`), remove app-level deps
+- [x] T005 [US1] Move existing app to `apps/web-legacy/`: relocate `app/`, `lib/`, `public/`, `next.config.js`, `tsconfig.json`, `postcss.config.mjs`, `next-i18next.config.js`, `next-env.d.ts`, `tailwind.config.ts` and adjust `apps/web-legacy/package.json` (name `@dayparty/web-legacy`)
 
 **Checkpoint**: Monorepo root structure exists. `pnpm install` resolves (no packages yet).
 
