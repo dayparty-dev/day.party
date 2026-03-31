@@ -58,18 +58,18 @@
 
 ### Domain Package
 
-- [ ] T022 Initialize `packages/domain/` package with `package.json` (`name: @dayparty/domain`, depends on `@dayparty/core`), `tsconfig.json`, and `src/index.ts` barrel
-- [ ] T023 [P] Create TaskRepository interface in `packages/domain/src/interfaces/task-repository.ts` — findByUserAndDate, findById, create, update, delete, reorder methods matching contracts/rest-api.md operations
-- [ ] T024 [P] Create UserRepository interface in `packages/domain/src/interfaces/user-repository.ts` — findById, findByEmail, create, update methods
-- [ ] T025 [P] Create SessionRepository interface in `packages/domain/src/interfaces/session-repository.ts` — findByToken, create, deleteByToken, deleteExpired methods
-- [ ] T026 [P] Create TagRepository interface in `packages/domain/src/interfaces/tag-repository.ts` — findByUser, findByKey, create, update, delete, seedDefaults methods
-- [ ] T027 [P] Create CreateTaskAction in `packages/domain/src/actions/create-task.ts` — receives TaskRepository + TagRepository, validates tagKey exists, auto-assigns position, returns created Task
-- [ ] T028 [P] Create ToggleTaskCompletionAction in `packages/domain/src/actions/toggle-task-completion.ts` — receives TaskRepository, toggles isComplete (true↔false), returns updated Task
-- [ ] T029 [P] Create GetRundownAction in `packages/domain/src/actions/get-rundown.ts` — receives TaskRepository, queries by userId + date, computes capacity + completed count, returns DayRundown
-- [ ] T030 [P] Create ReorderTasksAction in `packages/domain/src/actions/reorder-tasks.ts` — receives TaskRepository, validates all task IDs belong to user+date, updates positions, returns updated DayRundown
-- [ ] T031 [P] Create DeleteTaskAction in `packages/domain/src/actions/delete-task.ts` — receives TaskRepository, deletes task, compacts remaining positions
-- [ ] T032 [P] Create UpdateTaskAction in `packages/domain/src/actions/update-task.ts` — receives TaskRepository + TagRepository, partial update of task fields, validates tagKey if changed
-- [ ] T033 Export all interfaces and actions from `packages/domain/src/index.ts` barrel
+- [x] T022 Initialize `packages/domain/` package with `package.json` (`name: @dayparty/domain`, depends on `@dayparty/core`), `tsconfig.json`, and `src/index.ts` barrel
+- [x] T023 [P] Create TaskRepository interface in `packages/domain/src/interfaces/task-repository.ts` — findByUserAndDate, findById, create, update, delete, reorder methods matching contracts/rest-api.md operations
+- [x] T024 [P] Create UserRepository interface in `packages/domain/src/interfaces/user-repository.ts` — findById, findByEmail, create, update methods
+- [x] T025 [P] Create SessionRepository interface in `packages/domain/src/interfaces/session-repository.ts` — findByToken, create, deleteByToken, deleteExpired methods
+- [x] T026 [P] Create TagRepository interface in `packages/domain/src/interfaces/tag-repository.ts` — findByUser, findByKey, create, update, delete, seedDefaults methods
+- [x] T027 [P] Create CreateTaskAction in `packages/domain/src/actions/create-task.ts` — receives TaskRepository + TagRepository, validates tagKey exists, auto-assigns position, returns created Task
+- [x] T028 [P] Create ToggleTaskCompletionAction in `packages/domain/src/actions/toggle-task-completion.ts` — receives TaskRepository, toggles isComplete (true↔false), returns updated Task
+- [x] T029 [P] Create GetRundownAction in `packages/domain/src/actions/get-rundown.ts` — receives TaskRepository, queries by userId + date, computes capacity + completed count, returns DayRundown
+- [x] T030 [P] Create ReorderTasksAction in `packages/domain/src/actions/reorder-tasks.ts` — receives TaskRepository, validates all task IDs belong to user+date, updates positions, returns updated DayRundown
+- [x] T031 [P] Create DeleteTaskAction in `packages/domain/src/actions/delete-task.ts` — receives TaskRepository, deletes task, compacts remaining positions
+- [x] T032 [P] Create UpdateTaskAction in `packages/domain/src/actions/update-task.ts` — receives TaskRepository + TagRepository, partial update of task fields, validates tagKey if changed
+- [x] T033 Export all interfaces and actions from `packages/domain/src/index.ts` barrel
 
 ### DB Package
 

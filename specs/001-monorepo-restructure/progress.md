@@ -85,3 +85,38 @@ Started: 2026-03-31 05:29:22
 - sed 's/T01.../T01.../' was too broad — use python3 for precise task checkbox replacements
 
 ---
+
+---
+
+## Iteration 3 - 2026-03-31
+
+**User Story**: Phase 3 — Validation Package (T016-T021)
+**Tasks Completed**:
+
+- [x] T016: Initialized packages/validation/ with package.json (@dayparty/validation), tsconfig.json
+- [x] T017: Task Zod schemas (createTaskSchema, updateTaskSchema, reorderTasksSchema)
+- [x] T018: User Zod schema (loginSchema with email validation)
+- [x] T019: Tag Zod schemas (createTagSchema, updateTagSchema with hex color validation)
+- [x] T020: Error utilities (createApiError, fromZodError mapping ZodError → ApiError)
+- [x] T021: Barrel export in src/index.ts
+      **Tasks Remaining in Story**: None - story complete
+      **Commit**: fee1c8a
+      **Files Changed**:
+- packages/validation/package.json
+- packages/validation/tsconfig.json
+- packages/validation/eslint.config.js
+- packages/validation/src/schemas/task.ts
+- packages/validation/src/schemas/user.ts
+- packages/validation/src/schemas/tag.ts
+- packages/validation/src/errors.ts
+- packages/validation/src/index.ts
+- packages/core/eslint.config.js
+- packages/eslint-config/index.js (added ignores for \*.d.ts and dist/\*\*)
+- packages/eslint-config/package.json (added "type": "module")
+- packages/core/package.json (added "type": "module")
+  **Learnings**:
+- Packages need `"type": "module"` to avoid NODE_TYPELESS_PACKAGE_JSON warning with ESM eslint.config.js
+- ESLint flat config with `projectService: true` picks up .d.ts files in src/ unless explicitly ignored — added `ignores: ['**/*.d.ts', 'dist/**']` to shared eslint-config
+- Zod size enum cast needed: `z.number().int().min(1).max(5) as z.ZodType<1|2|3|4|5>` to align with Task type
+
+---

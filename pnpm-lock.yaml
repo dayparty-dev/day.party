@@ -141,6 +141,22 @@ importers:
         specifier: ^5.4.5
         version: 5.7.2
 
+  packages/domain:
+    dependencies:
+      '@dayparty/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@dayparty/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@dayparty/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.4.5
+        version: 5.7.2
+
   packages/eslint-config:
     devDependencies:
       '@typescript-eslint/eslint-plugin':
