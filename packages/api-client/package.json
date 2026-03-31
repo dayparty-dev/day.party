@@ -1,0 +1,30 @@
+{
+  "name": "@dayparty/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Typed API client for day.party REST API",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dayparty/core": "workspace:*",
+    "@dayparty/validation": "workspace:*"
+  },
+  "devDependencies": {
+    "@dayparty/eslint-config": "workspace:*",
+    "@dayparty/typescript-config": "workspace:*",
+    "typescript": "^5.4.5"
+  }
+}

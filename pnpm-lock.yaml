@@ -129,6 +129,25 @@ importers:
         specifier: 5.7.2
         version: 5.7.2
 
+  packages/api-client:
+    dependencies:
+      '@dayparty/core':
+        specifier: workspace:*
+        version: link:../core
+      '@dayparty/validation':
+        specifier: workspace:*
+        version: link:../validation
+    devDependencies:
+      '@dayparty/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@dayparty/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.4.5
+        version: 5.7.2
+
   packages/core:
     devDependencies:
       '@dayparty/eslint-config':

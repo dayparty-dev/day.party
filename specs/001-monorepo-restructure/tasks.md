@@ -83,12 +83,12 @@
 
 ### API Client Package
 
-- [ ] T041 Initialize `packages/api-client/` package with `package.json` (`name: @dayparty/api-client`, depends on `@dayparty/core` + `@dayparty/validation`), `tsconfig.json`, and `src/index.ts` barrel
-- [ ] T042 Create DayPartyClient class in `packages/api-client/src/client.ts` — fetch-based HTTP client with `Result<T, ApiError>` return type, bearer token management, base URL config per research.md
-- [ ] T043 [P] Add auth methods to DayPartyClient in `packages/api-client/src/client.ts` — login(email), verify(token), logout(), me() per contracts/rest-api.md auth endpoints
-- [ ] T044 [P] Add task methods to DayPartyClient in `packages/api-client/src/client.ts` — getRundown(date), createTask(data), updateTask(id, data), deleteTask(id), reorderTasks(date, taskIds) per contracts/rest-api.md task endpoints
-- [ ] T045 [P] Add tag methods to DayPartyClient in `packages/api-client/src/client.ts` — getTags(), createTag(data), updateTag(id, data), deleteTag(id) per contracts/rest-api.md tag endpoints
-- [ ] T046 Export DayPartyClient and Result type from `packages/api-client/src/index.ts` barrel
+- [x] T041 Initialize `packages/api-client/` package with `package.json` (`name: @dayparty/api-client`, depends on `@dayparty/core` + `@dayparty/validation`), `tsconfig.json`, and `src/index.ts` barrel
+- [x] T042 Create DayPartyClient class in `packages/api-client/src/client.ts` — fetch-based HTTP client with `Result<T, ApiError>` return type, bearer token management, base URL config per research.md
+- [x] T043 [P] Add auth methods to DayPartyClient in `packages/api-client/src/client.ts` — login(email), verify(token), logout(), me() per contracts/rest-api.md auth endpoints
+- [x] T044 [P] Add task methods to DayPartyClient in `packages/api-client/src/client.ts` — getRundown(date), createTask(data), updateTask(id, data), deleteTask(id), reorderTasks(date, taskIds) per contracts/rest-api.md task endpoints
+- [x] T045 [P] Add tag methods to DayPartyClient in `packages/api-client/src/client.ts` — getTags(), createTag(data), updateTag(id, data), deleteTag(id) per contracts/rest-api.md tag endpoints
+- [x] T046 Export DayPartyClient and Result type from `packages/api-client/src/index.ts` barrel
 
 **Checkpoint**: All 5 shared packages build successfully. `pnpm build` from root completes with no errors. Foundation ready — user story implementation can now begin.
 

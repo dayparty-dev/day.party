@@ -11,6 +11,8 @@ Started: 2026-03-31 05:29:22
 - `.npmrc` uses `node-linker=hoisted` (not `shamefully-hoist`) for NativeScript compatibility
 - `vitest.workspace.ts` uses `defineWorkspace(["packages/*/vitest.config.ts", "apps/*/vitest.config.ts"])`
 - Pre-existing `web-legacy` in `apps/web-legacy/` must remain untouched
+- Root `pnpm lint` can be blocked by an interactive `next lint` setup prompt in `apps/web-legacy`; use package-scoped lint commands for non-interactive validation
+- API-client pattern: return `Result<T, ApiError>` discriminated union (`ok: true|false`) and run `safeParse` on request payloads before network calls
 
 ---
 
@@ -162,5 +164,71 @@ Started: 2026-03-31 05:29:22
 - Actions use factory pattern: makeXxxAction(repos) returns an async function — clean DI, no classes
 - UpdateTaskInput uses `tagKey: string | null` to allow explicit nulling of tagKey (vs undefined meaning "no change")
 - Prettier (via lint-staged) reformats code on commit — no manual formatting needed
+
+---
+
+---
+
+## Iteration 5 - 2026-03-31
+
+**User Story**: Phase 2 — DB Package (T034-T040)
+**Tasks Completed**:
+
+- [x] T034: Initialized packages/db/ with package.json (@dayparty/db), tsconfig.json, eslint.config.js
+- [x] T035: MongoDB connection helper (getDb, getCollection) in src/connection.ts
+- [x] T036: MongoTaskRepository — findByUserAndDate, findById, create, update, delete, reorder
+- [x] T037: MongoUserRepository — findById, findByEmail, create, update
+- [x] T038: MongoSessionRepository — findByToken, create, deleteByToken, deleteExpired
+- [x] T039: MongoTagRepository — findByUser, findByKey, create, update, delete, seedDefaults (uses DEFAULT_TAGS from @dayparty/core)
+- [x] T040: Barrel export in src/index.ts
+      **Tasks Remaining in Story**: None - story complete
+      **Commit**: 4983867
+      **Files Changed**:
+- packages/db/package.json
+- packages/db/tsconfig.json
+- packages/db/eslint.config.js
+- packages/db/src/connection.ts
+- packages/db/src/index.ts
+- packages/db/src/repositories/task-repository.ts
+- packages/db/src/repositories/user-repository.ts
+- packages/db/src/repositories/session-repository.ts
+- packages/db/src/repositories/tag-repository.ts
+- specs/001-monorepo-restructure/tasks.md
+  **Learnings**:
+- MongoDB document type pattern: `type XxxDoc = Omit<Xxx, 'id'> & { _id: ObjectId }` with docToXxx mapper
+- Use `ObjectId.isValid(id)` guard before `new ObjectId(id)` to avoid throws on invalid input
+- `findOneAndUpdate` with `{ returnDocument: 'after' }` returns the updated document directly
+- `seedDefaults` checks for any existing default tag before inserting to prevent double-seeding
+- Connection module uses lazy singleton; `getCollection` is a thin wrapper for typed collection access
+
+---
+
+---
+
+## Iteration 6 - 2026-03-31 06:01:28
+
+**User Story**: Phase 2 — API Client Package (T041-T046)
+**Tasks Completed**:
+
+- [x] T041: Initialized `packages/api-client/` with `package.json`, `tsconfig.json`, `eslint.config.js`, and `src/index.ts`
+- [x] T042: Implemented `DayPartyClient` with base URL config, bearer token management, and `Result<T, ApiError>` response model
+- [x] T043: Added auth methods (`login`, `verify`, `logout`, `me`) mapped to contract endpoints
+- [x] T044: Added task methods (`getRundown`, `createTask`, `updateTask`, `deleteTask`, `reorderTasks`)
+- [x] T045: Added tag methods (`getTags`, `createTag`, `updateTag`, `deleteTag`)
+- [x] T046: Exported `DayPartyClient` and `Result` from package barrel
+      **Tasks Remaining in Story**: None - story complete
+      **Commit**: Pending
+      **Files Changed**:
+- packages/api-client/package.json
+- packages/api-client/tsconfig.json
+- packages/api-client/eslint.config.js
+- packages/api-client/src/client.ts
+- packages/api-client/src/index.ts
+- specs/001-monorepo-restructure/tasks.md
+- specs/001-monorepo-restructure/progress.md
+- pnpm-lock.yaml
+  **Learnings**:
+- `@dayparty/api-client` can reuse `@dayparty/validation` request schemas via `safeParse` to produce consistent `VALIDATION_ERROR` results client-side
+- Root `pnpm lint` currently fails non-interactively because `apps/web-legacy` triggers a `next lint` setup prompt; package-scoped lint still validates new package changes
 
 ---
