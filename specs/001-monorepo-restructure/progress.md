@@ -435,3 +435,32 @@ Started: 2026-03-31 05:29:22
 - T084 intent is isolation from shared **packages**; legacy app’s own npm scope in `name` does not violate that
 
 ---
+
+## Iteration 13 - 2026-03-31
+
+**User Story**: Phase 8 — Polish & cross-cutting (T085–T088)
+
+**Tasks Completed**:
+
+- [x] T085: Root `README.md` — overview, prerequisites, quickstart, per-app filters, package/app table, link to `specs/.../quickstart.md`
+- [x] T086: `AGENTS.md` — expanded structure map (`packages/*`, `apps/*`), filter commands, pointer to quickstart
+- [x] T087: Quickstart validation — `pnpm install`, `pnpm build`, `pnpm test`, `pnpm lint`; smoke `pnpm dev` (Turbo starts watch/vite/next/api)
+- [x] T088: Full workspace validation — same pipeline exit 0
+
+**Tasks Remaining in Story**: None — Phase 8 complete
+
+**Commit**: 45b795a
+
+**Files Changed**:
+
+- `README.md`
+- `AGENTS.md` (and `CLAUDE.md` symlink target)
+- `specs/001-monorepo-restructure/tasks.md`
+- `specs/001-monorepo-restructure/progress.md`
+
+**Learnings**:
+
+- Keep human “source of truth” for long prose in `specs/.../quickstart.md`; root README stays skimmable with a table + link
+- `CLAUDE.md` → `AGENTS.md`: one edit updates both agent entrypoints
+
+---

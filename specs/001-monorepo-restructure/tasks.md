@@ -214,10 +214,10 @@
 
 **Purpose**: Final validation, documentation alignment, and workspace-wide quality checks
 
-- [ ] T085 [P] Update root `README.md` with project overview, quickstart commands, and package/app map per quickstart.md
-- [ ] T086 [P] Update `AGENTS.md` agent context with final project structure, commands, and conventions
-- [ ] T087 Run quickstart.md validation — execute all commands from quickstart.md on a clean state and confirm they work as documented
-- [ ] T088 Run full workspace validation — `pnpm install && pnpm build && pnpm test && pnpm lint` from root with zero errors
+- [x] T085 [P] Update root `README.md` with project overview, quickstart commands, and package/app map per quickstart.md
+- [x] T086 [P] Update `AGENTS.md` agent context with final project structure, commands, and conventions
+- [x] T087 Run quickstart.md validation — execute all commands from quickstart.md on a clean state and confirm they work as documented
+- [x] T088 Run full workspace validation — `pnpm install && pnpm build && pnpm test && pnpm lint` from root with zero errors
 
 ---
 
