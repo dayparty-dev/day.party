@@ -1,0 +1,30 @@
+{
+  "name": "@dayparty/validation",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Zod schemas and error utilities for day.party",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dayparty/core": "workspace:*",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@dayparty/eslint-config": "workspace:*",
+    "@dayparty/typescript-config": "workspace:*",
+    "typescript": "^5.7.3"
+  }
+}

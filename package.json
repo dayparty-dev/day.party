@@ -1,55 +1,27 @@
 {
-  "name": "day.party",
+  "name": "@dayparty/root",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "day.party monorepo",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "build": "turbo run build --filter=!@dayparty/web-legacy",
+    "test": "turbo test --filter=!@dayparty/web-legacy",
+    "lint": "turbo lint --filter=!@dayparty/web-legacy",
+    "dev": "turbo dev --filter=!@dayparty/web-legacy",
+    "db:up": "docker compose up -d mongodb",
+    "db:seed": "pnpm --filter @dayparty/api build && pnpm --filter @dayparty/api seed",
+    "clean": "turbo clean --filter=!@dayparty/web-legacy",
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
-  "keywords": [],
-  "author": "",
-  "license": "UNLICENSED",
-  "dependencies": {
-    "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/sortable": "^10.0.0",
-    "@dnd-kit/utilities": "^3.2.2",
-    "@tailwindcss/postcss": "^4.0.9",
-    "cookies-next": "^5.1.0",
-    "date-fns": "^4.1.0",
-    "dedent-tabs": "^0.10.3",
-    "http-status-codes": "^2.3.0",
-    "i18next": "^24.2.3",
-    "jsonwebtoken": "^9.0.2",
-    "jwt-decode": "^4.0.0",
-    "mongodb": "^6.12.0",
-    "nanoid": "^5.0.9",
-    "next": "^15.2.4",
-    "next-i18next": "^15.4.2",
-    "postcss": "^8.5.3",
-    "re-resizable": "^6.10.3",
-    "react": "^19.0.0",
-    "react-day-picker": "^9.5.1",
-    "react-dom": "^19.0.0",
-    "react-i18next": "^15.4.1",
-    "react-icons": "^5.5.0",
-    "react-toastify": "^11.0.5",
-    "resend": "^4.1.2",
-    "sass": "^1.83.1",
-    "tailwindcss": "^4.0.9",
-    "use-long-press": "^3.2.0",
-    "use-persisted-state": "^0.3.3",
-    "zustand": "^5.0.3"
+  "lint-staged": {
+    "*": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.9",
-    "@types/node": "22.10.5",
-    "@types/react": "19.0.3",
-    "@types/react-i18next": "^8.1.0",
-    "daisyui": "^5.0.0",
-    "typescript": "5.7.2"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.1",
+    "turbo": "^2"
   },
   "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
 }

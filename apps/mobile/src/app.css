@@ -1,0 +1,82 @@
+@import '@nativescript/theme/css/core.css';
+@import '@nativescript/theme/css/default.css';
+
+Button.-primary {
+  font-size: 18;
+}
+
+.page {
+  background-color: #fafafa;
+}
+
+.label {
+  font-size: 14;
+  font-weight: 600;
+  margin-bottom: 4;
+}
+
+.input {
+  border-width: 1;
+  border-color: #d1d5db;
+  border-radius: 6;
+  padding: 10;
+  font-size: 16;
+  background-color: #ffffff;
+}
+
+.footnote {
+  font-size: 13;
+  color: #6b7280;
+}
+
+.error-banner {
+  background-color: #fef2f2;
+  border-width: 1;
+  border-color: #fecaca;
+  border-radius: 8;
+  padding: 12;
+}
+
+.error-text {
+  color: #b91c1c;
+  font-size: 14;
+}
+
+.task-title {
+  font-size: 16;
+}
+
+.size-badge {
+  font-size: 14;
+  margin-left: 8;
+  vertical-align: center;
+}
+
+.complete-icon {
+  font-size: 18;
+  margin-left: 8;
+}
+
+.list {
+  separator-color: #e5e7eb;
+}
+
+.m-t-8 {
+  margin-top: 8;
+}
+
+.m-t-12 {
+  margin-top: 12;
+}
+
+.m-t-16 {
+  margin-top: 16;
+}
+
+.m-t-20 {
+  margin-top: 20;
+}
+
+.m-b-12 {
+  margin-bottom: 12;
+}

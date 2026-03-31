@@ -1,0 +1,19 @@
+{
+  "name": "@dayparty/typescript-config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared TypeScript configuration presets for the day.party monorepo",
+  "exports": {
+    "./base.json": "./base.json",
+    "./library.json": "./library.json",
+    "./app.json": "./app.json"
+  },
+  "files": [
+    "base.json",
+    "library.json",
+    "app.json"
+  ],
+  "devDependencies": {
+    "typescript": "5.7.3"
+  }
+}

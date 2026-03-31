@@ -1,0 +1,30 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" loaded="onLoaded" unloaded="onUnloaded" class="page">
+  <ActionBar title="En curso">
+    <NavigationButton text="Atrás" tap="{{ onBack }}" android.systemIcon="ic_menu_back" />
+  </ActionBar>
+
+  <ScrollView>
+    <StackLayout class="p-20">
+      <StackLayout visibility="{{ errorBannerVisibility }}" class="error-banner m-b-12">
+        <Label text="{{ errorMessage }}" textWrap="true" class="error-text" />
+        <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8" />
+      </StackLayout>
+
+      <StackLayout visibility="{{ emptyVisibility }}">
+        <Label text="No hay tareas pendientes para hoy." class="h3" textWrap="true" />
+        <Button text="Volver al resumen" tap="{{ onBack }}" class="-primary m-t-12" />
+      </StackLayout>
+
+      <StackLayout visibility="{{ focusVisibility }}">
+        <Label text="{{ title }}" class="h1" textWrap="true" />
+        <Label text="{{ metaLine }}" class="h3 m-t-8" textWrap="true" />
+        <Label text="{{ elapsedLabel }}" class="footnote m-t-16" textWrap="true" />
+
+        <Progress value="{{ progressValue }}" maxValue="100" class="m-t-12" height="8" />
+
+        <Button text="Marcar completada" tap="{{ onComplete }}" class="-primary m-t-20" />
+        <Button text="Ir al resumen" tap="{{ onBack }}" class="-outline m-t-8" />
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+</Page>

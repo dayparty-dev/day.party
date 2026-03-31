@@ -1,0 +1,40 @@
+{
+  "name": "@dayparty/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Hono REST API for day.party",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --import extensionless/register --watch dist/index.js",
+    "start": "node --import extensionless/register dist/index.js",
+    "seed": "node --import extensionless/register dist/seed.js",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dayparty/core": "workspace:*",
+    "@dayparty/db": "workspace:*",
+    "@dayparty/domain": "workspace:*",
+    "@dayparty/validation": "workspace:*",
+    "@hono/node-server": "^1.13.0",
+    "dotenv": "^17.3.1",
+    "extensionless": "^2.0.6",
+    "hono": "^4.6.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@dayparty/eslint-config": "workspace:*",
+    "@dayparty/typescript-config": "workspace:*",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.7.3"
+  }
+}

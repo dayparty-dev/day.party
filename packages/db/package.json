@@ -1,0 +1,31 @@
+{
+  "name": "@dayparty/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MongoDB repository implementations for day.party",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dayparty/core": "workspace:*",
+    "@dayparty/domain": "workspace:*",
+    "mongodb": "^6.0.0"
+  },
+  "devDependencies": {
+    "@dayparty/eslint-config": "workspace:*",
+    "@dayparty/typescript-config": "workspace:*",
+    "typescript": "^5.7.3"
+  }
+}

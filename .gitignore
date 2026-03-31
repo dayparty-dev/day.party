@@ -125,3 +125,22 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Turborepo
+.turbo
+
+# Package build outputs
+packages/*/dist/
+
+# NativeScript
+platforms/
+apps/mobile/hooks/
+
+# macOS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.tmp

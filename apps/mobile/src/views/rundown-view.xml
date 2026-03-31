@@ -1,0 +1,28 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" loaded="onLoaded" class="page">
+  <ActionBar title="Resumen del día">
+    <ActionItem text="Salir" ios.position="right" android.position="actionBar" tap="{{ onLogout }}" />
+  </ActionBar>
+
+  <GridLayout rows="auto, auto, *">
+    <StackLayout row="0" visibility="{{ errorBannerVisibility }}" class="error-banner">
+      <Label text="{{ errorMessage }}" textWrap="true" class="error-text" />
+      <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8" />
+    </StackLayout>
+
+    <GridLayout row="1" rows="auto" columns="*, auto" class="p-12">
+      <Label col="0" text="{{ summaryText }}" class="h3" textWrap="true" />
+      <Button col="1" text="En curso" tap="{{ onOngoing }}" class="-primary" />
+    </GridLayout>
+
+    <ListView row="2" items="{{ taskRows }}" itemTap="{{ onTaskTap }}" class="list">
+      <ListView.itemTemplate>
+        <GridLayout columns="5, *, auto, auto" class="p-12 task-row">
+          <StackLayout col="0" width="5" backgroundColor="{{ tagColor }}" />
+          <Label col="1" text="{{ title }}" textWrap="true" class="task-title" />
+          <Label col="2" text="{{ size }}" class="size-badge" />
+          <Label col="3" text="{{ completeIcon }}" class="complete-icon" />
+        </GridLayout>
+      </ListView.itemTemplate>
+    </ListView>
+  </GridLayout>
+</Page>

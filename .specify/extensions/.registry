@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "checkpoint": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:f1f8587fcfee109d13e5fd2837df498439695218b32d00083f6e98095fca64c0",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.checkpoint.commit"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-03-31T01:41:55.516765+00:00"
+    },
+    "archive": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:ffa3831c0dd8aceeadad88efe4411676142d654dfbc1987e6e030ba6cdceb83e",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.archive.run"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-03-31T01:57:45.732662+00:00"
+    },
+    "iterate": {
+      "version": "2.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:f69d92321c68c54afb56b77947e34b0431e41a0b923e4e69e432abcf5957d95a",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.iterate.define",
+          "speckit.iterate.apply"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-03-31T01:58:09.276709+00:00"
+    },
+    "learn": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:88e5b334106c25aa5ee1e0564e8f684b39a33b799d35f4ff5a3567189ea94607",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.learn.review",
+          "speckit.learn.clarify"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-03-31T01:58:10.282267+00:00"
+    },
+    "maqa-ci": {
+      "version": "0.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:d5757b07b8ec5c31d7d24bee4a2b920ff7d2aa83be8db1cc48ec305662397a99",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.maqa-ci.setup",
+          "speckit.maqa-ci.check"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-03-31T01:58:11.765436+00:00"
+    },
+    "maqa-github-projects": {
+      "version": "0.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:04dc23dcaebb6312fb9fcdfaea073cf68a7c67f44cf99af6725d82f652909c7a",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.maqa-github-projects.setup",
+          "speckit.maqa-github-projects.populate"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-03-31T01:58:12.714071+00:00"
+    },
+    "onboard": {
+      "version": "2.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:8220058d725718da973dd45967a7403a03d0c6d815f25c2e80626b5428ae8f2f",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.onboard.start",
+          "speckit.onboard.explain",
+          "speckit.onboard.trail",
+          "speckit.onboard.quiz",
+          "speckit.onboard.badge",
+          "speckit.onboard.mentor",
+          "speckit.onboard.team"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-03-31T01:58:13.621842+00:00"
+    },
+    "product-forge": {
+      "version": "1.1.1",
+      "source": "local",
+      "manifest_hash": "sha256:e8fc6e2ae9be7d0edebf03b53f26f5c60dc86bd8441b77be6de6869bf2f60454",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.product-forge.forge",
+          "speckit.product-forge.research",
+          "speckit.product-forge.product-spec",
+          "speckit.product-forge.revalidate",
+          "speckit.product-forge.bridge",
+          "speckit.product-forge.implement",
+          "speckit.product-forge.verify-full",
+          "speckit.product-forge.test-plan",
+          "speckit.product-forge.test-run",
+          "speckit.product-forge.status"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-03-31T01:58:14.699161+00:00"
+    },
+    "ralph": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:6267a8fe75d3badbcb2674440c4542b21c0ee84b199e82f5208ce4757ab5e9bb",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.ralph.run",
+          "speckit.ralph.iterate"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-03-31T01:58:15.724773+00:00"
+    },
+    "retrospective": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:43dbaba249c6e7322de1130446632197bbcb21c3c9f08fbe16654e86f6d5d922",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.retrospective.analyze"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-03-31T01:58:16.669960+00:00"
+    }
+  }
+}

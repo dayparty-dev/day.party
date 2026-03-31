@@ -1,0 +1,2 @@
+# For scripts/migrate-speckit-github-to-cursor.py
+PyYAML>=6

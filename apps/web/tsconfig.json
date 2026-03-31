@@ -1,0 +1,11 @@
+{
+  "extends": "@dayparty/typescript-config/app.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "useDefineForClassFields": true,
+    "types": ["vite/client"],
+    "noEmit": true,
+    "rootDir": "."
+  },
+  "include": ["src", "vite.config.ts"]
+}
