@@ -1,0 +1,12 @@
+catalogs:
+  - name: 'repo-default'
+    url: 'https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json'
+    priority: 1
+    install_allowed: true
+    description: 'Community extensions installable by default in this repo'
+
+  - name: 'spec-kit-default'
+    url: 'https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.json'
+    priority: 2
+    install_allowed: true
+    description: 'Upstream default catalog fallback'
