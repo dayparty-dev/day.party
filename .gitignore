@@ -134,7 +134,7 @@ packages/*/dist/
 
 # NativeScript
 platforms/
-hooks/
+apps/mobile/hooks/
 
 # macOS
 .DS_Store

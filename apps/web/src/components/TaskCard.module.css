@@ -1,0 +1,87 @@
+.card {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--dp-surface);
+  border: 1px solid var(--dp-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+}
+
+.colorStrip {
+  width: 6px;
+  flex-shrink: 0;
+  border: none;
+  padding: 0;
+  cursor: default;
+}
+
+.body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.check {
+  margin-top: 3px;
+  accent-color: var(--dp-accent);
+}
+
+.title {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: var(--dp-text);
+  word-break: break-word;
+}
+
+.titleDone {
+  text-decoration: line-through;
+  color: var(--dp-muted);
+}
+
+.sizeBadge {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--dp-pill-bg);
+  color: var(--dp-pill-fg);
+}
+
+.sizeBadge[data-size='1'] {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+.sizeBadge[data-size='2'] {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+.sizeBadge[data-size='3'] {
+  background: #fff3e0;
+  color: #e65100;
+}
+.sizeBadge[data-size='4'] {
+  background: #fce4ec;
+  color: #880e4f;
+}
+.sizeBadge[data-size='5'] {
+  background: #f3e5f5;
+  color: #4a148c;
+}

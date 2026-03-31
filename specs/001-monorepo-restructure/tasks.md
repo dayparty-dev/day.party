@@ -181,17 +181,17 @@
 
 ### Web App Infrastructure
 
-- [ ] T076 [US4] Set up React Router in `apps/web/src/App.tsx` — routes for `/login`, `/rundown`, `/ongoing`, redirect unauthenticated users to `/login`
-- [ ] T077 [US4] Create useAuth hook in `apps/web/src/hooks/useAuth.ts` — manages bearer token in a React ref (in-memory only, never sessionStorage/localStorage — XSS-safe per FR-020a), exposes login/logout/isAuthenticated, wraps DayPartyClient auth methods, handles 401 by redirecting to login
+- [x] T076 [US4] Set up React Router in `apps/web/src/App.tsx` — routes for `/login`, `/rundown`, `/ongoing`, redirect unauthenticated users to `/login`
+- [x] T077 [US4] Create useAuth hook in `apps/web/src/hooks/useAuth.ts` — manages bearer token in a React ref (in-memory only, never sessionStorage/localStorage — XSS-safe per FR-020a), exposes login/logout/isAuthenticated, wraps DayPartyClient auth methods, handles 401 by redirecting to login
 
 ### Web Pages
 
-- [ ] T078 [US4] Create LoginPage in `apps/web/src/pages/LoginPage.tsx` — email input, submit button, calls DayPartyClient.login(); handle magic-link callback URL with token query param, call DayPartyClient.verify(), store token via useAuth
-- [ ] T079 [US4] Create RundownPage in `apps/web/src/pages/RundownPage.tsx` — fetch today's rundown via DayPartyClient.getRundown(), render task list with TaskCard components (title, size, tag, completion toggle), toggle isComplete via DayPartyClient.updateTask()
-- [ ] T080 [US4] Create TaskCard component in `apps/web/src/components/TaskCard.tsx` — displays task title, size badge, tag color indicator, completion checkbox; emits toggle event
-- [ ] T081 [US4] Create OngoingPage in `apps/web/src/pages/OngoingPage.tsx` — displays current/next incomplete task with title, size, tag, and a time/progress indicator; mark complete button; link back to rundown
-- [ ] T082 [US4] Add CSS Modules for core components in `apps/web/src/pages/*.module.css` and `apps/web/src/components/*.module.css` — minimal styling for login form, task list, task card, ongoing view
-- [ ] T082a [US4] Add basic network error handling in web pages — when DayPartyClient calls fail due to API unreachability, display a clear error banner/message and offer a retry action (edge case: "API unreachable")
+- [x] T078 [US4] Create LoginPage in `apps/web/src/pages/LoginPage.tsx` — email input, submit button, calls DayPartyClient.login(); handle magic-link callback URL with token query param, call DayPartyClient.verify(), store token via useAuth
+- [x] T079 [US4] Create RundownPage in `apps/web/src/pages/RundownPage.tsx` — fetch today's rundown via DayPartyClient.getRundown(), render task list with TaskCard components (title, size, tag, completion toggle), toggle isComplete via DayPartyClient.updateTask()
+- [x] T080 [US4] Create TaskCard component in `apps/web/src/components/TaskCard.tsx` — displays task title, size badge, tag color indicator, completion checkbox; emits toggle event
+- [x] T081 [US4] Create OngoingPage in `apps/web/src/pages/OngoingPage.tsx` — displays current/next incomplete task with title, size, tag, and a time/progress indicator; mark complete button; link back to rundown
+- [x] T082 [US4] Add CSS Modules for core components in `apps/web/src/pages/*.module.css` and `apps/web/src/components/*.module.css` — minimal styling for login form, task list, task card, ongoing view
+- [x] T082a [US4] Add basic network error handling in web pages — when DayPartyClient calls fail due to API unreachability, display a clear error banner/message and offer a retry action (edge case: "API unreachable")
 
 **Checkpoint**: US4 complete — web client login, rundown, and ongoing pages functional. Feature parity with mobile for core screens (SC-005).
 

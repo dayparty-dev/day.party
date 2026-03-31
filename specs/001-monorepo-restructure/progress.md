@@ -5,6 +5,8 @@ Started: 2026-03-31 05:29:22
 
 ## Codebase Patterns
 
+- Web: `apps/web/src/config.ts` — `API_BASE_URL` from `import.meta.env.VITE_API_BASE_URL` or `http://localhost:3001/api`; `AuthProvider` wraps the app in `main.tsx` inside `BrowserRouter` so `useNavigate` works
+- Web: Session token is kept in a `useRef` plus `DayPartyClient` (in-memory only); `void epoch` + `bump()` forces re-render when auth state changes; `onUnauthorized()` clears client token and redirects to `/login`
 - Mobile: `apps/mobile/src/config.ts` sets `API_BASE_URL` to `http://10.0.2.2:3001/api` (Android emulator) or `http://127.0.0.1:3001/api` (iOS); must match `contracts/rest-api.md` `/api` prefix
 - Mobile: `DayPartyClient` `Result` branches type-narrow with `result.ok === true` / `=== false` in views and `AuthState.consumeUnauthorized`
 - Import shared ESLint app preset as `@dayparty/eslint-config/app` (not `app.js`); package `exports` maps `./app` → `app.js`
@@ -369,5 +371,42 @@ Started: 2026-03-31 05:29:22
 - ListView tap typing: `ItemEventData` from `@nativescript/core/ui`
 - iOS URL handler: `Application.ios.addDelegateHandler('applicationOpenURLOptions', …)`
 - Magic link API logs full `http` URL; login view accepts full URL or raw token via regex `token=` extraction
+
+---
+
+## Iteration 11 - 2026-03-31
+
+**User Story**: Phase 6 — US4 Web client core task experience (T076–T082a)
+
+**Tasks Completed**:
+
+- [x] T076: React Router routes `/login`, `/rundown`, `/ongoing`; protected layout redirects unauthenticated users to `/login`; `/` resolves by auth state
+- [x] T077: `useAuth` + `AuthContext` — token in `useRef`, `DayPartyClient` in-memory, `login` / `verifyFromToken` / `logout` / `onUnauthorized`
+- [x] T078: `LoginPage` — magic link via `?token=` (or nested URL param), verify + navigation; login form + network banner
+- [x] T079: `RundownPage` — today’s rundown + tags for colors, `TaskCard` list, toggle completion with reload
+- [x] T080: `TaskCard` component + CSS module
+- [x] T081: `OngoingPage` — first incomplete task, elapsed timer + progress bar vs size-based guide, mark complete, link to rundown
+- [x] T082: CSS modules for pages + TaskCard; shared `index.css` variables + DM Sans
+- [x] T082a: `isLikelyNetworkFailure` + retry/dismiss banners on login, rundown, ongoing
+
+**Tasks Remaining in Story**: None — US4 complete
+
+**Commit**: 10b896c
+
+**Files Changed**:
+
+- `apps/web/src/App.tsx`, `main.tsx`, `vite-env.d.ts`, `index.css`
+- `apps/web/src/config.ts`
+- `apps/web/src/context/auth-context.tsx`
+- `apps/web/src/hooks/useAuth.ts` (`.gitignore` had blocked `hooks/`; scoped ignore to `apps/mobile/hooks/`)
+- `apps/web/src/utils/network-error.ts`, `today-local.ts`
+- `apps/web/src/components/TaskCard.tsx`, `TaskCard.module.css`
+- `apps/web/src/pages/LoginPage.tsx`, `LoginPage.module.css`, `RundownPage.tsx`, `RundownPage.module.css`, `OngoingPage.tsx`, `OngoingPage.module.css`
+- `specs/001-monorepo-restructure/tasks.md`, `progress.md`
+
+**Learnings**:
+
+- Match mobile: reuse `isLikelyNetworkFailure` heuristics on `INTERNAL_ERROR` for offline/unreachable API UX
+- `verify()` already sets the client token; sync `tokenRef` from `client.getToken()` after verify for a single source of truth with the ref contract
 
 ---
