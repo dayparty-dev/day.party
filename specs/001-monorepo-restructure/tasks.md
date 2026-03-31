@@ -37,15 +37,15 @@
 
 ### Core Package
 
-- [ ] T007 Initialize `packages/core/` package with `package.json` (`name: @dayparty/core`), `tsconfig.json` extending `@dayparty/typescript-config/library.json`, and `src/index.ts` barrel export
-- [ ] T008 [P] Create Task type in `packages/core/src/models/task.ts` per data-model.md (id, userId, title, size 1–5, tagKey?, isComplete, scheduledDate, position, createdAt, updatedAt)
-- [ ] T009 [P] Create User type in `packages/core/src/models/user.ts` per data-model.md (id, email, displayName?, role, createdAt, updatedAt)
-- [ ] T010 [P] Create Session type in `packages/core/src/models/session.ts` per data-model.md (id, userId, token, expiresAt, createdAt)
-- [ ] T011 [P] Create Tag type in `packages/core/src/models/tag.ts` per data-model.md (id, userId, key, displayName, color?, icon?, isDefault, createdAt)
-- [ ] T012 [P] Create DayRundown type in `packages/core/src/models/day-rundown.ts` per data-model.md (date, userId, tasks, capacity, completed)
-- [ ] T013 [P] Create ApiError type in `packages/core/src/models/api-error.ts` per data-model.md error model (code, message, fields?)
-- [ ] T014 [P] Create constants in `packages/core/src/constants/` — default tags array, size scale (1–5), standard error codes (VALIDATION_ERROR, UNAUTHORIZED, FORBIDDEN, NOT_FOUND, CONFLICT, INTERNAL_ERROR)
-- [ ] T015 Export all models and constants from `packages/core/src/index.ts` barrel
+- [x] T007 Initialize `packages/core/` package with `package.json` (`name: @dayparty/core`), `tsconfig.json` extending `@dayparty/typescript-config/library.json`, and `src/index.ts` barrel export
+- [x] T008 [P] Create Task type in `packages/core/src/models/task.ts` per data-model.md (id, userId, title, size 1–5, tagKey?, isComplete, scheduledDate, position, createdAt, updatedAt)
+- [x] T009 [P] Create User type in `packages/core/src/models/user.ts` per data-model.md (id, email, displayName?, role, createdAt, updatedAt)
+- [x] T010 [P] Create Session type in `packages/core/src/models/session.ts` per data-model.md (id, userId, token, expiresAt, createdAt)
+- [x] T011 [P] Create Tag type in `packages/core/src/models/tag.ts` per data-model.md (id, userId, key, displayName, color?, icon?, isDefault, createdAt)
+- [x] T012 [P] Create DayRundown type in `packages/core/src/models/day-rundown.ts` per data-model.md (date, userId, tasks, capacity, completed)
+- [x] T013 [P] Create ApiError type in `packages/core/src/models/api-error.ts` per data-model.md error model (code, message, fields?)
+- [x] T014 [P] Create constants in `packages/core/src/constants/` — default tags array, size scale (1–5), standard error codes (VALIDATION_ERROR, UNAUTHORIZED, FORBIDDEN, NOT_FOUND, CONFLICT, INTERNAL_ERROR)
+- [x] T015 Export all models and constants from `packages/core/src/index.ts` barrel
 
 ### Validation Package
 
