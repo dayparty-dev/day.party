@@ -75,20 +75,20 @@ the API runs on Node/Bun, not edge workers.
 
 ## Constraints Verified
 
-| Constraint | Status | Notes |
-|-----------|--------|-------|
-| NativeScript 9 + pnpm workspaces | ✅ Compatible | Requires `shamefully-hoist=true` and explicit package mappings in `nativescript.config.ts` |
-| Hono + MongoDB | ✅ Compatible | Hono is runtime-agnostic; MongoDB driver works on Node/Bun |
-| TypeScript strict mode in packages | ✅ Feasible | New packages start strict. Legacy app incremental. |
-| Zod in NativeScript | ✅ Compatible | Zod is pure TypeScript, no Node/browser-specific APIs |
-| Native fetch in NativeScript | ✅ Available | NativeScript polyfills fetch via `@nativescript/core/http` |
+| Constraint                         | Status        | Notes                                                                                      |
+| ---------------------------------- | ------------- | ------------------------------------------------------------------------------------------ |
+| NativeScript 9 + pnpm workspaces   | ✅ Compatible | Requires `shamefully-hoist=true` and explicit package mappings in `nativescript.config.ts` |
+| Hono + MongoDB                     | ✅ Compatible | Hono is runtime-agnostic; MongoDB driver works on Node/Bun                                 |
+| TypeScript strict mode in packages | ✅ Feasible   | New packages start strict. Legacy app incremental.                                         |
+| Zod in NativeScript                | ✅ Compatible | Zod is pure TypeScript, no Node/browser-specific APIs                                      |
+| Native fetch in NativeScript       | ✅ Available  | NativeScript polyfills fetch via `@nativescript/core/http`                                 |
 
 ## Open Questions (Resolved)
 
-| Question | Resolution |
-|----------|-----------|
-| Where do service implementations live? | `apps/api/src/services/` for API-specific (JWT signing, email sending). These implement interfaces from `@dayparty/domain`. |
-| How does mobile store JWT? | `@nativescript/secure-storage` for token, `ApplicationSettings` for cached data |
-| How does auth work on mobile without deep links? | MVP: user manually enters verification code / session ID. Or web redirect flow opens in-app browser. Deep links deferred. |
-| Should packages use ESM or CJS? | ESM (`"type": "module"` in package.json). All consumers support ESM. |
-| Should web-legacy depend on extracted packages? | No — `apps/web-legacy/` keeps its original code as-is for reference. It may break and that's accepted. |
+| Question                                         | Resolution                                                                                                                  |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Where do service implementations live?           | `apps/api/src/services/` for API-specific (JWT signing, email sending). These implement interfaces from `@dayparty/domain`. |
+| How does mobile store JWT?                       | `@nativescript/secure-storage` for token, `ApplicationSettings` for cached data                                             |
+| How does auth work on mobile without deep links? | MVP: user manually enters verification code / session ID. Or web redirect flow opens in-app browser. Deep links deferred.   |
+| Should packages use ESM or CJS?                  | ESM (`"type": "module"` in package.json). All consumers support ESM.                                                        |
+| Should web-legacy depend on extracted packages?  | No — `apps/web-legacy/` keeps its original code as-is for reference. It may break and that's accepted.                      |

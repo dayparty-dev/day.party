@@ -19,6 +19,7 @@ Rundown → Ongoing uses standard push/pop navigation.
 **Purpose**: Email-based magic-link authentication.
 
 **Layout** (`login-page.xml`):
+
 - StackLayout centered vertically
 - Logo/app name label
 - TextField (email input, keyboard type: email)
@@ -26,6 +27,7 @@ Rundown → Ongoing uses standard push/pop navigation.
 - Label (status message: "Check your email" or error)
 
 **Code-behind** (`login-page.ts`):
+
 - Uses `@dayparty/api-client` → `auth.login(email)`
 - On success: shows "Check your email" message
 - Verification: secondary input for session ID (MVP — no deep links)
@@ -38,6 +40,7 @@ Rundown → Ongoing uses standard push/pop navigation.
 **Purpose**: Day's task list — the primary screen.
 
 **Layout** (`rundown-page.xml`):
+
 - ActionBar with date title + prev/next day buttons
 - ProgressBar (day capacity: total elapsed / total duration)
 - ListView of tasks for the selected date
@@ -45,6 +48,7 @@ Rundown → Ongoing uses standard push/pop navigation.
 - FAB or ActionBar button to add task
 
 **Code-behind** (`rundown-page.ts`):
+
 - Uses `@dayparty/api-client` → `tasks.list(date)`
 - Day navigation: changes date string, refetches tasks
 - Tap task → if pending, start (status → ongoing, navigate to ongoing page)
@@ -59,6 +63,7 @@ Rundown → Ongoing uses standard push/pop navigation.
 **Purpose**: Active task timer view.
 
 **Layout** (`ongoing-page.xml`):
+
 - ActionBar with back button
 - Card (centered):
   - Task title label
@@ -67,6 +72,7 @@ Rundown → Ongoing uses standard push/pop navigation.
 - Button row: Pause / Complete
 
 **Code-behind** (`ongoing-page.ts`):
+
 - Receives task via navigation context
 - Timer: `setInterval(1000)` incrementing elapsed seconds
 - Pause: updates task status to "paused", navigates back
@@ -78,16 +84,19 @@ Rundown → Ongoing uses standard push/pop navigation.
 ## Shared Services
 
 ### auth-service.ts
+
 - `getToken(): string | null` — reads JWT from SecureStorage
 - `setToken(token: string): void` — writes JWT to SecureStorage
 - `clearToken(): void` — removes JWT
 - `isAuthenticated(): boolean` — checks if token exists and not expired
 
 ### task-service.ts
+
 - Thin wrapper over `@dayparty/api-client` tasks
 - Adds local caching via `ApplicationSettings` for offline resilience
 - `fetchTasks(date)`, `createTask(input)`, `updateTask(id, updates)`
 
 ### navigation.ts
+
 - `navigateTo(page: string, context?: any, clearHistory?: boolean)`
 - Wraps `Frame.topmost().navigate()`

@@ -10,20 +10,20 @@ The core domain object — a time-boxed action item in a user's day.
 
 ```typescript
 interface Task extends Entity {
-  title: string
-  size: 'small' | 'medium' | 'large'        // visual size indication
-  duration: number                            // planned duration in minutes
-  elapsedTime: number                         // actual time spent in minutes
-  status: TaskStatus                          // pending | ongoing | paused | done
-  scheduledAt: string                         // ISO date string (YYYY-MM-DD)
-  tags: TagOption[]                           // categorization labels
-  order: number                               // display ordering within a day
-  userId: string                              // owner
-  synced?: boolean                            // client-side sync flag
-  lastSyncedAt?: string                       // ISO datetime
+  title: string;
+  size: 'small' | 'medium' | 'large'; // visual size indication
+  duration: number; // planned duration in minutes
+  elapsedTime: number; // actual time spent in minutes
+  status: TaskStatus; // pending | ongoing | paused | done
+  scheduledAt: string; // ISO date string (YYYY-MM-DD)
+  tags: TagOption[]; // categorization labels
+  order: number; // display ordering within a day
+  userId: string; // owner
+  synced?: boolean; // client-side sync flag
+  lastSyncedAt?: string; // ISO datetime
 }
 
-type TaskStatus = 'pending' | 'ongoing' | 'paused' | 'done'
+type TaskStatus = 'pending' | 'ongoing' | 'paused' | 'done';
 ```
 
 **MongoDB collection**: `tasks`
@@ -35,12 +35,12 @@ A person using day.party.
 
 ```typescript
 interface User extends Entity {
-  email: string
-  username: string
-  role: UserRole
+  email: string;
+  username: string;
+  role: UserRole;
 }
 
-type UserRole = 'admin' | 'premium' | 'standard'
+type UserRole = 'admin' | 'premium' | 'standard';
 ```
 
 **MongoDB collection**: `users`
@@ -52,10 +52,10 @@ A temporary record for magic-link login flow.
 
 ```typescript
 interface AuthSession extends Entity {
-  email: string
-  sessionId: string
-  active: boolean
-  createdAt: string       // ISO datetime
+  email: string;
+  sessionId: string;
+  active: boolean;
+  createdAt: string; // ISO datetime
 }
 ```
 
@@ -66,10 +66,10 @@ interface AuthSession extends Entity {
 
 ```typescript
 interface AuthToken {
-  sessionId: string
-  email: string
-  userId: string
-  role: UserRole
+  sessionId: string;
+  email: string;
+  userId: string;
+  role: UserRole;
 }
 ```
 
@@ -77,8 +77,8 @@ interface AuthToken {
 
 ```typescript
 interface TagOption {
-  label: string
-  color: string           // hex color
+  label: string;
+  color: string; // hex color
 }
 ```
 
@@ -86,7 +86,7 @@ interface TagOption {
 
 ```typescript
 interface Entity {
-  _id?: string
+  _id?: string;
 }
 ```
 

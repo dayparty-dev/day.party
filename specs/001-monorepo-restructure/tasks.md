@@ -168,14 +168,14 @@
 
 ## Summary
 
-| Phase | Tasks | Dependencies | User Story |
-|-------|-------|-------------|------------|
-| 1. Setup | T001–T005 | None | US1 (foundation) |
-| 2. Packages | T006–T049 | Phase 1 | US1 (build passes) |
-| 3. API | T050–T061 | Phase 2 | US2 |
-| 4. Mobile Login | T062–T070 | Phase 2 + Phase 3 | US3 |
-| 5. Mobile Tasks | T071–T075 | Phase 4 | US4 |
-| 6. Web Client | T076–T080 | Phase 2 + Phase 3 | US5 |
+| Phase           | Tasks     | Dependencies      | User Story         |
+| --------------- | --------- | ----------------- | ------------------ |
+| 1. Setup        | T001–T005 | None              | US1 (foundation)   |
+| 2. Packages     | T006–T049 | Phase 1           | US1 (build passes) |
+| 3. API          | T050–T061 | Phase 2           | US2                |
+| 4. Mobile Login | T062–T070 | Phase 2 + Phase 3 | US3                |
+| 5. Mobile Tasks | T071–T075 | Phase 4           | US4                |
+| 6. Web Client   | T076–T080 | Phase 2 + Phase 3 | US5                |
 
 **Total**: 80 tasks across 6 phases
 **Critical path**: Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5

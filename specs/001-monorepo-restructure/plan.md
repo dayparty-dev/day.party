@@ -26,23 +26,23 @@ and Pod Pattern conventions.
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| I. Simplicity-First | ✅ PASS | 5 packages is the minimum needed. No extra abstractions. |
-| II. TypeScript Everywhere | ✅ PASS | All code is TypeScript. Packages export `.d.ts`. |
+| Principle                    | Status  | Notes                                                                                               |
+| ---------------------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| I. Simplicity-First          | ✅ PASS | 5 packages is the minimum needed. No extra abstractions.                                            |
+| II. TypeScript Everywhere    | ✅ PASS | All code is TypeScript. Packages export `.d.ts`.                                                    |
 | III. Tidy Architecture + Pod | ✅ PASS | core=models, domain=logic+interfaces, db=adapter, validation=contracts, api-client=consumer adapter |
-| IV. Shared Core, Platform UI | ✅ PASS | packages/ has zero UI deps. apps/ own all UI. |
-| V. Mobile-Native Fidelity | ✅ PASS | NativeScript TypeScript puro, frame-based nav, platform-specific UI |
-| VI. Pragmatic Quality | ✅ PASS | No tests required in prototype phase. Validation at boundaries only. |
+| IV. Shared Core, Platform UI | ✅ PASS | packages/ has zero UI deps. apps/ own all UI.                                                       |
+| V. Mobile-Native Fidelity    | ✅ PASS | NativeScript TypeScript puro, frame-based nav, platform-specific UI                                 |
+| VI. Pragmatic Quality        | ✅ PASS | No tests required in prototype phase. Validation at boundaries only.                                |
 
 **Complexity justification:**
 
-| Item | Why Needed | Simpler Alternative Rejected Because |
-|------|------------|--------------------------------------|
-| Repository interfaces in domain | Enable same interactors for API + tests + future DB swap | Direct MongoDB imports would couple domain to adapter |
-| 5 packages (not 3) | `validation` and `api-client` have distinct consumers and dependency graphs | Merging into core/domain would add unwanted deps (zod in core, fetch in domain) |
+| Item                            | Why Needed                                                                  | Simpler Alternative Rejected Because                                            |
+| ------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Repository interfaces in domain | Enable same interactors for API + tests + future DB swap                    | Direct MongoDB imports would couple domain to adapter                           |
+| 5 packages (not 3)              | `validation` and `api-client` have distinct consumers and dependency graphs | Merging into core/domain would add unwanted deps (zod in core, fetch in domain) |
 
 ## Project Structure
 
