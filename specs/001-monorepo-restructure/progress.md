@@ -120,3 +120,47 @@ Started: 2026-03-31 05:29:22
 - Zod size enum cast needed: `z.number().int().min(1).max(5) as z.ZodType<1|2|3|4|5>` to align with Task type
 
 ---
+
+---
+
+## Iteration 4 - 2026-03-31
+
+**User Story**: Phase 2 — Domain Package (T022-T033)
+**Tasks Completed**:
+
+- [x] T022: Initialized packages/domain/ with package.json (@dayparty/domain), tsconfig.json, eslint.config.js
+- [x] T023: TaskRepository interface (findByUserAndDate, findById, create, update, delete, reorder)
+- [x] T024: UserRepository interface (findById, findByEmail, create, update)
+- [x] T025: SessionRepository interface (findByToken, create, deleteByToken, deleteExpired)
+- [x] T026: TagRepository interface (findByUser, findByKey, create, update, delete, seedDefaults)
+- [x] T027: makeCreateTaskAction (validates tagKey, auto-assigns position)
+- [x] T028: makeToggleTaskCompletionAction (toggles isComplete true↔false)
+- [x] T029: makeGetRundownAction (queries by userId+date, computes capacity+completed)
+- [x] T030: makeReorderTasksAction (validates task ownership, updates positions, returns DayRundown)
+- [x] T031: makeDeleteTaskAction (deletes task, compacts remaining positions)
+- [x] T032: makeUpdateTaskAction (partial update, validates tagKey if changed)
+- [x] T033: Barrel export in src/index.ts
+      **Tasks Remaining in Story**: None - story complete
+      **Commit**: 280756c
+      **Files Changed**:
+- packages/domain/package.json
+- packages/domain/tsconfig.json
+- packages/domain/eslint.config.js
+- packages/domain/src/index.ts
+- packages/domain/src/interfaces/task-repository.ts
+- packages/domain/src/interfaces/user-repository.ts
+- packages/domain/src/interfaces/session-repository.ts
+- packages/domain/src/interfaces/tag-repository.ts
+- packages/domain/src/actions/create-task.ts
+- packages/domain/src/actions/toggle-task-completion.ts
+- packages/domain/src/actions/get-rundown.ts
+- packages/domain/src/actions/reorder-tasks.ts
+- packages/domain/src/actions/delete-task.ts
+- packages/domain/src/actions/update-task.ts
+- specs/001-monorepo-restructure/tasks.md
+  **Learnings**:
+- Actions use factory pattern: makeXxxAction(repos) returns an async function — clean DI, no classes
+- UpdateTaskInput uses `tagKey: string | null` to allow explicit nulling of tagKey (vs undefined meaning "no change")
+- Prettier (via lint-staged) reformats code on commit — no manual formatting needed
+
+---

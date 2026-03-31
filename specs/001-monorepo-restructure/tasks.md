@@ -73,13 +73,13 @@
 
 ### DB Package
 
-- [ ] T034 Initialize `packages/db/` package with `package.json` (`name: @dayparty/db`, depends on `@dayparty/core` + `@dayparty/domain` + `mongodb`), `tsconfig.json`, and `src/index.ts` barrel
-- [ ] T035 Create MongoDB connection helper in `packages/db/src/connection.ts` — `getDb()`, `getCollection()` functions accepting connection URI
-- [ ] T036 [P] Implement MongoTaskRepository in `packages/db/src/repositories/task-repository.ts` — implements TaskRepository interface from `@dayparty/domain` using MongoDB driver
-- [ ] T037 [P] Implement MongoUserRepository in `packages/db/src/repositories/user-repository.ts` — implements UserRepository interface
-- [ ] T038 [P] Implement MongoSessionRepository in `packages/db/src/repositories/session-repository.ts` — implements SessionRepository interface
-- [ ] T039 [P] Implement MongoTagRepository in `packages/db/src/repositories/tag-repository.ts` — implements TagRepository interface including seedDefaults for new users per data-model.md default tags
-- [ ] T040 Export all repository implementations and connection helper from `packages/db/src/index.ts` barrel
+- [x] T034 Initialize `packages/db/` package with `package.json` (`name: @dayparty/db`, depends on `@dayparty/core` + `@dayparty/domain` + `mongodb`), `tsconfig.json`, and `src/index.ts` barrel
+- [x] T035 Create MongoDB connection helper in `packages/db/src/connection.ts` — `getDb()`, `getCollection()` functions accepting connection URI
+- [x] T036 [P] Implement MongoTaskRepository in `packages/db/src/repositories/task-repository.ts` — implements TaskRepository interface from `@dayparty/domain` using MongoDB driver
+- [x] T037 [P] Implement MongoUserRepository in `packages/db/src/repositories/user-repository.ts` — implements UserRepository interface
+- [x] T038 [P] Implement MongoSessionRepository in `packages/db/src/repositories/session-repository.ts` — implements SessionRepository interface
+- [x] T039 [P] Implement MongoTagRepository in `packages/db/src/repositories/tag-repository.ts` — implements TagRepository interface including seedDefaults for new users per data-model.md default tags
+- [x] T040 Export all repository implementations and connection helper from `packages/db/src/index.ts` barrel
 
 ### API Client Package
 

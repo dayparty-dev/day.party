@@ -141,6 +141,28 @@ importers:
         specifier: ^5.4.5
         version: 5.7.2
 
+  packages/db:
+    dependencies:
+      '@dayparty/core':
+        specifier: workspace:*
+        version: link:../core
+      '@dayparty/domain':
+        specifier: workspace:*
+        version: link:../domain
+      mongodb:
+        specifier: ^6.0.0
+        version: 6.21.0
+    devDependencies:
+      '@dayparty/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@dayparty/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.4.5
+        version: 5.7.2
+
   packages/domain:
     dependencies:
       '@dayparty/core':
