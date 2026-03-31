@@ -19,6 +19,8 @@ pnpm test
 pnpm lint
 ```
 
+`pnpm build` does not build `apps/web-legacy` (Next reference app). Use `pnpm build:legacy` when you need it.
+
 Day-to-day development:
 
 ```bash

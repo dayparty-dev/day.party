@@ -43,7 +43,7 @@ Replace today’s sample tasks: `SEED_FORCE_TASKS=1 pnpm --filter @dayparty/api 
 ## Build
 
 ```bash
-pnpm build            # builds all packages in dependency order, then apps (via Turborepo)
+pnpm build            # shared packages + api/web/mobile (skips web-legacy); use pnpm build:legacy for Next reference app
 ```
 
 ## Development

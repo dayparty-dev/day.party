@@ -33,7 +33,8 @@ Human onboarding: `specs/001-monorepo-restructure/quickstart.md` (install, build
 ## Commands
 
 - `pnpm install` - install all workspaces (hoisted `node-linker` for NativeScript)
-- `pnpm build` - monorepo build via Turbo (`^build` graph)
+- `pnpm build` - monorepo build via Turbo (`^build` graph; excludes `@dayparty/web-legacy`)
+- `pnpm build:legacy` - Next.js build for `@dayparty/web-legacy` only
 - `pnpm test` - tests via Turbo (depends on `build`)
 - `pnpm lint` - lint across configured workspaces
 - `pnpm dev` - Turbo persistent dev tasks (API, web, etc. where defined)
