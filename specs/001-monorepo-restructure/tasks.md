@@ -203,8 +203,8 @@
 
 **Independent Test**: `cd apps/web-legacy && pnpm install && pnpm dev` — app starts and behaves as before.
 
-- [ ] T083 [US5] Verify `apps/web-legacy/` boots independently — run install and dev, confirm it starts without errors and is not affected by shared package changes
-- [ ] T084 [US5] Ensure `apps/web-legacy/package.json` has NO dependencies on any `@dayparty/*` packages — cross-check that the legacy app is fully isolated from the new monorepo packages
+- [x] T083 [US5] Verify `apps/web-legacy/` boots independently — run install and dev, confirm it starts without errors and is not affected by shared package changes
+- [x] T084 [US5] Ensure `apps/web-legacy/package.json` has NO dependencies on any `@dayparty/*` packages — cross-check that the legacy app is fully isolated from the new monorepo packages
 
 **Checkpoint**: US5 complete — legacy app boots and behaves identically to pre-restructure state (SC-006).
 

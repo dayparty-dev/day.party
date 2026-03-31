@@ -410,3 +410,28 @@ Started: 2026-03-31 05:29:22
 - `verify()` already sets the client token; sync `tokenRef` from `client.getToken()` after verify for a single source of truth with the ref contract
 
 ---
+
+## Iteration 12 - 2026-03-31
+
+**User Story**: Phase 7 — US5 Legacy app preserved (T083–T084)
+
+**Tasks Completed**:
+
+- [x] T083: `apps/web-legacy` — `pnpm install` + `pnpm build` succeed; `pnpm dev` reaches Next.js “Ready” on localhost:3000 (i18n App Router warning only, pre-existing)
+- [x] T084: `dependencies` / `devDependencies` contain no workspace libs (`@dayparty/core`, `@dayparty/domain`, etc.); scoped package `name` `@dayparty/web-legacy` is app identity, not a package dependency
+
+**Tasks Remaining in Story**: None — US5 complete
+
+**Commit**: bc7a800
+
+**Files Changed**:
+
+- `specs/001-monorepo-restructure/tasks.md`
+- `specs/001-monorepo-restructure/progress.md`
+
+**Learnings**:
+
+- US5 verification: prefer `pnpm build` in `web-legacy` for compile confidence plus short `next dev` smoke for “starts” confirmation
+- T084 intent is isolation from shared **packages**; legacy app’s own npm scope in `name` does not violate that
+
+---
