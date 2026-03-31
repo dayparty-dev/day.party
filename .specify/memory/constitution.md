@@ -1,10 +1,25 @@
 <!--
 Sync Impact Report
-- Version change: 2.0.0 → 2.0.1 (PATCH: clarification to Principle II)
-- Modified principle: II. TypeScript Everywhere — added extensionless import rule
-  (Imports MUST NOT use .js extensions; use moduleResolution: "bundler")
-- Templates requiring updates: ✅ research.md updated with ESM decision
-- Follow-up TODOs: none
+- Version change: 2.0.1 → 2.1.0 (MINOR: new Spec-Driven Implementation
+  constraint + strengthened legacy-as-reference language)
+- Added: "Spec-Driven Implementation" section in Architecture Constraints
+  with 4 rules governing how new code relates to legacy code
+- Modified: "Existing web app" constraint broadened — legacy is a vague
+  reference for ALL new code, not just the web client
+- Templates requiring updates:
+  - ✅ tasks-template.md: no changes needed (already spec-driven by design)
+  - ✅ plan-template.md: no changes needed (Constitution Check already gates)
+  - ✅ spec-template.md: no changes needed (user stories are source of truth)
+  - ⚠ specs/001-monorepo-restructure/tasks.md: task descriptions reference
+    legacy file paths as sources (e.g., "from app/_models/Entity.ts"). These
+    SHOULD be rewritten to reference spec/plan/contracts as the source of
+    truth, with legacy paths demoted to optional context. This is a follow-up
+    for the next speckit.tasks regeneration or manual edit.
+- Follow-up TODOs:
+  - Regenerate or manually update tasks.md for 001-monorepo-restructure to
+    remove "extract from" / "move from" language that frames implementation
+    as code migration rather than spec-driven design.
+  - Discard current Phase 2 implementation and re-implement from specs.
 -->
 
 # day.party Constitution
@@ -125,9 +140,18 @@ The NativeScript mobile app MUST feel native on each platform.
 - **Pod alignment**: Packages SHOULD follow cuakl Pod conventions (core/adapters/config)
   so they can be extracted to standalone pods for the broader cuakl ecosystem later.
   This is a design goal, not a blocker — don't over-abstract to force Pod shape.
-- **Existing web app** moves to `apps/web-legacy/` as reference only. It is NOT
-  the base for the new web client. It serves to understand existing features and
-  data flows during extraction of shared packages.
+- **Spec-Driven Implementation**: New code MUST be designed from the specs, plan,
+  data model, and contracts — NOT by copying, extracting, or adapting legacy code.
+  The legacy codebase (`apps/web-legacy/`) is a **vague reference** only:
+  - It MAY be consulted to understand what features exist and what data flows look
+    like, but it MUST NOT be treated as a blueprint or source of truth for new code.
+  - New types, interfaces, and logic MUST be designed from the spec requirements
+    and data model. If the legacy code has a field called `active` but the new
+    data model says `isActive`, the new code uses `isActive` — period.
+  - Implementation tasks MUST describe what to build (per spec/contracts), not
+    what to copy from. Legacy file paths are optional context, not instructions.
+  - When the legacy code conflicts with the spec or constitution, the spec and
+    constitution win. Always.
 - **New web client** (`apps/web/`) will be a minimal React + TypeScript app that
   consumes `api-client` for basic feature testing. Final web architecture (framework,
   routing, styling, SSR vs SPA) is intentionally deferred.
@@ -155,4 +179,4 @@ The NativeScript mobile app MUST feel native on each platform.
 - When a principle conflicts with shipping working software, the principle
   yields — but the conflict MUST be noted for future resolution.
 
-**Version**: 2.0.1 | **Ratified**: 2026-03-31 | **Last Amended**: 2026-03-31
+**Version**: 2.1.0 | **Ratified**: 2026-03-31 | **Last Amended**: 2026-03-31
