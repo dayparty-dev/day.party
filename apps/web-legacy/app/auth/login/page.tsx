@@ -54,55 +54,44 @@ function LoginForm(): React.ReactElement {
     <div className="login-container">
       <div>
         <ul className="steps my-4 w-full">
-          <li className="step step-secondary">
-            {t("LoginPage.steps.email")}
-          </li>
+          <li className="step step-secondary">{t('LoginPage.steps.email')}</li>
           <li
             className={
-              'step ' +
-              (loginState === LoginState.Code ||
-                loginState === LoginState.Processing
-                ? 'step-secondary'
-                : '')
+              'step ' + (loginState === LoginState.Code || loginState === LoginState.Processing ? 'step-secondary' : '')
             }
           >
-            {t("LoginPage.steps.check")}
+            {t('LoginPage.steps.check')}
           </li>
-          <li
-            className={
-              'step ' +
-              (loginState === LoginState.Processing ? 'step-secondary' : '')
-            }
-          >
-            {t("LoginPage.steps.verify")}
+          <li className={'step ' + (loginState === LoginState.Processing ? 'step-secondary' : '')}>
+            {t('LoginPage.steps.verify')}
           </li>
         </ul>
       </div>
       <div>
         {loginState === LoginState.Email && (
           <div className="step-container bg-secondary">
-            <p className="text-secondary-content">{t("LoginPage.welcome")}</p>
+            <p className="text-secondary-content">{t('LoginPage.welcome')}</p>
             <form className="flex gap-4" onSubmit={handleSubmit}>
               <label className="input">
-                <span className="label">{t("LoginPage.emailLabel")}</span>
+                <span className="label">{t('LoginPage.emailLabel')}</span>
                 <input type="text" placeholder="pepe@day.party" name="email" />
               </label>
               <button className="btn btn-primary" type="submit">
-                {t("LoginPage.nextButton")}
+                {t('LoginPage.nextButton')}
               </button>
             </form>
           </div>
         )}
         {loginState === LoginState.Code && (
           <div className="step-container bg-secondary">
-            <p className="text-secondary-content">{t("LoginPage.codeSent", { email: email })}</p>
+            <p className="text-secondary-content">{t('LoginPage.codeSent', { email: email })}</p>
           </div>
         )}
         {loginState === LoginState.Processing && (
-          <div className="step-container bg-secondary text-secondary-content">{t("LoginPage.verifying")}</div>
+          <div className="step-container bg-secondary text-secondary-content">{t('LoginPage.verifying')}</div>
         )}
       </div>
-    </div>
+    </div>,
   );
 }
 
@@ -110,7 +99,7 @@ export default function LoginPage() {
   const { t } = useAppTranslation();
 
   return (
-    <Suspense fallback={<div className="text-secondary-content">{t("LoginPage.loading")}</div>}>
+    <Suspense fallback={<div className="text-secondary-content">{t('LoginPage.loading')}</div>}>
       <LoginForm />
     </Suspense>
   );

@@ -1,13 +1,5 @@
-import {
-  closestCenter,
-  DndContext,
-  MeasuringStrategy,
-  Modifier,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { closestCenter, DndContext, MeasuringStrategy, Modifier } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useEffect } from 'react';
 import SortableTask from './SortableTask';
 // import { useTaskContext } from '../../_contexts/TaskContext';
@@ -37,23 +29,11 @@ const preventScaleModifier: Modifier = ({ transform }) => {
   };
 };
 
-const TaskList: React.FC<TaskListProps> = ({
-  isEditMode,
-  onLongPress,
-  setIsEditMode,
-}) => {
+const TaskList: React.FC<TaskListProps> = ({ isEditMode, onLongPress, setIsEditMode }) => {
   const { t } = useAppTranslation();
 
-  const {
-    tasksByDate,
-    updateTask,
-    deleteTask,
-    setTasks,
-    currentDate,
-    setCurrentDate,
-    dayCapacity,
-    currentDayTasks,
-  } = useTasks();
+  const { tasksByDate, updateTask, deleteTask, setTasks, currentDate, setCurrentDate, dayCapacity, currentDayTasks } =
+    useTasks();
 
   const dndSensors = useDndSensors();
 
@@ -65,7 +45,6 @@ const TaskList: React.FC<TaskListProps> = ({
   useEffect(() => {
     ensureOneOngoingTask();
   }, []); // Empty dependency array means it only runs once on mount
-
 
   return (
     <DndContext
@@ -79,10 +58,7 @@ const TaskList: React.FC<TaskListProps> = ({
         },
       }}
     >
-      <SortableContext
-        items={currentDayTasks.map((t) => t._id)}
-        strategy={verticalListSortingStrategy}
-      >
+      <SortableContext items={currentDayTasks.map((t) => t._id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-4">
           {currentDayTasks.map((task) => (
             <SortableTask

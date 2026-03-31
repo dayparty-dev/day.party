@@ -75,7 +75,7 @@ export default function TaskManagement({
       scheduledAt: new Date(date), // Actualiza "scheduledAt" con la nueva fecha
     }));
     // setDate(currentDate);
-  }
+  };
 
   // Función para resetear el formulario
   const resetForm = () => {
@@ -89,10 +89,8 @@ export default function TaskManagement({
 
   // Función para cambiar el modo del formulario
   const switchFormMode = (mode: TaskFormAction) => {
-    if (formMode === mode)
-      mode = "NONE";
-    else
-      navTo("task-options");
+    if (formMode === mode) mode = 'NONE';
+    else navTo('task-options');
     setFormMode(mode);
   };
 
@@ -181,9 +179,7 @@ export default function TaskManagement({
               placeholder="Task title"
               className="input input-bordered input-sm mb-2"
               value={taskData.title}
-              onChange={(e) =>
-                setTaskData({ ...taskData, title: e.target.value })
-              }
+              onChange={(e) => setTaskData({ ...taskData, title: e.target.value })}
             />
             <input
               type="date"
@@ -196,8 +192,7 @@ export default function TaskManagement({
                 //   scheduledAt: new Date(e.target.value),
                 // });
                 // setCurrentDate(new Date(e.target.value));
-              }
-              }
+              }}
             />
             {/* <textarea
                             placeholder="Task description"
@@ -220,9 +215,7 @@ export default function TaskManagement({
                   })
                 }
               />
-              <span className="badge badge-neutral">
-                {taskData.duration} mins
-              </span>
+              <span className="badge badge-neutral">{taskData.duration} mins</span>
             </div>
           </>
         );
@@ -244,10 +237,14 @@ export default function TaskManagement({
   // Obtener título del formulario basado en el modo
   const getFormTitle = () => {
     switch (formMode) {
-      case 'CREATE': return 'Create Task';
-      case 'EDIT': return 'Edit Task';
-      case 'DELETE': return 'Delete Task';
-      case 'NONE': return '';
+      case 'CREATE':
+        return 'Create Task';
+      case 'EDIT':
+        return 'Edit Task';
+      case 'DELETE':
+        return 'Delete Task';
+      case 'NONE':
+        return '';
     }
   };
 
@@ -283,10 +280,7 @@ export default function TaskManagement({
         <div className="card bg-base-200 p-3">
           <h3 className="text-sm font-bold mb-2">{getFormTitle()}</h3>
           {renderFormFields()}
-          <button
-            className="btn btn-sm btn-success mt-2"
-            onClick={handleSubmit}
-          >
+          <button className="btn btn-sm btn-success mt-2" onClick={handleSubmit}>
             Submit
           </button>
         </div>
@@ -294,26 +288,21 @@ export default function TaskManagement({
       <section className={`collapse collapse-arrow border border-base-300`}>
         <input type="checkbox" defaultChecked={dayTasks.length > 0} />
 
-        <div className="collapse-title font-medium">
-          Tasks by Day
-        </div>
+        <div className="collapse-title font-medium">Tasks by Day</div>
         <div className="collapse-content flex flex-col gap-2 card bg-base-200 p-3">
           <DayNavigator />
-          {dayTasks.length > 0 &&
-            (<><button
-              className={`btn btn-sm btn-error`}
-              onClick={handleDeleteSelectedDayTasks}
-            >
-              <FaTrash /> Delete All Tasks
-            </button>
+          {dayTasks.length > 0 && (
+            <>
+              <button className={`btn btn-sm btn-error`} onClick={handleDeleteSelectedDayTasks}>
+                <FaTrash /> Delete All Tasks
+              </button>
               {dayTasks.map((task) => {
                 const isSelected = taskData && task._id === taskData._id; // Verifica si la tarea está seleccionada
 
                 return (
                   <div
                     key={task._id}
-                    className={`card p-4 shadow-md border ${isSelected ? 'bg-blue-100 border-blue-500' : 'bg-white'
-                      }`}
+                    className={`card p-4 shadow-md border ${isSelected ? 'bg-blue-100 border-blue-500' : 'bg-white'}`}
                     onClick={() => setTaskData(task)} // Establece la tarea seleccionada
                   >
                     {/* Título y botones */}
@@ -364,10 +353,10 @@ export default function TaskManagement({
                   </div>
                 );
               })}
-            </>)}
+            </>
+          )}
         </div>
       </section>
-
     </div>
   );
-};
+}

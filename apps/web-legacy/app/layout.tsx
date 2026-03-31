@@ -5,11 +5,7 @@ import LangBubble from './_components/LangBubble';
 import ThemeSwitcher from './_components/ThemeSwitcher';
 import './styles/global.css';
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>

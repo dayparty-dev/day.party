@@ -20,14 +20,7 @@ interface SortableTaskProps {
   onLongPress: () => void;
 }
 
-const SortableTask = ({
-  task,
-  isEditMode,
-  onDelete,
-  onStatusChange,
-  onResize,
-  onLongPress,
-}: SortableTaskProps) => {
+const SortableTask = ({ task, isEditMode, onDelete, onStatusChange, onResize, onLongPress }: SortableTaskProps) => {
   const { t } = useAppTranslation();
   // const updateTask = useTaskStore((state) => state.updateTask);
   const { updateTask } = useTasks();
@@ -36,14 +29,7 @@ const SortableTask = ({
   const [elapsed, setElapsed] = useState<number>(task.elapsed ?? 0);
   const [showEndModal, setShowEndModal] = useState(false);
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: task._id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task._id });
 
   const { getTagByKey } = useTags();
   const tag = task.tagKey ? getTagByKey(task.tagKey) : null;
@@ -62,7 +48,7 @@ const SortableTask = ({
     {
       threshold: 500,
       cancelOnMovement: true,
-    }
+    },
   );
 
   // TIMER para 'ongoing'
@@ -109,9 +95,7 @@ const SortableTask = ({
   }
 
   const style = {
-    transform: transform
-      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-      : undefined,
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     transition,
     position: 'relative',
     zIndex: isDragging ? 999 : 0,
@@ -127,10 +111,10 @@ const SortableTask = ({
     const x = e.clientX - bounding.left;
     if (x < bounding.width / 2) {
       // Mitad izquierda
-      setElapsed(prev => Math.max(0, prev - 60));
+      setElapsed((prev) => Math.max(0, prev - 60));
     } else {
       // Mitad derecha
-      setElapsed(prev => Math.min(prev + 60, task.duration * 60));
+      setElapsed((prev) => Math.min(prev + 60, task.duration * 60));
     }
   };
 
@@ -138,7 +122,7 @@ const SortableTask = ({
 
   const handleMouseDownLeft = () => {
     // Resta 1 minuto inmediatamente
-    setElapsed(prev => {
+    setElapsed((prev) => {
       const next = Math.max(0, prev - 60);
       updateTask(task._id, { elapsed: next });
       return next;
@@ -146,7 +130,7 @@ const SortableTask = ({
 
     // Empieza intervalo para seguir restando cada 300ms
     holdIntervalRef.current = setInterval(() => {
-      setElapsed(prev => {
+      setElapsed((prev) => {
         const next = Math.max(0, prev - 60);
         updateTask(task._id, { elapsed: next });
         return next;
@@ -162,14 +146,14 @@ const SortableTask = ({
   };
 
   const handleMouseDownRight = () => {
-    setElapsed(prev => {
+    setElapsed((prev) => {
       const next = Math.min(prev + 60, task.duration * 60);
       updateTask(task._id, { elapsed: next });
       return next;
     });
 
     holdIntervalRef.current = setInterval(() => {
-      setElapsed(prev => {
+      setElapsed((prev) => {
         const next = Math.min(prev + 60, task.duration * 60);
         updateTask(task._id, { elapsed: next });
         return next;
@@ -185,24 +169,24 @@ const SortableTask = ({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      data-is-dragging={isDragging}
-      className="relative"
-    >
+    <div ref={setNodeRef} style={style} {...attributes} data-is-dragging={isDragging} className="relative">
       <Resizable
-        size={{ width: '100%', height: BASE_HEIGHT + ((task.duration - 15) * 2) }}
+        size={{ width: '100%', height: BASE_HEIGHT + (task.duration - 15) * 2 }}
         enable={isEditMode ? { top: false, right: false, bottom: true, left: false } : {}}
         grid={[1, 30]}
         minHeight={BASE_HEIGHT + 30}
         onResize={(_e, _direction, _ref, d) => {
-          const newSize = Math.max(1, Math.round((BASE_HEIGHT + (task.duration - 15) * 2 + d.height - BASE_HEIGHT) / 30));
+          const newSize = Math.max(
+            1,
+            Math.round((BASE_HEIGHT + (task.duration - 15) * 2 + d.height - BASE_HEIGHT) / 30),
+          );
           setTempSize(newSize);
         }}
         onResizeStop={(_e, _direction, _ref, d) => {
-          const newSize = Math.max(1, Math.round((BASE_HEIGHT + (task.duration - 15) * 2 + d.height - BASE_HEIGHT) / 30));
+          const newSize = Math.max(
+            1,
+            Math.round((BASE_HEIGHT + (task.duration - 15) * 2 + d.height - BASE_HEIGHT) / 30),
+          );
           setTempSize(null);
           if (newSize !== task.size) {
             onResize(task._id, newSize);
@@ -210,12 +194,14 @@ const SortableTask = ({
         }}
       >
         {/* <div onDoubleClick={task.status === "ongoing" ? handleElapsedTime : undefined} className={`relative group task-content z-10 bg-base-100 h-full shadow-md rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}> */}
-        <div className={`relative group task-content z-10 bg-base-100 h-full shadow-md rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}>
+        <div
+          className={`relative group task-content z-10 bg-base-100 h-full shadow-md rounded-md border transition-shadow duration-200 hover:shadow-lg ${task.status === 'ongoing' ? 'border-2 border-green-500 bg-green-100' : 'border-b'}`}
+        >
           {/* Background progress bar */}
           {(task.status === 'ongoing' || task.status === 'paused') && (
             <div className="absolute top-0 left-0 w-full h-full rounded-md overflow-hidden z-0">
               <div
-                className={`h-full ${task.status === 'ongoing' ? "bg-green-300" : "bg-yellow-100"} transition-all duration-300 ease-linear pointer-events-none`}
+                className={`h-full ${task.status === 'ongoing' ? 'bg-green-300' : 'bg-yellow-100'} transition-all duration-300 ease-linear pointer-events-none`}
                 style={{
                   width: `${Math.min(100, (elapsed / (task.duration * 60)) * 100)}%`,
                 }}
@@ -224,7 +210,10 @@ const SortableTask = ({
           )}
 
           {/* Task content */}
-          <div className="flex flex-col gap-2 h-full p-4 z-10 relative" {...(isEditMode ? listeners : longPressBinding())}>
+          <div
+            className="flex flex-col gap-2 h-full p-4 z-10 relative"
+            {...(isEditMode ? listeners : longPressBinding())}
+          >
             <h3 className="text-lg font-semibold flex items-center gap-2 flex-wrap mix-blend-difference">
               {task.title}
               {task.tagKey ? (
@@ -249,7 +238,7 @@ const SortableTask = ({
               )}
             </h3>
             <p className="text-sm text-gray-500">
-              {`${t('task.duration', { minutes: task.duration ?? "" })} (${Math.floor(elapsed / 60)})`}
+              {`${t('task.duration', { minutes: task.duration ?? '' })} (${Math.floor(elapsed / 60)})`}
             </p>
 
             <div className="absolute right-1.5 bottom-1.5 flex justify-end items-center gap-2 mt-auto z-30">
@@ -277,7 +266,16 @@ const SortableTask = ({
                   onClick={() => onStatusChange(task._id, 'done')}
                   aria-label={t('task.markDone')}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </button>
@@ -286,7 +284,7 @@ const SortableTask = ({
           </div>
 
           {/* Time progress for Ongoing */}
-          {(isEditMode && task.status === 'ongoing') && (
+          {isEditMode && task.status === 'ongoing' && (
             <>
               <div
                 className="absolute top-0 left-0 h-full w-1/2 z-20 cursor-pointer"
@@ -296,7 +294,7 @@ const SortableTask = ({
                 onTouchStart={handleMouseDownLeft}
                 onTouchEnd={handleMouseUpLeft}
                 onDoubleClick={() => {
-                  setElapsed(prev => {
+                  setElapsed((prev) => {
                     const next = Math.max(0, prev - 60);
                     updateTask(task._id, { elapsed: next });
                     return next;
@@ -311,7 +309,7 @@ const SortableTask = ({
                 onTouchStart={handleMouseDownRight}
                 onTouchEnd={handleMouseUpRight}
                 onDoubleClick={() => {
-                  setElapsed(prev => {
+                  setElapsed((prev) => {
                     const next = Math.min(prev + 60, task.duration * 60);
                     updateTask(task._id, { elapsed: next });
                     return next;
@@ -348,12 +346,9 @@ const SortableTask = ({
         />
       )}
 
-      {showEndModal && <EndTaskModal
-        task={task}
-        setShowEndModal={setShowEndModal}
-        setElapsed={setElapsed}
-        elapsed={elapsed}
-      />}
+      {showEndModal && (
+        <EndTaskModal task={task} setShowEndModal={setShowEndModal} setElapsed={setElapsed} elapsed={elapsed} />
+      )}
     </div>
   );
 };

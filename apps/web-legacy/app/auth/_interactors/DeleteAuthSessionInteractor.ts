@@ -9,18 +9,12 @@ export interface DeleteAuthSessionInput {
 
 export type DeleteAuthSessionOutput = void;
 
-export class DeleteAuthSessionInteractor
-  implements Interactor<DeleteAuthSessionInput, DeleteAuthSessionOutput>
-{
+export class DeleteAuthSessionInteractor implements Interactor<DeleteAuthSessionInput, DeleteAuthSessionOutput> {
   private readonly COLLECTION_NAME = 'auth_sessions';
 
-  constructor(
-    private readonly authTokenService = new JsonWebTokenAuthTokenService()
-  ) {}
+  constructor(private readonly authTokenService = new JsonWebTokenAuthTokenService()) {}
 
-  public async interact(
-    input: DeleteAuthSessionInput
-  ): Promise<DeleteAuthSessionOutput> {
+  public async interact(input: DeleteAuthSessionInput): Promise<DeleteAuthSessionOutput> {
     const { token } = input;
 
     const authSession = await this.extractAuthSessionFromToken(token);
@@ -28,11 +22,8 @@ export class DeleteAuthSessionInteractor
     await this.deleteAuthSession(authSession);
   }
 
-  private async extractAuthSessionFromToken(
-    token: string
-  ): Promise<AuthSession> {
-    const { sessionId: authSessionId } =
-      await this.authTokenService.verifyToken({ token });
+  private async extractAuthSessionFromToken(token: string): Promise<AuthSession> {
+    const { sessionId: authSessionId } = await this.authTokenService.verifyToken({ token });
 
     const collection = await getCollection<AuthSession>(this.COLLECTION_NAME);
     const authSession = await collection.findOne({ _id: authSessionId });

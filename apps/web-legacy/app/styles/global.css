@@ -2,16 +2,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 @plugin "daisyui" {
-  themes: latte --default, coffee --prefersdark;
+  themes:
+    latte --default,
+    coffee --prefersdark;
 }
 
 /* Definición del tema claro */
 @plugin "daisyui/theme" {
-  name: "latte";
+  name: 'latte';
   default: false; /* Tema por defecto */
   prefersdark: false; /* No es el tema preferido para modo oscuro */
   color-scheme: light; /* Indica que es un tema claro */
-
 
   --color-base-100: oklch(94% 0.023 329.708);
   --color-base-200: oklch(91% 0.021 329.708);
@@ -40,12 +41,12 @@
   --size-field: 0.25rem;
   --border: 1px;
   --depth: 0;
-  --noise: 0;  
+  --noise: 0;
 }
 
 /* Definición del tema oscuro */
 @plugin "daisyui/theme" {
-  name: "coffee";
+  name: 'coffee';
   default: true; /* No es el tema por defecto */
   prefersdark: true; /* Es el tema preferido para modo oscuro */
   color-scheme: dark; /* Indica que es un tema oscuro */

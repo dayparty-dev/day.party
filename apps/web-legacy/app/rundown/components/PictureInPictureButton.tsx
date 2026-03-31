@@ -16,12 +16,7 @@ const PictureInPictureButton: React.FC<PictureInPictureButtonProps> = ({
   }
 
   return (
-    <button
-      className="pip-button"
-      onClick={onActivate}
-      disabled={isActive}
-      aria-label="Open Picture-in-Picture"
-    >
+    <button className="pip-button" onClick={onActivate} disabled={isActive} aria-label="Open Picture-in-Picture">
       <svg
         width="24"
         height="24"

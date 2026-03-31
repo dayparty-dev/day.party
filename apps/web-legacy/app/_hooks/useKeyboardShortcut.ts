@@ -1,29 +1,32 @@
 import { useCallback, useEffect } from 'react';
 
 const useKeyboardShortcut = (shortcut, callback) => {
-  const handleKeyPress = useCallback((event) => {
-    const isInput = event.target.tagName.match(/INPUT|TEXTAREA|SELECT/i);
-    
-    if (isInput) return;
+  const handleKeyPress = useCallback(
+    (event) => {
+      const isInput = event.target.tagName.match(/INPUT|TEXTAREA|SELECT/i);
 
-    const keys = shortcut.split('+').map(k => k.trim().toLowerCase());
-    const modifiers = {
-      ctrl: event.ctrlKey,
-      shift: event.shiftKey,
-      alt: event.altKey,
-      meta: event.metaKey
-    };
+      if (isInput) return;
 
-    const requiredKeys = keys.every(key => {
-      if (key in modifiers) return modifiers[key];
-      return event.key.toLowerCase() === key;
-    });
+      const keys = shortcut.split('+').map((k) => k.trim().toLowerCase());
+      const modifiers = {
+        ctrl: event.ctrlKey,
+        shift: event.shiftKey,
+        alt: event.altKey,
+        meta: event.metaKey,
+      };
 
-    if (requiredKeys) {
-      event.preventDefault();
-      callback();
-    }
-  }, [shortcut, callback]);
+      const requiredKeys = keys.every((key) => {
+        if (key in modifiers) return modifiers[key];
+        return event.key.toLowerCase() === key;
+      });
+
+      if (requiredKeys) {
+        event.preventDefault();
+        callback();
+      }
+    },
+    [shortcut, callback],
+  );
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);

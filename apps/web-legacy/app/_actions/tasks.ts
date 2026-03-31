@@ -91,16 +91,14 @@ export const syncTasksToServer = withAuth(async (ctx: AuthContext, clientTasks: 
 
   const tasksCollection = await getCollection<Task>('tasks');
 
-  const updates = clientTasks.filter(t => !t.deletedAt);
-  const deletions = clientTasks.filter(t => !!t.deletedAt);
+  const updates = clientTasks.filter((t) => !t.deletedAt);
+  const deletions = clientTasks.filter((t) => !!t.deletedAt);
 
-
-  
   console.log(`🛰️ Syncing tasks for user ${userId}`);
   console.log(`🟢 Tasks to upsert: ${updates.length}`);
   console.log(`❌ Tasks to delete: ${deletions.length}`);
 
-  const bulkOps = updates.map(task => {
+  const bulkOps = updates.map((task) => {
     const _id = task._id;
     return {
       updateOne: {
@@ -110,10 +108,10 @@ export const syncTasksToServer = withAuth(async (ctx: AuthContext, clientTasks: 
             ...task,
             userId,
             updatedAt: new Date(task.updatedAt ?? Date.now()),
-          }
+          },
         },
         upsert: true,
-      }
+      },
     };
   });
 
@@ -125,11 +123,11 @@ export const syncTasksToServer = withAuth(async (ctx: AuthContext, clientTasks: 
     } else {
       console.log('🔶 No tasks to upsert');
     }
-    
+
     console.log('🧮 Start deletions');
     if (deletions.length > 0) {
       // const idsToDelete = deletions.map(t => new ObjectId(t._id));
-      const idsToDelete = deletions.map(t => t._id);
+      const idsToDelete = deletions.map((t) => t._id);
       console.log(`🗑️ Deleting tasks with ids: ${idsToDelete.join(', ')}`);
       const deleteResult = await tasksCollection.deleteMany({ _id: { $in: idsToDelete }, userId });
       console.log(`🗑️ Deleted ${deleteResult.deletedCount} tasks`);
@@ -139,8 +137,6 @@ export const syncTasksToServer = withAuth(async (ctx: AuthContext, clientTasks: 
   } catch (err) {
     console.error('❌ Error during sync tasks:', err);
   }
-  
 
   return { success: true };
 });
-

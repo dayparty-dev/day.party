@@ -7,10 +7,7 @@ import { useState } from 'react';
 export default function DayNavigator() {
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const {
-    currentDate,
-    setCurrentDate,
-  } = useTasks();
+  const { currentDate, setCurrentDate } = useTasks();
 
   // Modificado para aceptar tanto número como Date
   const goToDay = (offsetOrDate: number | Date) => {
@@ -39,10 +36,7 @@ export default function DayNavigator() {
         <button className="btn btn-neutral" onClick={() => goToDay(-1)}>
           &larr;
         </button>
-        <h2
-          onClick={() => setShowCalendar(!showCalendar)}
-          style={{ cursor: 'pointer' }}
-        >
+        <h2 onClick={() => setShowCalendar(!showCalendar)} style={{ cursor: 'pointer' }}>
           {new Date(currentDate).toLocaleDateString('en-US', {
             weekday: 'long',
             month: 'long',
@@ -53,11 +47,7 @@ export default function DayNavigator() {
           &rarr;
         </button>
       </div>
-      {showCalendar && (
-        <Calendar
-          onSelectDate={handleCalendarSelect}
-        />
-      )}
+      {showCalendar && <Calendar onSelectDate={handleCalendarSelect} />}
     </div>
   );
 }

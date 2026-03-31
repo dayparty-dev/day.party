@@ -20,7 +20,10 @@ export class CreateAuthSessionInteractor implements Interactor<CreateAuthSession
   private readonly BASE_URL: string;
   private readonly COLLECTION_NAME = 'auth_sessions';
 
-  constructor(env = process.env, private readonly emailService: EmailService = getEmailService()) {
+  constructor(
+    env = process.env,
+    private readonly emailService: EmailService = getEmailService(),
+  ) {
     if (env.BASE_URL) {
       this.BASE_URL = env.BASE_URL;
     } else if (env.VERCEL_PROJECT_PRODUCTION_URL) {

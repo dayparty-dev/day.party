@@ -10,8 +10,7 @@ export interface useAuthGuardArgs {
 useAuthGuard.DEFAULT_REDIRECT_URL = '/auth/login';
 
 export function useAuthGuard(args: useAuthGuardArgs = {}) {
-  const { redirectUrl = useAuthGuard.DEFAULT_REDIRECT_URL, isLogin = false } =
-    args;
+  const { redirectUrl = useAuthGuard.DEFAULT_REDIRECT_URL, isLogin = false } = args;
   const router = useRouter();
 
   function authGuard(element: ReactElement) {

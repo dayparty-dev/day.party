@@ -11,9 +11,7 @@ interface CalendarProps {
 }
 
 function CustomDayCell(props: DayProps) {
-  const {
-    getTasksForDate,
-  } = useTasks();
+  const { getTasksForDate } = useTasks();
   const { day, modifiers } = props;
 
   // Only fetch tasks if the day has the 'withTasks' modifier
@@ -37,8 +35,7 @@ function CustomDayCell(props: DayProps) {
   // Prepare title attribute for days with tasks
   let titleAttr = '';
   if (tasksForDay.length > 0) {
-    titleAttr = `${tasksForDay.length} task${tasksForDay.length > 1 ? 's' : ''
-      }`;
+    titleAttr = `${tasksForDay.length} task${tasksForDay.length > 1 ? 's' : ''}`;
   }
 
   // Simplified rendering - just show the day number with the CSS dot indicator if there are tasks
@@ -49,29 +46,24 @@ function CustomDayCell(props: DayProps) {
   );
 }
 
-export default function Calendar({
-  onSelectDate,
-}: CalendarProps) {
+export default function Calendar({ onSelectDate }: CalendarProps) {
   const today = new Date();
-  const {
-    getDaysWithTasksInMonth,
-    currentDate,
-  } = useTasks();
+  const { getDaysWithTasksInMonth, currentDate } = useTasks();
 
   const [month, setMonth] = useState(today);
 
   // Get the days with tasks for the current month range (including prev/next month days)
   // This is memoized internally in the useTasks hook for better performance
-  console.log("daysWithTasks called for", month);
+  console.log('daysWithTasks called for', month);
   const daysWithTasks = getDaysWithTasksInMonth(month);
-  console.log("DAYS WITH TASKS", daysWithTasks);
+  console.log('DAYS WITH TASKS', daysWithTasks);
   // Create a memoized modifiers object that includes days with tasks
   const modifiers = useMemo(() => {
     const modifiersObj: Record<string, Date[]> = {
       today: [today],
       withTasks: daysWithTasks,
     };
-    console.log("MODIFIERS", modifiersObj);
+    console.log('MODIFIERS', modifiersObj);
     return modifiersObj;
   }, [today, daysWithTasks]);
 
@@ -109,11 +101,7 @@ export default function Calendar({
         className="custom-day-picker"
       />
       {shouldShowTodayButton && (
-        <button
-          className="today-button"
-          onClick={handleGoToToday}
-          aria-label="Go to today's date"
-        >
+        <button className="today-button" onClick={handleGoToToday} aria-label="Go to today's date">
           Today
         </button>
       )}

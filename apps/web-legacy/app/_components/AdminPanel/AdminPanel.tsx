@@ -33,28 +33,25 @@ export default function AdminPanel() {
     deleteAllDayTasks,
     getTasksForDate,
     syncTasks,
-    initialize
+    initialize,
   } = useTasks();
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const [visibleSections, setVisibleSections] = useState<string[]>([
-    'users',
-    'tasks',
-  ]);
+  const [visibleSections, setVisibleSections] = useState<string[]>(['users', 'tasks']);
   const [visibleActions, setVisibleOptions] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<MenuOption | null>(null);
 
   // Definir opciones del menú
   const menuOptions: MenuOption[] = [
-    { id: 'create-user', label: 'Create User', section: 'users', form: "CREATE" },
-    { id: 'edit-user', label: 'Edit User', section: 'users', form: "EDIT" },
-    { id: 'delete-user', label: 'Delete User', section: 'users', form: "DELETE" },
-    { id: 'switch-user', label: 'Switch User', section: 'users', form: "SWITCH" },
-    { id: 'create-task', label: 'Create Task', section: 'tasks', form: "CREATE" },
-    { id: 'edit-task', label: 'Edit Task', section: 'tasks', form: "EDIT" },
-    { id: 'delete-task', label: 'Delete Task', section: 'tasks', form: "DELETE" },
+    { id: 'create-user', label: 'Create User', section: 'users', form: 'CREATE' },
+    { id: 'edit-user', label: 'Edit User', section: 'users', form: 'EDIT' },
+    { id: 'delete-user', label: 'Delete User', section: 'users', form: 'DELETE' },
+    { id: 'switch-user', label: 'Switch User', section: 'users', form: 'SWITCH' },
+    { id: 'create-task', label: 'Create Task', section: 'tasks', form: 'CREATE' },
+    { id: 'edit-task', label: 'Edit Task', section: 'tasks', form: 'EDIT' },
+    { id: 'delete-task', label: 'Delete Task', section: 'tasks', form: 'DELETE' },
   ];
   // { id: 'delete-today', label: "Delete Today's Tasks", section: 'tasks' },
 
@@ -83,7 +80,6 @@ export default function AdminPanel() {
   //   });
   // }, [getTasksForDate, selectedDay]); // Añade selectedDay como dependencia
 
-
   // Filtrar opciones y secciones basadas en la búsqueda
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -98,8 +94,7 @@ export default function AdminPanel() {
     // Filtrar opciones visibles
     const filteredOptions = menuOptions.filter(
       (option) =>
-        option.label.toLowerCase().includes(lowerCaseQuery) ||
-        option.section.toLowerCase().includes(lowerCaseQuery)
+        option.label.toLowerCase().includes(lowerCaseQuery) || option.section.toLowerCase().includes(lowerCaseQuery),
     );
     setVisibleOptions(filteredOptions.map((option) => option.id));
 
@@ -157,10 +152,9 @@ export default function AdminPanel() {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <div
-        className={`bg-base-100 shadow-xl transition-all duration-300 ${isExpanded
-          ? 'w-96 h-[600px] rounded-box'
-          : 'w-10 h-10 rounded-full relative'
-          }`}
+        className={`bg-base-100 shadow-xl transition-all duration-300 ${
+          isExpanded ? 'w-96 h-[600px] rounded-box' : 'w-10 h-10 rounded-full relative'
+        }`}
       >
         {!isExpanded ? (
           <button
@@ -181,17 +175,9 @@ export default function AdminPanel() {
         )}
         {isExpanded && (
           <div className="p-4 h-full flex flex-col gap-4">
-            <button onClick={() => syncTasks()}>
-              🔁 Forzar sincronización
-            </button>
-            <button onClick={() => initialize()}>
-              🔁 Initialize
-            </button>
-            <SearchBar
-              onSearch={setSearchQuery}
-              menuOptions={menuOptions}
-              onOptionSelected={handleOptionSelected}
-            />
+            <button onClick={() => syncTasks()}>🔁 Forzar sincronización</button>
+            <button onClick={() => initialize()}>🔁 Initialize</button>
+            <SearchBar onSearch={setSearchQuery} menuOptions={menuOptions} onOptionSelected={handleOptionSelected} />
             <div className="flex-1 overflow-y-auto space-y-2">
               <Section
                 id="users"
@@ -201,7 +187,11 @@ export default function AdminPanel() {
                 isSelected={selectedSection === 'users'}
               >
                 <UserManagement
-                  selectedAction={selectedOption && selectedOption.section == "users" ? selectedOption.form as UserFormAction : "NONE"}
+                  selectedAction={
+                    selectedOption && selectedOption.section == 'users'
+                      ? (selectedOption.form as UserFormAction)
+                      : 'NONE'
+                  }
                   visibleActions={visibleActions}
                 />
               </Section>
@@ -215,7 +205,11 @@ export default function AdminPanel() {
                 <TaskManagement
                   dayTasks={currentDayTasks}
                   visibleActions={visibleActions}
-                  selectedAction={selectedOption && selectedOption.section == "tasks" ? selectedOption.form as TaskFormAction : "NONE"}
+                  selectedAction={
+                    selectedOption && selectedOption.section == 'tasks'
+                      ? (selectedOption.form as TaskFormAction)
+                      : 'NONE'
+                  }
                   onTaskCreated={handleTaskCreated}
                   onTaskUpdated={handleTaskUpdated}
                   deleteTask={handleDeleteTask}
@@ -228,20 +222,18 @@ export default function AdminPanel() {
               <div className="flex overflow-x-auto gap-2">
                 <a
                   href="#users"
-                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${!visibleSections.includes('users')
-                    ? 'opacity-50 cursor-not-allowed pointer-events-none'
-                    : ''
-                    }`}
+                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${
+                    !visibleSections.includes('users') ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
+                  }`}
                   onClick={() => handleSectionClick('users')}
                 >
                   <FaUser />
                 </a>
                 <a
                   href="#tasks"
-                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${!visibleSections.includes('tasks')
-                    ? 'opacity-50 cursor-not-allowed pointer-events-none'
-                    : ''
-                    }`}
+                  className={`btn btn-sm w-10 h-10 flex items-center justify-center rounded-full hover:border-info border ${
+                    !visibleSections.includes('tasks') ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
+                  }`}
                   onClick={() => handleSectionClick('tasks')}
                 >
                   <FaTasks />

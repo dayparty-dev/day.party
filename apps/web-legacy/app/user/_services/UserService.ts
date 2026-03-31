@@ -11,15 +11,11 @@ export class UserService {
 
     const regex = new RegExp(searchQuery, 'i');
     const query = {
-      $or: [
-        { email: regex },
-        { username: regex },
-        { _id: regex },
-      ],
+      $or: [{ email: regex }, { username: regex }, { _id: regex }],
     };
 
     const users = await collection.find(query).toArray();
-    
+
     return users;
   }
 
@@ -29,18 +25,13 @@ export class UserService {
     return collection.findOne({ _id: id });
   }
 
-
   async findByEmail(email: string): Promise<User | null> {
     const collection = await getCollection<User>(this.COLLECTION_NAME);
 
     return collection.findOne({ email });
   }
 
-  async createUser(
-    email: string,
-    username: string,
-    role: UserRole = UserRole.Standard
-  ): Promise<User> { 
+  async createUser(email: string, username: string, role: UserRole = UserRole.Standard): Promise<User> {
     const collection = await getCollection<User>(this.COLLECTION_NAME);
 
     const now = new Date();
@@ -58,18 +49,20 @@ export class UserService {
     return user;
   }
 
-  async updateUserRole(
-    userId: string,
-    role: UserRole = UserRole.Standard
-  ): Promise<void> {
+  async updateUserRole(userId: string, role: UserRole = UserRole.Standard): Promise<void> {
     const collection = await getCollection<User>(this.COLLECTION_NAME);
 
     const now = new Date();
 
-    await collection.updateOne({ _id: userId }, { $set: {
-      role,
-      _updatedAt: now,
-    } });
+    await collection.updateOne(
+      { _id: userId },
+      {
+        $set: {
+          role,
+          _updatedAt: now,
+        },
+      },
+    );
   }
 }
 

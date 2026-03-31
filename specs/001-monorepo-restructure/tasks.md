@@ -107,7 +107,7 @@ Typed HTTP client for consuming the Hono API. Per contracts/packages.md `ApiClie
 
 **Independent Test**: `curl http://localhost:3001/api/health` returns 200
 
-- [ ] T046 [P] [US2] Create `apps/api/package.json` (`@dayparty/api`, deps: hono, @hono/node-server, all @dayparty/* packages) and `tsconfig.json`
+- [ ] T046 [P] [US2] Create `apps/api/package.json` (`@dayparty/api`, deps: hono, @hono/node-server, all @dayparty/\* packages) and `tsconfig.json`
 - [ ] T047 [US2] Create Hono app entry with health route (`GET /api/health`) → `apps/api/src/index.ts` (serves on port 3001 per quickstart.md)
 - [ ] T048 [US2] Implement JWT auth middleware (verify token, attach user context to Hono context) → `apps/api/src/middleware/auth.ts`
 - [ ] T049 [US2] Implement `AuthTokenService` concretely using jsonwebtoken (sign + verify per research.md D7) → `apps/api/src/services/jwt-auth-token-service.ts`

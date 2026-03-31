@@ -37,7 +37,7 @@ function LoginForm() {
         <input type="email" name="email" />
         <button type="submit">Send login link</button>
       </form>
-    </div>
+    </div>,
   );
 }
 

@@ -72,6 +72,6 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'day.party.auth',
-    }
-  )
+    },
+  ),
 );

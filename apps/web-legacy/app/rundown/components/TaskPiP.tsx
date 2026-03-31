@@ -7,22 +7,13 @@ interface TaskPiPProps {
   onFinish?: () => Promise<void>;
 }
 
-export default function TaskPiP({
-  currentTask,
-  nextTask,
-  onStatusChange,
-  onFinish,
-}: TaskPiPProps) {
+export default function TaskPiP({ currentTask, nextTask, onStatusChange, onFinish }: TaskPiPProps) {
   return (
     <div className="pip-container">
       {currentTask && (
         <div className="current-task">
           <h3>Current Task</h3>
-          <div
-            className="task-info"
-            data-task-id={currentTask._id}
-            data-status={currentTask.status}
-          >
+          <div className="task-info" data-task-id={currentTask._id} data-status={currentTask.status}>
             <h4>{currentTask.title}</h4>
             <p>{currentTask.size * 15} mins</p>
             {onStatusChange && (
@@ -30,8 +21,7 @@ export default function TaskPiP({
                 <button
                   className={`status ${currentTask.status}`}
                   onClick={() => {
-                    const nextStatus: TaskStatus =
-                      currentTask.status === 'ongoing' ? 'paused' : 'ongoing';
+                    const nextStatus: TaskStatus = currentTask.status === 'ongoing' ? 'paused' : 'ongoing';
                     onStatusChange(currentTask._id, nextStatus);
                   }}
                   aria-pressed={currentTask.status === 'ongoing'}
@@ -40,11 +30,7 @@ export default function TaskPiP({
                   {currentTask.status}
                 </button>
                 {currentTask.status !== 'done' && (
-                  <button
-                    className="finish-btn"
-                    onClick={onFinish}
-                    aria-label="Mark task as done"
-                  >
+                  <button className="finish-btn" onClick={onFinish} aria-label="Mark task as done">
                     <svg
                       width="14"
                       height="14"

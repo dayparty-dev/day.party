@@ -93,13 +93,12 @@ const TagPopoverEditor: React.FC<TagPopoverEditorProps> = ({
 
   return (
     // <div ref={ref} style={style} className="bg-white border rounded shadow-lg">
-    <div ref={popoverRef} className="absolute bg-base-100 border shadow-lg rounded-2xl bottom-full max-w-[350px] md:max-w-[435px] lg:max-w-[600px]">
-      <div className='relative p-4'>
-
-        <TagSelector
-          selectedKey={selectedKey}
-          onSelect={handleSelect}
-        />
+    <div
+      ref={popoverRef}
+      className="absolute bg-base-100 border shadow-lg rounded-2xl bottom-full max-w-[350px] md:max-w-[435px] lg:max-w-[600px]"
+    >
+      <div className="relative p-4">
+        <TagSelector selectedKey={selectedKey} onSelect={handleSelect} />
 
         <button
           className="absolute btn btn-circle -top-1.5 right-0 h-auto bg-red-300 text-gray-500 hover:text-black"

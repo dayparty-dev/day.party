@@ -7,6 +7,4 @@ export interface EmailService {
 }
 
 export const getEmailService = () =>
-  process.env.EMAIL_RESEND_API_KEY !== undefined
-    ? new ResendEmailService()
-    : new FakeEmailService();
+  process.env.EMAIL_RESEND_API_KEY !== undefined ? new ResendEmailService() : new FakeEmailService();

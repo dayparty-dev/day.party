@@ -12,13 +12,9 @@ export default function DayCapacity() {
   //   totalMinutes,
   // } = useTaskContext();
 
-  const {
-    dayCapacity,
-    setDayCapacity,
-    totalMinutes,
-  } = useTasks();
+  const { dayCapacity, setDayCapacity, totalMinutes } = useTasks();
 
-  console.log("Total minutes:", totalMinutes);
+  console.log('Total minutes:', totalMinutes);
 
   const percentageUsed = (totalMinutes / (dayCapacity * 60)) * 100;
   const isOverCapacity = totalMinutes > dayCapacity * 60;
@@ -55,6 +51,5 @@ export default function DayCapacity() {
         </div>
       </div>
     </>
-
   );
 }

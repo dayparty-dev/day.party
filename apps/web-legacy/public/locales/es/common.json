@@ -31,7 +31,7 @@
     "verifying": "Verificando...",
     "loading": "Cargando..."
   },
-  "rundownPage":{
+  "rundownPage": {
     "done": "Hecho"
   },
   "taskForm": {
@@ -64,12 +64,12 @@
       "ongoing": "En curso",
       "paused": "Pausada",
       "done": "Completada"
-      },
-      "endTaskModal": {
+    },
+    "endTaskModal": {
       "finishedConfirm": "¿Has terminado esta tarea?",
-        "markDone": "Marcar como completada",
-        "customMinutes": "Añadir minutos personalizados",
-        "addMinutes": "Añadir {{count}} minutos"
+      "markDone": "Marcar como completada",
+      "customMinutes": "Añadir minutos personalizados",
+      "addMinutes": "Añadir {{count}} minutos"
     }
   }
 }

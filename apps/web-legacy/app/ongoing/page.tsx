@@ -28,12 +28,8 @@ const TaskPage: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   // const currentDayTasks = getTasksForDate(currentDate);
   // const [currentTask, setCurrentTask] = useState<Task | null>(null);
-  const [currentTask, setCurrentTask] = useState<Task | null>(
-    currentDayTasks.length >= 0 ? currentDayTasks[0] : null
-  );
-  const [nextTask, setNextTask] = useState<Task | null>(
-    currentDayTasks.length >= 1 ? currentDayTasks[1] : null
-  ); // La siguiente tarea
+  const [currentTask, setCurrentTask] = useState<Task | null>(currentDayTasks.length >= 0 ? currentDayTasks[0] : null);
+  const [nextTask, setNextTask] = useState<Task | null>(currentDayTasks.length >= 1 ? currentDayTasks[1] : null); // La siguiente tarea
 
   return (
     <div className="task-page">
@@ -42,21 +38,13 @@ const TaskPage: React.FC = () => {
           <TaskCard task={currentTask} />
           <TimeSlider
             task={currentTask}
-            onTaskResized={(value) =>
-              updateTask(currentTask._id, { duration: value })
-            }
-            onTaskCompleted={() =>
-              updateTask(currentTask._id, { status: 'done' })
-            }
+            onTaskResized={(value) => updateTask(currentTask._id, { duration: value })}
+            onTaskCompleted={() => updateTask(currentTask._id, { status: 'done' })}
           />
           {/* <FeedbackForm onSubmitFeedback={handleFeedback} /> */}
         </div>
       )}
-      {nextTask ? (
-        <UpcomingTask task={nextTask} />
-      ) : (
-        currentTask && <p>No more task for today 😊</p>
-      )}
+      {nextTask ? <UpcomingTask task={nextTask} /> : currentTask && <p>No more task for today 😊</p>}
       {/* <ToastContainer /> */}
     </div>
   );

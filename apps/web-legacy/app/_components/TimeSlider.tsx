@@ -6,22 +6,14 @@ interface TimeSliderProps {
   onTaskCompleted: () => void;
 }
 
-const TimeSlider: React.FC<TimeSliderProps> = ({
-  task,
-  onTaskResized,
-  onTaskCompleted,
-}) => {
+const TimeSlider: React.FC<TimeSliderProps> = ({ task, onTaskResized, onTaskCompleted }) => {
   const now = new Date();
-  const dueDate = new Date(
-    new Date(task.scheduledAt).getTime() + task.size * 15 * 60 * 1000
-  );
+  const dueDate = new Date(new Date(task.scheduledAt).getTime() + task.size * 15 * 60 * 1000);
   const duration = task.size * 15 * 60 * 1000; // Duración en ms (35 min por defecto)
 
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [isAdjusting, setIsAdjusting] = useState<boolean>(false);
-  const [timeLeft, setTimeLeft] = useState<number>(
-    Math.max(0, Math.floor((dueDate.getTime() - now.getTime()) / 1000))
-  );
+  const [timeLeft, setTimeLeft] = useState<number>(Math.max(0, Math.floor((dueDate.getTime() - now.getTime()) / 1000)));
 
   // Función para calcular el tiempo restante
   const calculateRemainingTime = useCallback(() => {
@@ -66,7 +58,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
       const newRemainingTime = (value / 100) * duration;
       setTimeLeft(newRemainingTime);
     },
-    [duration]
+    [duration],
   );
 
   // Finalizar ajuste: guardar o revertir cambios
@@ -80,9 +72,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
     }
 
     const newDuration = Date.now() + timeLeft;
-    const userConfirmed = window.confirm(
-      '¿Guardar cambios en la fecha de finalización?'
-    );
+    const userConfirmed = window.confirm('¿Guardar cambios en la fecha de finalización?');
     if (userConfirmed) {
       onTaskResized(newDuration);
     } else {
@@ -104,9 +94,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
     <div className="time-slider">
       {timeLeft > 0 ? (
         <>
-          <div className="time-left">
-            Tiempo restante: {formatTimeLeft(timeLeft)}
-          </div>
+          <div className="time-left">Tiempo restante: {formatTimeLeft(timeLeft)}</div>
           <input
             type="range"
             min="0"
@@ -119,9 +107,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
         </>
       ) : (
         <>
-          <div className="time-left">
-            Tiempo total: {formatTimeLeft(totalDuration)}
-          </div>
+          <div className="time-left">Tiempo total: {formatTimeLeft(totalDuration)}</div>
           <input type="range" min="0" max="100" value={0} disabled />
         </>
       )}

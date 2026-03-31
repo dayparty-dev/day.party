@@ -12,13 +12,7 @@ const timeOptions = [
 
 const TaskForm: React.FC = () => {
   const { t } = useAppTranslation();
-  const {
-    addTask,
-    currentDate,
-    setCurrentDate,
-    dayCapacity,
-    totalMinutes,
-  } = useTasks();
+  const { addTask, currentDate, setCurrentDate, dayCapacity, totalMinutes } = useTasks();
   const [selectedTagKey, setSelectedTagKey] = useState<string | null>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const sizeRef = useRef<HTMLSelectElement>(null);
@@ -33,11 +27,9 @@ const TaskForm: React.FC = () => {
 
       if (!title) return;
 
-      console.log("selectedTagKey", selectedTagKey);
+      console.log('selectedTagKey', selectedTagKey);
       if (totalMinutes + newTaskMinutes > dayCapacity * 60) {
-        if (
-          confirm('This will exceed your daily capacity. Move to next day?')
-        ) {
+        if (confirm('This will exceed your daily capacity. Move to next day?')) {
           const nextDay = new Date(currentDate);
           nextDay.setDate(nextDay.getDate() + 1);
           addTask({ title, size, scheduledAt: nextDay, tagKey: selectedTagKey });
@@ -51,7 +43,7 @@ const TaskForm: React.FC = () => {
       if (sizeRef.current) sizeRef.current.value = '1';
       // setSelectedTagKey(null);
     },
-    [addTask, currentDate, totalMinutes, dayCapacity, selectedTagKey, setCurrentDate]
+    [addTask, currentDate, totalMinutes, dayCapacity, selectedTagKey, setCurrentDate],
   );
 
   const handleTagSelect = (key: string | null) => {
@@ -69,11 +61,7 @@ const TaskForm: React.FC = () => {
           className="input input-bordered w-3/5 sm:w-full"
         />
 
-        <select
-          ref={sizeRef}
-          defaultValue="1"
-          className="select select-bordered w-2/5 sm:w-auto"
-        >
+        <select ref={sizeRef} defaultValue="1" className="select select-bordered w-2/5 sm:w-auto">
           {timeOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

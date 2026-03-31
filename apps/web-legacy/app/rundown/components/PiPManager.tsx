@@ -10,13 +10,7 @@ interface PiPManagerProps {
   onFinish: () => Promise<void>;
 }
 
-const PiPManager: React.FC<PiPManagerProps> = ({
-  isPiPActive,
-  currentTask,
-  nextTask,
-  onStatusChange,
-  onFinish,
-}) => {
+const PiPManager: React.FC<PiPManagerProps> = ({ isPiPActive, currentTask, nextTask, onStatusChange, onFinish }) => {
   const pipContainerRef = useRef<HTMLDivElement>(null);
 
   if (isPiPActive) {
@@ -25,12 +19,7 @@ const PiPManager: React.FC<PiPManagerProps> = ({
 
   return (
     <div ref={pipContainerRef} className="pip-source-container">
-      <TaskPiP
-        currentTask={currentTask}
-        nextTask={nextTask}
-        onStatusChange={onStatusChange}
-        onFinish={onFinish}
-      />
+      <TaskPiP currentTask={currentTask} nextTask={nextTask} onStatusChange={onStatusChange} onFinish={onFinish} />
     </div>
   );
 };

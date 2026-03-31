@@ -24,7 +24,7 @@ export default function Rundown() {
   return authGuard(
     // <TaskProvider>
     <div className={`rundown ${isEditMode ? 'edit-mode' : ''} min-h-screen`}>
-      <div className='w-full h-full sm:w-3/5 p-4 sm:p-0 mx-auto flex flex-col gap-4'>
+      <div className="w-full h-full sm:w-3/5 p-4 sm:p-0 mx-auto flex flex-col gap-4">
         {isEditMode && (
           // <TaskForm
           //   newTaskTitle={newTaskTitle}
@@ -38,20 +38,18 @@ export default function Rundown() {
         <DayNavigator />
         <DayCapacity />
 
-        <TaskList
-          isEditMode={isEditMode}
-          onLongPress={() => setIsEditMode(true)}
-          setIsEditMode={setIsEditMode}
-        />
+        <TaskList isEditMode={isEditMode} onLongPress={() => setIsEditMode(true)} setIsEditMode={setIsEditMode} />
 
         {isEditMode && (
-          <button className="btn btn-primary fixed bottom-2.5 left-1/2 -translate-x-1/2 rounded-2xl z-50 active:!-translate-x-1/2" onClick={() => setIsEditMode(false)}>
-            {t("rundownPage.done")}
+          <button
+            className="btn btn-primary fixed bottom-2.5 left-1/2 -translate-x-1/2 rounded-2xl z-50 active:!-translate-x-1/2"
+            onClick={() => setIsEditMode(false)}
+          >
+            {t('rundownPage.done')}
           </button>
         )}
       </div>
-
-    </div>
+    </div>,
     // </TaskProvider>
   );
 }

@@ -122,17 +122,20 @@ export const useTaskStore = create<State & Actions>()(
             console.log('☁️ Cloud tasks:', cloudTasks);
 
             if (cloudTasks?.length) {
-              const grouped = cloudTasks.reduce((acc, task) => {
-                const dateKey = getDateKey(new Date(task.scheduledAt));
-                acc[dateKey] = acc[dateKey] || [];
-                acc[dateKey].push({
-                  ...task,
-                  isSynced: true,
-                  isDirty: false,
-                  lastSyncedAt: new Date(),
-                });
-                return acc;
-              }, {} as Record<string, Task[]>);
+              const grouped = cloudTasks.reduce(
+                (acc, task) => {
+                  const dateKey = getDateKey(new Date(task.scheduledAt));
+                  acc[dateKey] = acc[dateKey] || [];
+                  acc[dateKey].push({
+                    ...task,
+                    isSynced: true,
+                    isDirty: false,
+                    lastSyncedAt: new Date(),
+                  });
+                  return acc;
+                },
+                {} as Record<string, Task[]>,
+              );
 
               for (const dateTasks of Object.values(grouped)) {
                 dateTasks.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
