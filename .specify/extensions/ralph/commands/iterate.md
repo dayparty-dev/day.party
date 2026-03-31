@@ -1,5 +1,5 @@
 ---
-description: "Execute a single Ralph loop iteration - complete one work unit from tasks.md with proper commits and progress tracking"
+description: 'Execute a single Ralph loop iteration - complete one work unit from tasks.md with proper commits and progress tracking'
 ---
 
 ## User Input
@@ -55,10 +55,18 @@ You **MUST** consider the user input before proceeding (if not empty).
 
      ```sh
      git add -A
-     git commit -m "feat(<feature-name>): <user story title>"
+       git commit \
+          -m "<emoji> (<scope>): <description lowercase>" \
+          -m "<optional body with concise details when relevant>"
      ```
 
-   - Example: `git commit -m "feat(001-ralph-loop-implement): US-001 Initialize Ralph Command"`
+   - Follow the repository commit convention in `.vscode/settings.json`
+   - Use a gitmoji message in the format `<emoji> (<scope>): <description lowercase>`
+   - Choose the emoji that matches the change type and use a narrow scope based on the package or area changed
+   - For non-trivial changes, add a body after a blank line summarizing the key changes, rationale, and important validation; omit the body for trivial changes
+   - Keep the body concise and factual, preferably 2-5 short lines or bullets
+   - Example: `git commit -m "🦺 (validation): add zod schemas and validation package" -m "- add task, user, and tag schemas\n- expose zod error helpers\n- run pnpm lint and pnpm test"`
+   - Do not use Conventional Commit prefixes like `feat(...)` or capitalize the description
    - If only partial progress, NO commit -- let the next iteration continue
 
 6. **Update progress log**:
@@ -117,10 +125,10 @@ Follow the patterns established in the codebase:
 
 ## Error Handling
 
-| Condition | Expected Behavior |
-| --------- | ----------------- |
-| User story unclear | Ask for clarification in progress entry, mark tasks as blocked |
-| Tests fail | Report failure, do not mark task complete, no commit |
+| Condition             | Expected Behavior                                                              |
+| --------------------- | ------------------------------------------------------------------------------ |
+| User story unclear    | Ask for clarification in progress entry, mark tasks as blocked                 |
+| Tests fail            | Report failure, do not mark task complete, no commit                           |
 | Cannot complete story | Report partial progress, commit only if all completed tasks form coherent unit |
-| All tasks done | Commit final story, output `<promise>COMPLETE</promise>` |
-| Dependencies missing | Note in progress file, skip to next available task |
+| All tasks done        | Commit final story, output `<promise>COMPLETE</promise>`                       |
+| Dependencies missing  | Note in progress file, skip to next available task                             |
