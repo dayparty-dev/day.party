@@ -10,6 +10,10 @@ function sessionExpiryIso(): string {
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
 }
 
+function trimTrailingSlash(url: string): string {
+  return url.replace(/\/$/, '');
+}
+
 export function createAuthRoutes(env: ApiEnv) {
   const auth = new Hono<{ Variables: ApiVariables }>();
   const requireAuth = createAuthMiddleware(env);
@@ -26,9 +30,12 @@ export function createAuthRoutes(env: ApiEnv) {
       return c.json(fromZodError(parsed.error), 422);
     }
     const magicToken = mintMagicLinkToken(parsed.data.email);
-    const apiBase = process.env.API_PUBLIC_URL?.replace(/\/$/, '') ?? 'http://localhost:3001';
+    const apiBase = trimTrailingSlash(process.env.API_PUBLIC_URL ?? 'http://localhost:3001');
+    const webBase = trimTrailingSlash(process.env.WEB_PUBLIC_URL ?? 'http://localhost:5173');
     const verifyUrl = `${apiBase}/api/auth/verify?token=${encodeURIComponent(magicToken)}`;
-    console.info(`[auth] Magic link for ${parsed.data.email}: ${verifyUrl}`);
+    const webUrl = `${webBase}/login?token=${encodeURIComponent(magicToken)}`;
+    console.info(`[auth] Magic link for ${parsed.data.email}: ${webUrl}`);
+    console.info(`[auth] API verify URL (debug): ${verifyUrl}`);
     return c.json({ message: 'Magic link sent' });
   });
 

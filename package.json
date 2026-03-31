@@ -5,13 +5,12 @@
   "description": "day.party monorepo",
   "scripts": {
     "build": "turbo run build --filter=!@dayparty/web-legacy",
-    "build:legacy": "turbo run build --filter=@dayparty/web-legacy",
-    "test": "turbo test",
-    "lint": "turbo lint",
-    "dev": "turbo dev",
+    "test": "turbo test --filter=!@dayparty/web-legacy",
+    "lint": "turbo lint --filter=!@dayparty/web-legacy",
+    "dev": "turbo dev --filter=!@dayparty/web-legacy",
     "db:up": "docker compose up -d mongodb",
     "db:seed": "pnpm --filter @dayparty/api build && pnpm --filter @dayparty/api seed",
-    "clean": "turbo clean",
+    "clean": "turbo clean --filter=!@dayparty/web-legacy",
     "format": "prettier --write .",
     "prepare": "husky"
   },

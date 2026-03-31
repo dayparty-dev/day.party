@@ -1,12 +1,13 @@
 import { ObjectId, type Db, type Collection } from 'mongodb';
 import type { Task } from '@dayparty/core';
 import type { TaskRepository } from '@dayparty/domain';
+import { bsonIdToString } from '../bson-id';
 
 type TaskDoc = Omit<Task, 'id'> & { _id: ObjectId };
 
 function docToTask(doc: TaskDoc): Task {
   const { _id, ...rest } = doc;
-  return { id: _id.toHexString(), ...rest };
+  return { id: bsonIdToString(_id), ...rest };
 }
 
 export class MongoTaskRepository implements TaskRepository {

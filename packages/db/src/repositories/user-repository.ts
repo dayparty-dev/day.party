@@ -1,12 +1,14 @@
 import { ObjectId, type Db, type Collection } from 'mongodb';
 import type { User } from '@dayparty/core';
 import type { UserRepository } from '@dayparty/domain';
+import { bsonIdToString } from '../bson-id';
 
 type UserDoc = Omit<User, 'id'> & { _id: ObjectId };
 
 function docToUser(doc: UserDoc): User {
   const { _id, ...rest } = doc;
-  return { id: _id.toHexString(), ...rest };
+  const role = rest.role === 'admin' || rest.role === 'user' ? rest.role : 'user';
+  return { id: bsonIdToString(_id), ...rest, role };
 }
 
 export class MongoUserRepository implements UserRepository {
@@ -17,8 +19,8 @@ export class MongoUserRepository implements UserRepository {
   }
 
   async findById(id: string): Promise<User | null> {
-    if (!ObjectId.isValid(id)) return null;
-    const doc = await this.collection.findOne({ _id: new ObjectId(id) });
+    const query = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { _id: id };
+    const doc = await this.collection.findOne(query as never);
     return doc ? docToUser(doc) : null;
   }
 

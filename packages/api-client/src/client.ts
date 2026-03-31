@@ -50,7 +50,7 @@ export class DayPartyClient {
 
   constructor(options: ClientOptions) {
     this.baseUrl = options.baseUrl.replace(/\/$/, '');
-    this.fetchImpl = options.fetchImpl ?? globalThis.fetch;
+    this.fetchImpl = options.fetchImpl ?? globalThis.fetch.bind(globalThis);
     this.token = options.token ?? null;
   }
 
@@ -305,9 +305,7 @@ function parseAuthUser(input: unknown): AuthUser | null {
     return null;
   }
 
-  if (input.role !== 'user' && input.role !== 'admin') {
-    return null;
-  }
+  const role = input.role === 'admin' || input.role === 'user' ? input.role : 'user';
 
   const displayName = typeof input.displayName === 'string' ? input.displayName : undefined;
 
@@ -315,7 +313,7 @@ function parseAuthUser(input: unknown): AuthUser | null {
     id: input.id,
     email: input.email,
     displayName,
-    role: input.role,
+    role,
   };
 }
 

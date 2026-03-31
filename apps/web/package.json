@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Minimal React web client for day.party",
   "scripts": {
-    "build": "vite build",
+    "build": "pnpm run typecheck && vite build",
     "dev": "vite",
     "lint": "eslint src",
     "preview": "vite preview",

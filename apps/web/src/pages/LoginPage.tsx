@@ -130,7 +130,10 @@ export function LoginPage(): ReactElement {
       {status ? <p className={styles.ok}>{status}</p> : null}
       {error ? <p className={styles.err}>{error}</p> : null}
 
-      <p className={styles.hint}>After tapping the link in your email, you’ll land here and we’ll open your rundown.</p>
+      <p className={styles.hint}>
+        Local dev note: no real email is sent. Use the magic link printed in the API logs; opening it here should sign
+        you in and redirect to your rundown.
+      </p>
     </div>
   );
 }

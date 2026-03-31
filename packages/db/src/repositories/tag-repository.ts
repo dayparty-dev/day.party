@@ -2,12 +2,13 @@ import { ObjectId, type Db, type Collection } from 'mongodb';
 import type { Tag } from '@dayparty/core';
 import { DEFAULT_TAGS } from '@dayparty/core';
 import type { TagRepository } from '@dayparty/domain';
+import { bsonIdToString } from '../bson-id';
 
 type TagDoc = Omit<Tag, 'id'> & { _id: ObjectId };
 
 function docToTag(doc: TagDoc): Tag {
   const { _id, ...rest } = doc;
-  return { id: _id.toHexString(), ...rest };
+  return { id: bsonIdToString(_id), ...rest };
 }
 
 export class MongoTagRepository implements TagRepository {

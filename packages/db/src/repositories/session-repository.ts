@@ -1,12 +1,13 @@
 import { ObjectId, type Db, type Collection } from 'mongodb';
 import type { Session } from '@dayparty/core';
 import type { SessionRepository } from '@dayparty/domain';
+import { bsonIdToString } from '../bson-id';
 
 type SessionDoc = Omit<Session, 'id'> & { _id: ObjectId };
 
 function docToSession(doc: SessionDoc): Session {
   const { _id, ...rest } = doc;
-  return { id: _id.toHexString(), ...rest };
+  return { id: bsonIdToString(_id), ...rest };
 }
 
 export class MongoSessionRepository implements SessionRepository {
