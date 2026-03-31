@@ -49,12 +49,12 @@
 
 ### Validation Package
 
-- [ ] T016 Initialize `packages/validation/` package with `package.json` (`name: @dayparty/validation`, depends on `@dayparty/core`), `tsconfig.json`, and `src/index.ts` barrel
-- [ ] T017 [P] Create task Zod schemas in `packages/validation/src/schemas/task.ts` — createTaskSchema, updateTaskSchema, reorderTasksSchema per data-model.md validation rules and contracts/rest-api.md request shapes
-- [ ] T018 [P] Create user Zod schema in `packages/validation/src/schemas/user.ts` — loginSchema (email validation) per contracts/rest-api.md
-- [ ] T019 [P] Create tag Zod schemas in `packages/validation/src/schemas/tag.ts` — createTagSchema, updateTagSchema per data-model.md validation rules and contracts/rest-api.md
-- [ ] T020 [P] Create error utilities in `packages/validation/src/errors.ts` — `createApiError()`, `fromZodError()` mapping Zod issues to the ApiError shape with field-level detail per data-model.md error model
-- [ ] T021 Export all schemas and error utilities from `packages/validation/src/index.ts` barrel
+- [x] T016 Initialize `packages/validation/` package with `package.json` (`name: @dayparty/validation`, depends on `@dayparty/core`), `tsconfig.json`, and `src/index.ts` barrel
+- [x] T017 [P] Create task Zod schemas in `packages/validation/src/schemas/task.ts` — createTaskSchema, updateTaskSchema, reorderTasksSchema per data-model.md validation rules and contracts/rest-api.md request shapes
+- [x] T018 [P] Create user Zod schema in `packages/validation/src/schemas/user.ts` — loginSchema (email validation) per contracts/rest-api.md
+- [x] T019 [P] Create tag Zod schemas in `packages/validation/src/schemas/tag.ts` — createTagSchema, updateTagSchema per data-model.md validation rules and contracts/rest-api.md
+- [x] T020 [P] Create error utilities in `packages/validation/src/errors.ts` — `createApiError()`, `fromZodError()` mapping Zod issues to the ApiError shape with field-level detail per data-model.md error model
+- [x] T021 Export all schemas and error utilities from `packages/validation/src/index.ts` barrel
 
 ### Domain Package
 

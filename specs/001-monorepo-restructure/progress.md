@@ -48,3 +48,40 @@ Started: 2026-03-31 05:29:22
 - eslint-config uses JS (not TS) for flat config files since the package has no build step
 
 ---
+
+---
+
+## Iteration 2 - 2026-03-31
+
+**User Story**: Phase 2 — Core Package (T007-T015)
+**Tasks Completed**:
+
+- [x] T007: Initialized packages/core/ with package.json (@dayparty/core) and tsconfig.json
+- [x] T008: Task type (id, userId, title, size 1|2|3|4|5, tagKey?, isComplete, scheduledDate, position, createdAt, updatedAt)
+- [x] T009: User type (id, email, displayName?, role, createdAt, updatedAt)
+- [x] T010: Session type (id, userId, token, expiresAt, createdAt)
+- [x] T011: Tag type (id, userId, key, displayName, color?, icon?, isDefault, createdAt)
+- [x] T012: DayRundown type (date, userId, tasks, capacity, completed)
+- [x] T013: ApiError type (code, message, fields?)
+- [x] T014: Constants — SIZE_SCALE, DEFAULT_TAGS, ERROR_CODES with ErrorCode type
+- [x] T015: Barrel export in src/index.ts
+      **Tasks Remaining in Story**: None - Core Package complete
+      **Commit**: bba745b
+      **Files Changed**:
+- packages/core/package.json
+- packages/core/tsconfig.json
+- packages/core/src/index.ts
+- packages/core/src/models/task.ts
+- packages/core/src/models/user.ts
+- packages/core/src/models/session.ts
+- packages/core/src/models/tag.ts
+- packages/core/src/models/day-rundown.ts
+- packages/core/src/models/api-error.ts
+- packages/core/src/constants/index.ts
+- specs/001-monorepo-restructure/tasks.md
+  **Learnings**:
+- tsconfig extends with relative rootDir/outDir must be overridden in each local tsconfig.json — the inherited path resolves relative to the parent config file, not the extending one
+- dist/ files committed (no .gitignore exclusion for packages/core/dist); consider adding gitignore if desired
+- sed 's/T01.../T01.../' was too broad — use python3 for precise task checkbox replacements
+
+---

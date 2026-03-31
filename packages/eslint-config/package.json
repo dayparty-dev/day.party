@@ -2,6 +2,7 @@
   "name": "@dayparty/eslint-config",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "description": "Shared ESLint flat config for the day.party monorepo",
   "exports": {
     ".": "./index.js",

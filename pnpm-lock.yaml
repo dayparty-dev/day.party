@@ -155,6 +155,25 @@ importers:
 
   packages/typescript-config: {}
 
+  packages/validation:
+    dependencies:
+      '@dayparty/core':
+        specifier: workspace:*
+        version: link:../core
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+    devDependencies:
+      '@dayparty/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@dayparty/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.4.5
+        version: 5.7.2
+
 packages:
   '@alloc/quick-lru@5.2.0':
     resolution:
@@ -2021,6 +2040,10 @@ packages:
       { integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q== }
     engines: { node: '>=10' }
 
+  zod@3.25.76:
+    resolution:
+      { integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ== }
+
   zustand@5.0.12:
     resolution:
       { integrity: sha512-i77ae3aZq4dhMlRhJVCYgMLKuSiZAaUPAct2AksxQ+gOtimhGMdXljRT21P5BNpeT4kXlLIckvkPM029OljD7g== }
@@ -3426,6 +3449,8 @@ snapshots:
   yaml@2.8.3: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@3.25.76: {}
 
   zustand@5.0.12(@types/react@19.0.3)(react@19.2.4):
     optionalDependencies:

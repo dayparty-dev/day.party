@@ -5,6 +5,9 @@ import tsParser from '@typescript-eslint/parser';
 /** @type {import("eslint").Linter.Config[]} */
 const base = [
   {
+    ignores: ['**/*.d.ts', 'dist/**'],
+  },
+  {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parser: tsParser,

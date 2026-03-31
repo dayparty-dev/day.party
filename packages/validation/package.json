@@ -1,9 +1,9 @@
 {
-  "name": "@dayparty/core",
+  "name": "@dayparty/validation",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Shared types, models, and constants for day.party",
+  "description": "Zod schemas and error utilities for day.party",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -17,6 +17,10 @@
     "dev": "tsc --watch",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dayparty/core": "workspace:*",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@dayparty/eslint-config": "workspace:*",
