@@ -19,6 +19,27 @@ git clone <repo-url> && cd day.party
 pnpm install          # installs all packages + apps
 ```
 
+## Local database (Docker)
+
+```bash
+cp .env.example .env              # optional; API loads .env via dotenv
+docker compose up -d mongodb      # or: pnpm db:up
+```
+
+Connection defaults for this stack (root user, `authSource=admin`) are in `.env.example`. Optional browser UI:
+
+```bash
+docker compose --profile tools up -d   # mongo-express on http://localhost:8081 (basic auth admin/admin)
+```
+
+Seed a dev user (`dev@day.party`), default tags, and sample tasks for **today** (skips if tasks already exist for that date):
+
+```bash
+pnpm db:seed
+```
+
+Replace today’s sample tasks: `SEED_FORCE_TASKS=1 pnpm --filter @dayparty/api seed` (after `pnpm --filter @dayparty/api build` if needed).
+
 ## Build
 
 ```bash

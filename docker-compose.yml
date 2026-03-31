@@ -1,17 +1,54 @@
-version: '3.8'
+# Local MongoDB for day.party (matches @dayparty/api MONGODB_URI in .env.example).
+# Start: docker compose up -d
+# With optional UI: docker compose --profile tools up -d
 
 services:
   mongodb:
     image: mongo:6.0
-    container_name: mongodb
-    restart: always
+    container_name: dayparty-mongodb
+    restart: unless-stopped
     ports:
       - '27017:27017'
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=dayparty
-      - MONGO_INITDB_ROOT_PASSWORD=partyday
+      MONGO_INITDB_ROOT_USERNAME: dayparty
+      MONGO_INITDB_ROOT_PASSWORD: partyday
     volumes:
       - mongodb_data:/data/db
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mongosh',
+          '-u',
+          'dayparty',
+          '-p',
+          'partyday',
+          '--authenticationDatabase',
+          'admin',
+          '--quiet',
+          '--eval',
+          'db.adminCommand({ ping: 1 }).ok',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  mongo-express:
+    image: mongo-express:1.0.2-20
+    container_name: dayparty-mongo-express
+    restart: unless-stopped
+    profiles:
+      - tools
+    ports:
+      - '8081:8081'
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://dayparty:partyday@mongodb:27017/?authSource=admin
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    depends_on:
+      mongodb:
+        condition: service_healthy
 
 volumes:
   mongodb_data:

@@ -34,6 +34,8 @@ pnpm --filter @dayparty/mobile run ios       # iOS simulator
 pnpm --filter @dayparty/mobile run android   # Android emulator
 ```
 
+**API + MongoDB locally:** copy [.env.example](.env.example) to `.env`, run `pnpm db:up`, then `pnpm db:seed`, then start the API (`pnpm --filter @dayparty/api dev`). Details and mongo-express profile are in [quickstart.md](specs/001-monorepo-restructure/quickstart.md).
+
 Full step-by-step onboarding (flows, layout, filters): **[specs/001-monorepo-restructure/quickstart.md](specs/001-monorepo-restructure/quickstart.md)**.
 
 ## Project layout
