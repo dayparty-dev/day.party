@@ -449,7 +449,7 @@ Started: 2026-03-31 05:29:22
 
 **Tasks Remaining in Story**: None — Phase 8 complete
 
-**Commit**: 45b795a
+**Commit**: 1915a31
 
 **Files Changed**:
 
@@ -462,5 +462,6 @@ Started: 2026-03-31 05:29:22
 
 - Keep human “source of truth” for long prose in `specs/.../quickstart.md`; root README stays skimmable with a table + link
 - `CLAUDE.md` → `AGENTS.md`: one edit updates both agent entrypoints
+- The progress **Commit** line must record the **deliverable** commit, in a **follow-up** commit only (see iteration 12). Never try to put the current tip’s hash into the same commit that introduces that hash—the object id is a hash of the tree
 
 ---
