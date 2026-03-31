@@ -12,5 +12,8 @@
     "base.json",
     "library.json",
     "app.json"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "5.7.3"
+  }
 }

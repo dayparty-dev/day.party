@@ -1,5 +1,5 @@
 import type { Task } from '@dayparty/core';
-import type { TaskRepository } from '../interfaces/task-repository.js';
+import type { TaskRepository } from '../interfaces/task-repository';
 
 export function makeToggleTaskCompletionAction(taskRepo: TaskRepository) {
   return async (id: string): Promise<Task> => {

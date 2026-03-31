@@ -1,2 +1,2 @@
-export { DayPartyClient } from './client.js';
-export type { Result } from './client.js';
+export { DayPartyClient } from './client';
+export type { Result } from './client';

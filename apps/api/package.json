@@ -14,9 +14,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "node --watch dist/index.js",
-    "start": "node dist/index.js",
-    "seed": "node dist/seed.js",
+    "dev": "node --import extensionless/register --watch dist/index.js",
+    "start": "node --import extensionless/register dist/index.js",
+    "seed": "node --import extensionless/register dist/seed.js",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit"
   },
@@ -27,6 +27,7 @@
     "@dayparty/validation": "workspace:*",
     "@hono/node-server": "^1.13.0",
     "dotenv": "^17.3.1",
+    "extensionless": "^2.0.6",
     "hono": "^4.6.0",
     "zod": "^3.22.4"
   },
@@ -34,6 +35,6 @@
     "@dayparty/eslint-config": "workspace:*",
     "@dayparty/typescript-config": "workspace:*",
     "@types/node": "^20.14.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.7.3"
   }
 }

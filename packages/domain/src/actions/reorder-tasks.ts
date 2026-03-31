@@ -1,5 +1,5 @@
 import type { DayRundown } from '@dayparty/core';
-import type { TaskRepository } from '../interfaces/task-repository.js';
+import type { TaskRepository } from '../interfaces/task-repository';
 
 export function makeReorderTasksAction(taskRepo: TaskRepository) {
   return async (userId: string, date: string, taskIds: string[]): Promise<DayRundown> => {

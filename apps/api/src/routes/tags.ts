@@ -2,8 +2,8 @@ import type { Tag } from '@dayparty/core';
 import { ERROR_CODES } from '@dayparty/core';
 import { createApiError, createTagSchema, fromZodError, updateTagSchema } from '@dayparty/validation';
 import { Hono } from 'hono';
-import { createAuthMiddleware } from '../middleware/auth-middleware.js';
-import type { ApiEnv, ApiVariables } from '../types.js';
+import { createAuthMiddleware } from '../middleware/auth-middleware';
+import type { ApiEnv, ApiVariables } from '../types';
 
 function tagPublic(tag: Tag): Omit<Tag, 'userId'> {
   const { userId: _u, ...rest } = tag;

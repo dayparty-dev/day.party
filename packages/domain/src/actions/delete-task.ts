@@ -1,4 +1,4 @@
-import type { TaskRepository } from '../interfaces/task-repository.js';
+import type { TaskRepository } from '../interfaces/task-repository';
 
 export function makeDeleteTaskAction(taskRepo: TaskRepository) {
   return async (id: string): Promise<void> => {

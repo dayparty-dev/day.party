@@ -38,7 +38,7 @@ Human onboarding: `specs/001-monorepo-restructure/quickstart.md` (install, build
 - `pnpm test` - tests via Turbo (depends on `build`)
 - `pnpm lint` - lint across configured workspaces
 - `pnpm dev` - Turbo persistent dev tasks (API, web, etc. where defined)
-- `pnpm --filter @dayparty/api dev` - API only (e.g. http://localhost:3001)
+- `pnpm --filter @dayparty/api dev` - API only (e.g. http://localhost:3001); uses `node --import extensionless/register` so extensionless relative imports in emitted ESM resolve (see `@dayparty/api` scripts)
 - `pnpm --filter @dayparty/web dev` - web only (e.g. http://localhost:5173)
 - `pnpm --filter @dayparty/mobile run ios|android` - NativeScript targets
 - `pnpm --filter @dayparty/<package> test` - single-package tests

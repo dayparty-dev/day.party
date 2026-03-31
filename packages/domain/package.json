@@ -24,6 +24,6 @@
   "devDependencies": {
     "@dayparty/eslint-config": "workspace:*",
     "@dayparty/typescript-config": "workspace:*",
-    "typescript": "^5.4.5"
+    "typescript": "^5.7.3"
   }
 }

@@ -1,4 +1,4 @@
-import './load-env.js';
+import './load-env';
 import { serve } from '@hono/node-server';
 import {
   getDb,
@@ -14,7 +14,7 @@ import {
   makeReorderTasksAction,
   makeUpdateTaskAction,
 } from '@dayparty/domain';
-import { createApp } from './app.js';
+import { createApp } from './app';
 
 const MONGODB_URI = process.env.MONGODB_URI ?? 'mongodb://127.0.0.1:27017';
 const MONGODB_DB = process.env.MONGODB_DB ?? 'dayparty';

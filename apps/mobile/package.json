@@ -15,7 +15,7 @@
     "@nativescript/types": "~9.0.0",
     "@nativescript/webpack": "~5.0.25",
     "eslint": "^9.0.0",
-    "typescript": "~5.4.0"
+    "typescript": "~5.7.3"
   },
   "scripts": {
     "build": "tsc --noEmit",

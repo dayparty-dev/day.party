@@ -1,7 +1,7 @@
 import { fromZodError } from '@dayparty/validation';
 import { createMiddleware } from 'hono/factory';
 import type { z } from 'zod';
-import type { ApiVariables } from '../types.js';
+import type { ApiVariables } from '../types';
 
 /**
  * Validates JSON body with a Zod schema. On failure returns 422 with ApiError from fromZodError().

@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { registerErrorHandler } from './middleware/error-handler.js';
-import { createAuthRoutes } from './routes/auth.js';
-import { createTagRoutes } from './routes/tags.js';
-import { createTaskRoutes } from './routes/tasks.js';
-import type { ApiEnv, ApiVariables } from './types.js';
+import { registerErrorHandler } from './middleware/error-handler';
+import { createAuthRoutes } from './routes/auth';
+import { createTagRoutes } from './routes/tags';
+import { createTaskRoutes } from './routes/tasks';
+import type { ApiEnv, ApiVariables } from './types';
 
 function corsOrigins(): string[] {
   const raw = process.env.CORS_ORIGIN;

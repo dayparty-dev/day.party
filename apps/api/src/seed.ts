@@ -1,4 +1,4 @@
-import './load-env.js';
+import './load-env';
 import { closeDb, getDb, MongoTagRepository, MongoTaskRepository, MongoUserRepository } from '@dayparty/db';
 
 function todayLocal(): string {

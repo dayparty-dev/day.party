@@ -1,4 +1,4 @@
-import type { Tag } from '../models/tag.js';
+import type { Tag } from '../models/tag';
 
 export const SIZE_SCALE = [1, 2, 3, 4, 5] as const;
 

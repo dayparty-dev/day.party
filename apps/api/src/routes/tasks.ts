@@ -8,8 +8,8 @@ import {
   updateTaskSchema,
 } from '@dayparty/validation';
 import { Hono } from 'hono';
-import { createAuthMiddleware } from '../middleware/auth-middleware.js';
-import type { ApiEnv, ApiVariables } from '../types.js';
+import { createAuthMiddleware } from '../middleware/auth-middleware';
+import type { ApiEnv, ApiVariables } from '../types';
 
 function taskPublic(task: Task): Omit<Task, 'userId'> {
   const { userId: _u, ...rest } = task;

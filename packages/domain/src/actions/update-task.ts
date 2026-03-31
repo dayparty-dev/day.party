@@ -1,6 +1,6 @@
 import type { Task } from '@dayparty/core';
-import type { TaskRepository } from '../interfaces/task-repository.js';
-import type { TagRepository } from '../interfaces/tag-repository.js';
+import type { TaskRepository } from '../interfaces/task-repository';
+import type { TagRepository } from '../interfaces/tag-repository';
 
 export type UpdateTaskInput = Partial<{
   title: string;

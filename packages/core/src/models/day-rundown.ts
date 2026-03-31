@@ -1,4 +1,4 @@
-import type { Task } from './task.js';
+import type { Task } from './task';
 
 export interface DayRundown {
   date: string;

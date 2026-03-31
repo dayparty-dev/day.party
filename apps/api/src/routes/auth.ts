@@ -1,9 +1,9 @@
 import { ERROR_CODES } from '@dayparty/core';
 import { createApiError, fromZodError, loginSchema } from '@dayparty/validation';
 import { Hono } from 'hono';
-import { mintBearerToken, mintMagicLinkToken, parseMagicLinkToken } from '../magic-link.js';
-import { createAuthMiddleware } from '../middleware/auth-middleware.js';
-import type { ApiEnv, ApiVariables } from '../types.js';
+import { mintBearerToken, mintMagicLinkToken, parseMagicLinkToken } from '../magic-link';
+import { createAuthMiddleware } from '../middleware/auth-middleware';
+import type { ApiEnv, ApiVariables } from '../types';
 
 function sessionExpiryIso(): string {
   const days = 7;

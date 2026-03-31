@@ -5,7 +5,7 @@ import type { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import { ZodError } from 'zod';
-import type { ApiVariables } from '../types.js';
+import type { ApiVariables } from '../types';
 
 type ApiHono = Hono<{ Variables: ApiVariables }>;
 

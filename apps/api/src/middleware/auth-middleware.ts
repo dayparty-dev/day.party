@@ -1,7 +1,7 @@
 import { ERROR_CODES } from '@dayparty/core';
 import { createApiError } from '@dayparty/validation';
 import { createMiddleware } from 'hono/factory';
-import type { ApiEnv, ApiVariables } from '../types.js';
+import type { ApiEnv, ApiVariables } from '../types';
 
 export function createAuthMiddleware(env: ApiEnv) {
   return createMiddleware<{ Variables: ApiVariables }>(async (c, next) => {
