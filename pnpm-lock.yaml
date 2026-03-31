@@ -68,6 +68,9 @@ importers:
       '@nativescript/core':
         specifier: ~9.0.0
         version: 9.0.18
+      '@nativescript/secure-storage':
+        specifier: ^4.0.1
+        version: 4.0.1
       '@nativescript/theme':
         specifier: ^3.1.0
         version: 3.1.0
@@ -1004,6 +1007,10 @@ packages:
   '@nativescript/hook@3.0.5':
     resolution:
       { integrity: sha512-MzL7R/nPZU2qnvDWWuJ8RB7H3luEwANgFX/d/ILdg7bSYxl6uANCfzlueHnWgrQmBxu6dTkvPsFW2WNVUxlhUg== }
+
+  '@nativescript/secure-storage@4.0.1':
+    resolution:
+      { integrity: sha512-TY+ZoSTPJ5AcnoTTFAr1Hc2lqQ3R2JOlZ272pKcxXfxuD+2vBwlIsplqmhIMFAz6loPxi3SdcFGigt9aGTWrBA== }
 
   '@nativescript/theme@3.1.0':
     resolution:
@@ -5479,6 +5486,8 @@ snapshots:
 
   '@nativescript/hook@3.0.5': {}
 
+  '@nativescript/secure-storage@4.0.1': {}
+
   '@nativescript/theme@3.1.0': {}
 
   '@nativescript/types-android@9.0.0': {}
@@ -6213,17 +6222,17 @@ snapshots:
       '@webassemblyjs/ast': 1.14.1
       '@xtuc/long': 4.2.2
 
-  '@webpack-cli/configtest@3.0.1(webpack-cli@6.0.1(webpack-bundle-analyzer@4.10.2)(webpack@5.105.4))(webpack@5.105.4)':
+  '@webpack-cli/configtest@3.0.1(webpack-cli@6.0.1)(webpack@5.105.4)':
     dependencies:
       webpack: 5.105.4(webpack-cli@6.0.1)
       webpack-cli: 6.0.1(webpack-bundle-analyzer@4.10.2)(webpack@5.105.4)
 
-  '@webpack-cli/info@3.0.1(webpack-cli@6.0.1(webpack-bundle-analyzer@4.10.2)(webpack@5.105.4))(webpack@5.105.4)':
+  '@webpack-cli/info@3.0.1(webpack-cli@6.0.1)(webpack@5.105.4)':
     dependencies:
       webpack: 5.105.4(webpack-cli@6.0.1)
       webpack-cli: 6.0.1(webpack-bundle-analyzer@4.10.2)(webpack@5.105.4)
 
-  '@webpack-cli/serve@3.0.1(webpack-cli@6.0.1(webpack-bundle-analyzer@4.10.2)(webpack@5.105.4))(webpack@5.105.4)':
+  '@webpack-cli/serve@3.0.1(webpack-cli@6.0.1)(webpack@5.105.4)':
     dependencies:
       webpack: 5.105.4(webpack-cli@6.0.1)
       webpack-cli: 6.0.1(webpack-bundle-analyzer@4.10.2)(webpack@5.105.4)
@@ -8748,9 +8757,9 @@ snapshots:
   webpack-cli@6.0.1(webpack-bundle-analyzer@4.10.2)(webpack@5.105.4):
     dependencies:
       '@discoveryjs/json-ext': 0.6.3
-      '@webpack-cli/configtest': 3.0.1(webpack-cli@6.0.1(webpack-bundle-analyzer@4.10.2)(webpack@5.105.4))(webpack@5.105.4)
-      '@webpack-cli/info': 3.0.1(webpack-cli@6.0.1(webpack-bundle-analyzer@4.10.2)(webpack@5.105.4))(webpack@5.105.4)
-      '@webpack-cli/serve': 3.0.1(webpack-cli@6.0.1(webpack-bundle-analyzer@4.10.2)(webpack@5.105.4))(webpack@5.105.4)
+      '@webpack-cli/configtest': 3.0.1(webpack-cli@6.0.1)(webpack@5.105.4)
+      '@webpack-cli/info': 3.0.1(webpack-cli@6.0.1)(webpack@5.105.4)
+      '@webpack-cli/serve': 3.0.1(webpack-cli@6.0.1)(webpack@5.105.4)
       colorette: 2.0.20
       commander: 12.1.0
       cross-spawn: 7.0.6

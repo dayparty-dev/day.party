@@ -1,14 +1,24 @@
 /*
-In NativeScript, the app.ts file is the entry point to your application.
-You can use this file to perform app-level initialization, but the primary
-purpose of the file is to pass control to the app’s first module.
-*/
+ * NativeScript entry: root Frame + initial route from persisted session.
+ */
+import { Application, Frame } from '@nativescript/core';
 
-import { Application } from '@nativescript/core';
+import { registerDeepLinkHandlers } from './deep-link-handlers';
+import { authState } from './services/auth-state';
 
-Application.run({ moduleName: 'app-root' });
+import './app.css';
 
-/*
-Do not place any code after the application has been started as it will not
-be executed on iOS.
-*/
+registerDeepLinkHandlers();
+
+Application.run({
+  create: () => {
+    authState.hydrateFromStorage();
+    const frame = new Frame();
+    const start = authState.isAuthenticated() ? 'views/rundown-view' : 'views/login-view';
+    frame.navigate({
+      moduleName: start,
+      clearHistory: true,
+    });
+    return frame;
+  },
+});

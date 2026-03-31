@@ -326,3 +326,46 @@ Started: 2026-03-31 05:29:22
 - Mirror api-client `Omit<…, 'userId'>` at the HTTP boundary for tasks and tags
 
 ---
+
+## Iteration 10 - 2026-03-31
+
+**User Story**: Phase 5 — US3 Mobile core task experience (T070–T075a)
+
+**Tasks Completed**:
+
+- [x] T070: Root `Frame` in `app.ts` with initial route from `AuthState.hydrateFromStorage()` (rundown vs login)
+- [x] T071: `AuthState` singleton + `@nativescript/secure-storage` + `DayPartyClient` with `API_BASE_URL` `…/api` (Android `10.0.2.2`, iOS `127.0.0.1`)
+- [x] T072: `login-view` (Spanish), magic link field / URL paste, `registerDeepLinkHandlers` + Android VIEW intent + iOS `CFBundleURLTypes` (`dayparty://auth/verify`)
+- [x] T073: `rundown-view` ListView, tag color strip, toggle completion, ongoing + logout
+- [x] T074: `ongoing-view` focus task, progress + elapsed ticker, complete + back; unload stops timer (resume does not force login)
+- [x] T075: `consumeUnauthorized` on 401 → clear vault + `navigateToLogin(true)`
+- [x] T075a: Error banner + reintentar on likely network failures (`INTERNAL_ERROR` + message heuristics)
+
+**Tasks Remaining in Story**: None — US3 complete
+
+**Commit**: (after commit)
+
+**Files Changed**:
+
+- `apps/mobile/package.json`
+- `apps/mobile/src/app.ts`, `app.css`
+- `apps/mobile/src/config.ts`
+- `apps/mobile/src/deep-link-handlers.ts`
+- `apps/mobile/src/services/auth-state.ts`
+- `apps/mobile/src/utils/parse-token-from-url.ts`, `network-error.ts`
+- `apps/mobile/src/views/login-view.xml`, `login-view.ts`
+- `apps/mobile/src/views/rundown-view.xml`, `rundown-view.ts`
+- `apps/mobile/src/views/ongoing-view.xml`, `ongoing-view.ts`
+- `apps/mobile/App_Resources/Android/src/main/AndroidManifest.xml`
+- `apps/mobile/App_Resources/iOS/Info.plist`
+- Removed: `apps/mobile/src/app-root.xml`, `main-page.*`, `main-view-model.ts`
+- `pnpm-lock.yaml`, `specs/001-monorepo-restructure/tasks.md`, `progress.md`
+
+**Learnings**:
+
+- `@dayparty/api-client` `Result` narrows reliably with `result.ok === true` / `=== false` under mobile `tsc` (not only `!result.ok`)
+- ListView tap typing: `ItemEventData` from `@nativescript/core/ui`
+- iOS URL handler: `Application.ios.addDelegateHandler('applicationOpenURLOptions', …)`
+- Magic link API logs full `http` URL; login view accepts full URL or raw token via regex `token=` extraction
+
+---

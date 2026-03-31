@@ -158,16 +158,16 @@
 
 ### Mobile App Infrastructure
 
-- [ ] T070 [US3] Set up NativeScript navigation in `apps/mobile/src/app.ts` — frame-based navigation between LoginView, RundownView, and OngoingView
-- [ ] T071 [US3] Create AuthState singleton service in `apps/mobile/src/services/auth-state.ts` — manages bearer token in secure storage, exposes login/logout/isAuthenticated methods, uses `@dayparty/api-client` DayPartyClient
+- [x] T070 [US3] Set up NativeScript navigation in `apps/mobile/src/app.ts` — frame-based navigation between LoginView, RundownView, and OngoingView
+- [x] T071 [US3] Create AuthState singleton service in `apps/mobile/src/services/auth-state.ts` — manages bearer token in secure storage, exposes login/logout/isAuthenticated methods, uses `@dayparty/api-client` DayPartyClient
 
 ### Mobile Screens
 
-- [ ] T072 [US3] Create LoginView in `apps/mobile/src/views/login-view.ts` — email input field, "Send magic link" button, calls DayPartyClient.login(); deep-link handler for magic-link verification that calls DayPartyClient.verify() and stores token via AuthState
-- [ ] T073 [US3] Create RundownView in `apps/mobile/src/views/rundown-view.ts` — displays today's tasks as a list (title, size indicator, tag color, completion state), tap to toggle isComplete via DayPartyClient.updateTask(), navigate-to-ongoing button
-- [ ] T074 [US3] Create OngoingView in `apps/mobile/src/views/ongoing-view.ts` — displays current/next incomplete task with title, size, tag, and a time/progress indicator; mark complete button; navigate back to rundown; handle app resume from background by restoring view state without resetting to login (edge case: "mobile app backgrounded during ongoing session")
-- [ ] T075 [US3] Implement token expiration handling in `apps/mobile/src/services/auth-state.ts` — on 401 response from API client, clear stored token and navigate to LoginView preserving navigation stack context (FR-020)
-- [ ] T075a [US3] Add basic network error handling in mobile views — when DayPartyClient calls fail due to API unreachability, display a clear error banner/message and offer a retry action (edge case: "API unreachable")
+- [x] T072 [US3] Create LoginView in `apps/mobile/src/views/login-view.ts` — email input field, "Send magic link" button, calls DayPartyClient.login(); deep-link handler for magic-link verification that calls DayPartyClient.verify() and stores token via AuthState
+- [x] T073 [US3] Create RundownView in `apps/mobile/src/views/rundown-view.ts` — displays today's tasks as a list (title, size indicator, tag color, completion state), tap to toggle isComplete via DayPartyClient.updateTask(), navigate-to-ongoing button
+- [x] T074 [US3] Create OngoingView in `apps/mobile/src/views/ongoing-view.ts` — displays current/next incomplete task with title, size, tag, and a time/progress indicator; mark complete button; navigate back to rundown; handle app resume from background by restoring view state without resetting to login (edge case: "mobile app backgrounded during ongoing session")
+- [x] T075 [US3] Implement token expiration handling in `apps/mobile/src/services/auth-state.ts` — on 401 response from API client, clear stored token and navigate to LoginView preserving navigation stack context (FR-020)
+- [x] T075a [US3] Add basic network error handling in mobile views — when DayPartyClient calls fail due to API unreachability, display a clear error banner/message and offer a retry action (edge case: "API unreachable")
 
 **Checkpoint**: US3 complete — mobile app login, rundown, and ongoing screens functional. User can authenticate, view tasks, mark complete, and focus on current task.
 

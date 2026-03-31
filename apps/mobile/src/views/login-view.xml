@@ -1,0 +1,24 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" class="page">
+  <ActionBar title="Iniciar sesión" />
+
+  <ScrollView>
+    <StackLayout class="p-20">
+      <Label text="Correo electrónico" class="label" />
+      <TextField hint="tu@correo.com" text="{{ email }}" keyboardType="email" autocorrect="false" autocapitalizationType="none" class="input" />
+
+      <Button text="Enviar enlace mágico" tap="{{ onSendLink }}" class="-primary m-t-12" />
+
+      <Label text="Token del enlace (o pega la URL completa)" class="label m-t-20" textWrap="true" />
+      <TextField hint="token o URL" text="{{ tokenOrUrl }}" autocorrect="false" class="input" />
+
+      <Button text="Verificar" tap="{{ onVerify }}" class="-outline m-t-8" />
+
+      <Label text="{{ statusMessage }}" class="footnote m-t-12" textWrap="true" visibility="{{ statusVisibility }}" />
+
+      <StackLayout visibility="{{ errorBannerVisibility }}" class="error-banner m-t-12">
+        <Label text="{{ errorMessage }}" textWrap="true" class="error-text" />
+        <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8" visibility="{{ retryVisibility }}" />
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+</Page>
