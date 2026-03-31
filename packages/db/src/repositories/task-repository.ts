@@ -62,4 +62,9 @@ export class MongoTaskRepository implements TaskRepository {
       }),
     );
   }
+
+  async nullifyTagKeyForUser(userId: string, tagKey: string): Promise<void> {
+    const updatedAt = new Date().toISOString();
+    await this.collection.updateMany({ userId, tagKey }, { $unset: { tagKey: '' }, $set: { updatedAt } });
+  }
 }

@@ -118,33 +118,33 @@
 
 ### API Middleware & Infrastructure
 
-- [ ] T052 [US2] Create Hono app setup in `apps/api/src/app.ts` — initialize Hono instance, mount route groups, configure CORS
-- [ ] T053 [US2] Create auth middleware in `apps/api/src/middleware/auth-middleware.ts` — extract bearer token from `Authorization` header, validate via SessionRepository, inject user context into Hono context; reject with 401 ApiError if invalid/expired
-- [ ] T054 [US2] Create validation middleware in `apps/api/src/middleware/validate.ts` — generic Hono middleware that takes a Zod schema and validates request body, returning 422 ApiError with field details on failure using `@dayparty/validation` `fromZodError()`
-- [ ] T055 [US2] Create error handler middleware in `apps/api/src/middleware/error-handler.ts` — catch-all Hono error handler that maps errors to ApiError response shape per data-model.md error model
-- [ ] T056 [US2] Create dependency injection setup in `apps/api/src/index.ts` — instantiate MongoDB connection, repositories (MongoTask/User/Session/TagRepository), wire into actions, pass to route handlers
+- [x] T052 [US2] Create Hono app setup in `apps/api/src/app.ts` — initialize Hono instance, mount route groups, configure CORS
+- [x] T053 [US2] Create auth middleware in `apps/api/src/middleware/auth-middleware.ts` — extract bearer token from `Authorization` header, validate via SessionRepository, inject user context into Hono context; reject with 401 ApiError if invalid/expired
+- [x] T054 [US2] Create validation middleware in `apps/api/src/middleware/validate.ts` — generic Hono middleware that takes a Zod schema and validates request body, returning 422 ApiError with field details on failure using `@dayparty/validation` `fromZodError()`
+- [x] T055 [US2] Create error handler middleware in `apps/api/src/middleware/error-handler.ts` — catch-all Hono error handler that maps errors to ApiError response shape per data-model.md error model
+- [x] T056 [US2] Create dependency injection setup in `apps/api/src/index.ts` — instantiate MongoDB connection, repositories (MongoTask/User/Session/TagRepository), wire into actions, pass to route handlers
 
 ### Auth Routes
 
-- [ ] T057 [US2] Implement POST /auth/login route in `apps/api/src/routes/auth.ts` — validate email via loginSchema, send magic-link email (stub email service for now), return 200 per contract
-- [ ] T058 [US2] Implement GET /auth/verify route in `apps/api/src/routes/auth.ts` — verify magic-link token, create Session via SessionRepository, seed default tags for new users via TagRepository.seedDefaults, return bearer token + user per contract
-- [ ] T059 [US2] Implement POST /auth/logout route in `apps/api/src/routes/auth.ts` — requires auth middleware, delete session via SessionRepository, return 200 per contract
-- [ ] T060 [US2] Implement GET /auth/me route in `apps/api/src/routes/auth.ts` — requires auth middleware, return current user from context per contract
+- [x] T057 [US2] Implement POST /auth/login route in `apps/api/src/routes/auth.ts` — validate email via loginSchema, send magic-link email (stub email service for now), return 200 per contract
+- [x] T058 [US2] Implement GET /auth/verify route in `apps/api/src/routes/auth.ts` — verify magic-link token, create Session via SessionRepository, seed default tags for new users via TagRepository.seedDefaults, return bearer token + user per contract
+- [x] T059 [US2] Implement POST /auth/logout route in `apps/api/src/routes/auth.ts` — requires auth middleware, delete session via SessionRepository, return 200 per contract
+- [x] T060 [US2] Implement GET /auth/me route in `apps/api/src/routes/auth.ts` — requires auth middleware, return current user from context per contract
 
 ### Task Routes
 
-- [ ] T061 [US2] Implement GET /tasks route in `apps/api/src/routes/tasks.ts` — requires auth middleware, validate `date` query param, call GetRundownAction, return DayRundown per contract
-- [ ] T062 [US2] Implement POST /tasks route in `apps/api/src/routes/tasks.ts` — requires auth middleware, validate body via createTaskSchema, call CreateTaskAction, return 201 with created task per contract
-- [ ] T063 [US2] Implement PATCH /tasks/:id route in `apps/api/src/routes/tasks.ts` — requires auth middleware, validate body via updateTaskSchema, call UpdateTaskAction, return updated task per contract
-- [ ] T064 [US2] Implement DELETE /tasks/:id route in `apps/api/src/routes/tasks.ts` — requires auth middleware, call DeleteTaskAction, return 200 per contract
-- [ ] T065 [US2] Implement PATCH /tasks/reorder route in `apps/api/src/routes/tasks.ts` — requires auth middleware, validate body via reorderTasksSchema, call ReorderTasksAction, return updated DayRundown per contract
+- [x] T061 [US2] Implement GET /tasks route in `apps/api/src/routes/tasks.ts` — requires auth middleware, validate `date` query param, call GetRundownAction, return DayRundown per contract
+- [x] T062 [US2] Implement POST /tasks route in `apps/api/src/routes/tasks.ts` — requires auth middleware, validate body via createTaskSchema, call CreateTaskAction, return 201 with created task per contract
+- [x] T063 [US2] Implement PATCH /tasks/:id route in `apps/api/src/routes/tasks.ts` — requires auth middleware, validate body via updateTaskSchema, call UpdateTaskAction, return updated task per contract
+- [x] T064 [US2] Implement DELETE /tasks/:id route in `apps/api/src/routes/tasks.ts` — requires auth middleware, call DeleteTaskAction, return 200 per contract
+- [x] T065 [US2] Implement PATCH /tasks/reorder route in `apps/api/src/routes/tasks.ts` — requires auth middleware, validate body via reorderTasksSchema, call ReorderTasksAction, return updated DayRundown per contract
 
 ### Tag Routes
 
-- [ ] T066 [US2] Implement GET /tags route in `apps/api/src/routes/tags.ts` — requires auth middleware, query tags by userId, return array per contract
-- [ ] T067 [US2] Implement POST /tags route in `apps/api/src/routes/tags.ts` — requires auth middleware, validate body via createTagSchema, check key uniqueness (409 on conflict), create tag, return 201 per contract
-- [ ] T068 [US2] Implement PATCH /tags/:id route in `apps/api/src/routes/tags.ts` — requires auth middleware, validate body via updateTagSchema, update tag, return 200 per contract
-- [ ] T069 [US2] Implement DELETE /tags/:id route in `apps/api/src/routes/tags.ts` — requires auth middleware, delete tag, nullify tagKey on referencing tasks, return 200 per contract
+- [x] T066 [US2] Implement GET /tags route in `apps/api/src/routes/tags.ts` — requires auth middleware, query tags by userId, return array per contract
+- [x] T067 [US2] Implement POST /tags route in `apps/api/src/routes/tags.ts` — requires auth middleware, validate body via createTagSchema, check key uniqueness (409 on conflict), create tag, return 201 per contract
+- [x] T068 [US2] Implement PATCH /tags/:id route in `apps/api/src/routes/tags.ts` — requires auth middleware, validate body via updateTagSchema, update tag, return 200 per contract
+- [x] T069 [US2] Implement DELETE /tags/:id route in `apps/api/src/routes/tags.ts` — requires auth middleware, delete tag, nullify tagKey on referencing tasks, return 200 per contract
 
 **Checkpoint**: US2 complete — all 11 API endpoints functional. Auth flow works end-to-end. Task CRUD, rundown retrieval, reordering, and tag management all return correct responses per contracts/rest-api.md.
 

@@ -25,7 +25,8 @@
     "@dayparty/domain": "workspace:*",
     "@dayparty/validation": "workspace:*",
     "@hono/node-server": "^1.13.0",
-    "hono": "^4.6.0"
+    "hono": "^4.6.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@dayparty/eslint-config": "workspace:*",

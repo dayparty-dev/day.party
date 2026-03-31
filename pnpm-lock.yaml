@@ -40,6 +40,9 @@ importers:
       hono:
         specifier: ^4.6.0
         version: 4.12.9
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
     devDependencies:
       '@dayparty/eslint-config':
         specifier: workspace:*

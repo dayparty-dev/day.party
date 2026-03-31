@@ -16,6 +16,7 @@ Started: 2026-03-31 05:29:22
 - Pre-existing `web-legacy` in `apps/web-legacy/` must remain untouched
 - `apps/web-legacy` uses flat `eslint.config.mjs` + `eslint .` (not interactive `next lint`); several rules are relaxed for the legacy codebase
 - API-client pattern: return `Result<T, ApiError>` discriminated union (`ok: true|false`) and run `safeParse` on request payloads before network calls
+- API wire format: omit `userId` from Task and Tag JSON (mirror `ApiTask` / `ApiTag` in `@dayparty/api-client`); invalid `tagKey` on task create/update → `VALIDATION_ERROR` 422 with `fields.tagKey`
 
 ---
 
@@ -260,5 +261,68 @@ Started: 2026-03-31 05:29:22
 - NativeScript CLI `create --path apps/mobile` nested an extra `mobile/` dir — flattened with rsync
 - `web-legacy` `next lint` without config is interactive; flat ESLint + relaxed legacy rules unblocks `pnpm lint`
 - `@vitejs/plugin-react` type defs can break `tsc --noEmit` on web; `vite build` alone is enough for production bundle
+
+---
+
+## Iteration 8 - 2026-03-31
+
+**User Story**: Partial progress on US2 — API middleware & infrastructure (T052–T056)
+
+**Tasks Completed**:
+
+- [x] T052: Hono `createApp` with route groups under `/api/*`, explicit CORS (`CORS_ORIGIN` or localhost dev defaults), health + error handler registration order preserved
+- [x] T053: `auth-middleware.ts` — Bearer token, `SessionRepository.findByToken`, expiry check, `user` on context (already present; verified)
+- [x] T054: `middleware/validate.ts` — `validateJsonBody(schema)` sets `validatedJson`, 422 via `fromZodError`
+- [x] T055: `error-handler.ts` — `HTTPException`, `ZodError`, ApiError-shaped throws → status from code; fallback `INTERNAL_ERROR` 500
+- [x] T056: `index.ts` — MongoDB + repos + domain actions wired into `createApp(env)` (already present; verified)
+
+**Tasks Remaining in Story**: 13 (T057–T069 route tasks — implementations exist in tree; needs contract check-off and checkbox updates in a follow-up iteration)
+
+**Commit**: No commit — partial progress on US2 (complete US2 or commit coherent units per project rules)
+
+**Files Changed**:
+
+- `apps/api/src/app.ts`
+- `apps/api/src/middleware/error-handler.ts`
+- `apps/api/src/middleware/validate.ts` (new)
+- `apps/api/src/types.ts`
+- `apps/api/package.json`
+- `pnpm-lock.yaml`
+- `specs/001-monorepo-restructure/tasks.md`
+- `specs/001-monorepo-restructure/progress.md`
+
+**Learnings**:
+
+- Prefer explicit `zod` in `apps/api` when importing `ZodError` / schema types at runtime
+- `validateJsonBody` composes with route chains; optional `validatedJson` on `ApiVariables` keeps public routes typable
+- Next iteration: confirm `routes/auth.ts`, `tasks.ts`, `tags.ts` against `contracts/rest-api.md`, then mark T057–T069 and commit US2
+
+---
+
+## Iteration 9 - 2026-03-31
+
+**User Story**: Phase 4 — US2 REST API (T057–T069)
+
+**Tasks Completed**:
+
+- [x] T057–T060: Auth routes verified — login (magic-link stub log), verify + session + `seedDefaults`, logout + `/me` with `requireAuth`
+- [x] T061–T065: Task routes — rundown without outer `userId`, tasks in rundown without per-task `userId`; create/update return public task; invalid tag → `VALIDATION_ERROR` 422; reorder before `/:id` patch; delete message per contract
+- [x] T066–T069: Tag routes — list/create/patch omit `userId`; 409 duplicate key; delete + `nullifyTagKeyForUser`
+
+**Tasks Remaining in Story**: None — US2 complete
+
+**Commit**: a1e2dfd
+
+**Files Changed**:
+
+- `apps/api/src/routes/tasks.ts`
+- `apps/api/src/routes/tags.ts`
+- `specs/001-monorepo-restructure/tasks.md`
+- `specs/001-monorepo-restructure/progress.md`
+
+**Learnings**:
+
+- Align error codes with contract: unknown tag on task writes is validation domain (422 + `VALIDATION_ERROR`), not `NOT_FOUND` at 422
+- Mirror api-client `Omit<…, 'userId'>` at the HTTP boundary for tasks and tags
 
 ---
