@@ -5,6 +5,8 @@ Started: 2026-03-31 05:29:22
 
 ## Codebase Patterns
 
+- Mobile: `apps/mobile/src/config.ts` sets `API_BASE_URL` to `http://10.0.2.2:3001/api` (Android emulator) or `http://127.0.0.1:3001/api` (iOS); must match `contracts/rest-api.md` `/api` prefix
+- Mobile: `DayPartyClient` `Result` branches type-narrow with `result.ok === true` / `=== false` in views and `AuthState.consumeUnauthorized`
 - Import shared ESLint app preset as `@dayparty/eslint-config/app` (not `app.js`); package `exports` maps `./app` → `app.js`
 - `apps/web` production build uses `vite build` only; separate `typecheck` can use `tsc` when plugin types align with repo TypeScript
 - `apps/mobile` uses NativeScript default `src/` app path (`appPath: 'src'` in `nativescript.config.ts`); entry `src/app.ts`
@@ -343,7 +345,7 @@ Started: 2026-03-31 05:29:22
 
 **Tasks Remaining in Story**: None — US3 complete
 
-**Commit**: (after commit)
+**Commit**: 5280b86
 
 **Files Changed**:
 
