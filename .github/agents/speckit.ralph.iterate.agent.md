@@ -3,9 +3,9 @@ description: Execute a single Ralph loop iteration - complete one work unit from
   with proper commits and progress tracking
 ---
 
-
 <!-- Extension: ralph -->
 <!-- Config: .specify/extensions/ralph/ -->
+
 ## User Input
 
 ```text
@@ -35,7 +35,12 @@ You **MUST** consider the user input before proceeding (if not empty).
    .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
    ```
 
-2. **Read context first**:
+2. **Load repository instructions**:
+   - Read `AGENTS.md` from repo root if present
+   - If `AGENTS.md` is absent, read `.github/agents/copilot-instructions.md` and `CLAUDE.md` when present
+   - Treat repository commit conventions as authoritative over generic examples in this prompt
+
+3. **Read context first**:
    - Read `FEATURE_DIR/progress.md` if it exists -- check the `## Codebase Patterns` section for discovered conventions
    - Read `FEATURE_DIR/tasks.md` -- understand task structure and identify next incomplete user story
    - Read `FEATURE_DIR/plan.md` for tech stack, architecture, and file structure
@@ -43,29 +48,31 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Read `FEATURE_DIR/contracts/` for API specifications
    - **IF EXISTS**: Read `FEATURE_DIR/research.md` for technical decisions and constraints
 
-3. **Identify scope**:
+4. **Identify scope**:
    - Find the FIRST user story section with incomplete tasks (`- [ ]`)
    - Work ONLY on tasks within that single user story
    - Example: If "US-001: Initialize Ralph Command" has incomplete tasks, work only on US-001
 
-4. **Implement tasks**:
+5. **Implement tasks**:
    - Complete tasks in dependency order (non-[P] before parallel [P] where noted)
    - Follow TDD when appropriate: write tests first, then implementation
    - Run quality checks after each task (typecheck, lint, test as appropriate)
    - Mark each completed task by changing `[ ]` to `[x]` in tasks.md
 
-5. **Commit on user story completion**:
+6. **Commit on user story completion**:
    - When ALL tasks in the current user story are complete (`[x]`), create a commit:
 
      ```sh
      git add -A
-     git commit -m "feat(<feature-name>): <user story title>"
+     git commit -m "<emoji> (<scope>): <description lowercase>" [-m "<body>"]
      ```
 
-   - Example: `git commit -m "feat(001-ralph-loop-implement): US-001 Initialize Ralph Command"`
+   - Use a narrow scope that matches the changed package/app area (for example, `api-client`, `domain`, `mobile`)
+   - For non-trivial changes, include a commit body with what changed, why, and validation
+   - If repository instruction files define commit style, follow them exactly
    - If only partial progress, NO commit -- let the next iteration continue
 
-6. **Update progress log**:
+7. **Update progress log**:
    - Create or append to `FEATURE_DIR/progress.md`
    - Add any discovered patterns to `## Codebase Patterns` section at TOP of file
    - Use the Progress Report Format below
@@ -121,10 +128,10 @@ Follow the patterns established in the codebase:
 
 ## Error Handling
 
-| Condition | Expected Behavior |
-| --------- | ----------------- |
-| User story unclear | Ask for clarification in progress entry, mark tasks as blocked |
-| Tests fail | Report failure, do not mark task complete, no commit |
+| Condition             | Expected Behavior                                                              |
+| --------------------- | ------------------------------------------------------------------------------ |
+| User story unclear    | Ask for clarification in progress entry, mark tasks as blocked                 |
+| Tests fail            | Report failure, do not mark task complete, no commit                           |
 | Cannot complete story | Report partial progress, commit only if all completed tasks form coherent unit |
-| All tasks done | Commit final story, output `<promise>COMPLETE</promise>` |
-| Dependencies missing | Note in progress file, skip to next available task |
+| All tasks done        | Commit final story, output `<promise>COMPLETE</promise>`                       |
+| Dependencies missing  | Note in progress file, skip to next available task                             |

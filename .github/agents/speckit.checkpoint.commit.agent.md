@@ -41,15 +41,18 @@ The agent should use judgment — the goal is to produce commits that are meanin
 
 ## Workflow
 
-1. Determine a clear, concise commit message based on the work just completed
-2. Stage all current changes (`git add -A`)
-3. Commit with the message (`git commit -m "<message>"`)
+1. Read repository instruction files (`AGENTS.md`, then `.github/agents/copilot-instructions.md` and `CLAUDE.md` as fallback) and apply commit conventions from them
+2. Determine a clear, concise commit message based on the work just completed
+3. Stage all current changes (`git add -A`)
+4. Commit with the message (`git commit -m "<message>"`)
 
 ## Commit Message Guidelines
 
-- For pre-implementation steps, use the step name as a prefix (e.g., `constitution: establish project principles`, `tasks: break down implementation into actionable items`)
-- For implementation commits, describe what was built (e.g., `implement user authentication service`, `add product listing page and API routes`)
-- Keep messages concise but descriptive enough to understand the scope of the commit
+- Default format: `<emoji> (<scope>): <description lowercase>`
+- Use a narrow scope matching the changed area (package/app/feature)
+- For non-trivial commits, add a body after a blank line with what changed, why, and validation
+- Keep subjects concise but descriptive enough to understand the checkpoint
+- If repository instructions specify different commit rules, they override these defaults
 
 ## Exit Criteria
 

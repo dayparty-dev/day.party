@@ -2,26 +2,26 @@
 description: Perform a post-implementation retrospective analysis measuring spec adherence,
   implementation deviations, and lessons learned.
 handoffs:
-- label: Update Constitution
-  agent: speckit.constitution
-  prompt: Update constitution based on retrospective learnings
-  send: true
-- label: Create New Feature
-  agent: speckit.specify
-  prompt: Create a new feature incorporating learnings from retrospective
-  send: true
-- label: Create Checklist
-  agent: speckit.checklist
-  prompt: Create checklist based on retrospective findings
-  send: true
+  - label: Update Constitution
+    agent: speckit.constitution
+    prompt: Update constitution based on retrospective learnings
+    send: true
+  - label: Create New Feature
+    agent: speckit.specify
+    prompt: Create a new feature incorporating learnings from retrospective
+    send: true
+  - label: Create Checklist
+    agent: speckit.checklist
+    prompt: Create checklist based on retrospective findings
+    send: true
 scripts:
   sh: .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
   ps: .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
 ---
 
-
 <!-- Extension: retrospective -->
 <!-- Config: .specify/extensions/retrospective/ -->
+
 ## User Input
 
 ```text
@@ -61,7 +61,8 @@ completion_rate=$((completed_tasks * 100 / total_tasks))
 ```
 
 Completion thresholds:
-- >=80%: Proceed with full retrospective
+
+- > =80%: Proceed with full retrospective
 - 50-79%: Warn about incomplete implementation, continue with partial analysis
 - <50%: STOP and confirm before continuing
 
@@ -81,6 +82,7 @@ Completion thresholds:
 ### 5. Spec Drift Analysis
 
 Perform:
+
 1. Requirement coverage (implemented, partial, not implemented, modified, unspecified)
 2. Success criteria validation
 3. Architecture drift against plan
@@ -98,6 +100,7 @@ Where Total Requirements is the count of all FR-XXX, NFR-XXX, SC-XXX from `spec.
 ### 6. Severity Classification
 
 Classify findings as:
+
 - CRITICAL (core functionality or constitution violations)
 - SIGNIFICANT (deviations that affect UX/performance/operations)
 - MINOR (small or cosmetic variations)
@@ -106,6 +109,7 @@ Classify findings as:
 ### 7. Innovation Opportunities
 
 For positive deviations, document:
+
 - What improved
 - Why it is better
 - Reusability potential
@@ -114,6 +118,7 @@ For positive deviations, document:
 ### 8. Root Cause Analysis
 
 For key deviations capture:
+
 - Discovery point (planning/implementation/testing/review)
 - Cause (spec gap, tech constraint, scope evolution, misunderstanding, improvement, process skip)
 - Prevention recommendation
@@ -125,6 +130,7 @@ Check each constitution article against implementation. Treat violations as CRIT
 ### 10. Generate Report
 
 Create `retrospective.md` with:
+
 - YAML frontmatter (feature, branch, date, completion_rate, spec_adherence, counts)
 - Executive summary
 - Proposed Spec Changes (explicit list of intended `spec.md` edits, grouped by FR/NFR/SC and rationale)
@@ -159,13 +165,16 @@ Before finalizing output, run this checklist and mark each item as PASS/FAIL:
   - Recommendations are specific, prioritized, and directly tied to findings.
 
 Blocking rule:
+
 - If any of these fail: `Coverage integrity`, `Metrics sanity`, `Human Gate readiness` (when applicable), or `Constitution review`, do not finalize the report. Fix the gaps first.
 
 ### 12. Save Report
 
 1. Write to `FEATURE_DIR/retrospective.md`
 2. Optionally commit with:
-   - `feat(retrospective): add spec adherence report (adherence X%, completion X%)`
+
+- `📝 (retrospective): add spec adherence report (adherence x%, completion x%)`
+
 3. Confirm:
    - `Retrospective saved | Adherence: X% | Critical findings: X`
 
@@ -184,12 +193,14 @@ Treat launching `/speckit.specify` as a spec-modifying action that requires this
 ### 14. Follow-up Actions
 
 Prioritize:
+
 1. CRITICAL: constitution violations, breaking changes, security issues
 2. HIGH: significant drift and process improvements
 3. MEDIUM: best practices and constitution candidates
 4. LOW: minor optimizations
 
 Follow-up commands:
+
 - `/speckit.constitution` for violations
 - `/speckit.specify` for spec updates
 - `/speckit.checklist` for new checklists

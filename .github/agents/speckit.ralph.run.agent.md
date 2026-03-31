@@ -3,9 +3,9 @@ description: Run the ralph autonomous implementation loop
 model: Claude Haiku 4.5 (copilot)
 ---
 
-
 <!-- Extension: ralph -->
 <!-- Config: .specify/extensions/ralph/ -->
+
 ## User Input
 
 ```text
@@ -27,12 +27,12 @@ This command is a **thin launcher** for the ralph loop orchestrator. It validate
 
 2. **Validate prerequisites** (all MUST pass before proceeding):
 
-   | Check | Method | On Failure |
-   |-------|--------|------------|
-   | Agent CLI installed | Run `which copilot` or `Get-Command copilot` | Print error with install instructions, STOP |
-   | `tasks.md` exists | Search `specs/*/tasks.md` for current feature | Print error, suggest running `/speckit.tasks`, STOP |
-   | Git repository | Run `git rev-parse --git-dir` | Print error: "Not a git repository", STOP |
-   | Feature branch | Run `git branch --show-current`, verify not `main`/`master` | Print warning but continue |
+   | Check               | Method                                                      | On Failure                                          |
+   | ------------------- | ----------------------------------------------------------- | --------------------------------------------------- |
+   | Agent CLI installed | Run `which copilot` or `Get-Command copilot`                | Print error with install instructions, STOP         |
+   | `tasks.md` exists   | Search `specs/*/tasks.md` for current feature               | Print error, suggest running `/speckit.tasks`, STOP |
+   | Git repository      | Run `git rev-parse --git-dir`                               | Print error: "Not a git repository", STOP           |
+   | Feature branch      | Run `git branch --show-current`, verify not `main`/`master` | Print warning but continue                          |
 
 3. **Detect feature context**:
    - Run the prerequisite check script:
@@ -58,11 +58,13 @@ This command is a **thin launcher** for the ralph loop orchestrator. It validate
    - Execute with resolved parameters:
 
      **PowerShell**:
+
      ```powershell
      & ".specify/extensions/ralph/scripts/powershell/ralph-loop.ps1" -FeatureName "{feature}" -TasksPath "{tasks_path}" -SpecDir "{spec_dir}" -MaxIterations {n} -Model "{model}" [-DetailedOutput]
      ```
 
      **Bash**:
+
      ```bash
      bash ".specify/extensions/ralph/scripts/bash/ralph-loop.sh" --feature-name "{feature}" --tasks-path "{tasks_path}" --spec-dir "{spec_dir}" --max-iterations {n} --model "{model}" [--verbose]
      ```
@@ -76,10 +78,10 @@ This command is a **thin launcher** for the ralph loop orchestrator. It validate
 
 This command exits as soon as the orchestrator script is launched. It does **not** monitor the script or report its outcome.
 
-| Outcome | Meaning |
-|---------|---------|
-| Command completes normally | Orchestrator was launched successfully — user should monitor the terminal |
-| Command fails during validation | A prerequisite check failed — see error message for details |
+| Outcome                         | Meaning                                                                   |
+| ------------------------------- | ------------------------------------------------------------------------- |
+| Command completes normally      | Orchestrator was launched successfully — user should monitor the terminal |
+| Command fails during validation | A prerequisite check failed — see error message for details               |
 
 The orchestrator script itself has its own exit codes (0 = all tasks complete, 1 = limit/failure, 130 = interrupted). The user will see these directly in the terminal where the script is running.
 
@@ -89,6 +91,7 @@ The orchestrator script itself has its own exit codes (0 = all tasks complete, 1
 - The orchestrator script handles ALL loop logic: iteration management, termination, progress tracking
 - The script runs in a **visible terminal** so the user can watch progress in real time
 - This command uses `claude-haiku-4.5` (via frontmatter `model` field) since it only does lightweight setup work
+- Commit style for any commits created during iterations is defined by repository instruction files (prefer `AGENTS.md` at repo root)
 - Users can also run the scripts directly from terminal for debugging:
 
   ```bash
