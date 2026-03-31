@@ -36,6 +36,11 @@ export function createAuthRoutes(env: ApiEnv) {
     const webUrl = `${webBase}/login?token=${encodeURIComponent(magicToken)}`;
     console.info(`[auth] Magic link for ${parsed.data.email}: ${webUrl}`);
     console.info(`[auth] API verify URL (debug): ${verifyUrl}`);
+    // Development convenience for iOS Simulator: avoid flaky copy/paste from Xcode.
+    // This copies the verify URL directly into the simulator clipboard.
+    console.info(`[auth] iOS simulator pbcopy command (verify): echo -n "${verifyUrl}" | xcrun simctl pbcopy booted`);
+    // Also provide the web URL (mobile can extract the token from either).
+    console.info(`[auth] iOS simulator pbcopy command (login): echo -n "${webUrl}" | xcrun simctl pbcopy booted`);
     return c.json({ message: 'Magic link sent' });
   });
 
