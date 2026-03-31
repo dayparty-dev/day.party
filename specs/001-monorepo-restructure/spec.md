@@ -5,7 +5,7 @@
 **Status**: Draft
 **Input**: Restructure project as TypeScript monorepo with Turborepo, extract shared packages, create Hono API backend, and scaffold NativeScript 9 mobile app
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 — Developer runs `pnpm install` and `pnpm build` from root (Priority: P1)
 
@@ -140,7 +140,7 @@ validates that `api-client` and `core` types work in a browser/React context.
 - What happens when the JWT secret is missing from env? → API fails to start with
   a clear validation error at startup, not at first request.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -166,7 +166,7 @@ validates that `api-client` and `core` types work in a browser/React context.
 - **AuthToken**: A JWT payload containing session ID, email, user ID, and role. Used for authenticating API requests.
 - **TagOption**: A label+color pair for categorizing tasks (work, home, personal, study, or custom).
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
