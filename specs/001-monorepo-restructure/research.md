@@ -85,10 +85,10 @@ the API runs on Node/Bun, not edge workers.
 
 ## Open Questions (Resolved)
 
-| Question                                         | Resolution                                                                                                                  |
-| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| Where do service implementations live?           | `apps/api/src/services/` for API-specific (JWT signing, email sending). These implement interfaces from `@dayparty/domain`. |
-| How does mobile store JWT?                       | `@nativescript/secure-storage` for token, `ApplicationSettings` for cached data                                             |
-| How does auth work on mobile without deep links? | MVP: user manually enters verification code / session ID. Or web redirect flow opens in-app browser. Deep links deferred.   |
-| Should packages use ESM or CJS?                  | ESM (`"type": "module"` in package.json). All consumers support ESM.                                                        |
-| Should web-legacy depend on extracted packages?  | No — `apps/web-legacy/` keeps its original code as-is for reference. It may break and that's accepted.                      |
+| Question                                         | Resolution                                                                                                                                                    |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Where do service implementations live?           | `apps/api/src/services/` for API-specific (JWT signing, email sending). These implement interfaces from `@dayparty/domain`.                                   |
+| How does mobile store JWT?                       | `@nativescript/secure-storage` for token, `ApplicationSettings` for cached data                                                                               |
+| How does auth work on mobile without deep links? | MVP: user manually enters verification code / session ID. Or web redirect flow opens in-app browser. Deep links deferred.                                     |
+| Should packages use ESM or CJS?                  | ESM (`"type": "module"` in package.json). All consumers support ESM. Use `moduleResolution: "bundler"` with extensionless imports (no `.js` in import paths). |
+| Should web-legacy depend on extracted packages?  | No — `apps/web-legacy/` keeps its original code as-is for reference. It may break and that's accepted.                                                        |

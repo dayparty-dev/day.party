@@ -1,14 +1,9 @@
 <!--
 Sync Impact Report
-- Version change: 1.1.0 → 2.0.0 (MAJOR: fundamental context change)
-- Added cuakl ecosystem context: day.party is part of a product studio, not standalone
-- Adopted Tidy Architecture as the guiding architectural philosophy
-- Adopted Pod Pattern as the organizational unit for shared packages
-- Changed "solo developer" to "small team (2-3 people)"
-- Added principle: Tidy Architecture + Pod Pattern
-- Renamed/merged Dependency Injection principle into Tidy Architecture principle
-- Added Architecture Constraints: Pod alignment, auth-pod adoption path, ecosystem awareness
-- Added Ecosystem Context section
+- Version change: 2.0.0 → 2.0.1 (PATCH: clarification to Principle II)
+- Modified principle: II. TypeScript Everywhere — added extensionless import rule
+  (Imports MUST NOT use .js extensions; use moduleResolution: "bundler")
+- Templates requiring updates: ✅ research.md updated with ESM decision
 - Follow-up TODOs: none
 -->
 
@@ -55,6 +50,8 @@ All code — packages, web, API, mobile — MUST be written in TypeScript.
 - Shared packages MUST export proper type declarations.
 - No `any` in shared packages. `any` is tolerated temporarily in app-level code
   during active migration only.
+- Imports MUST NOT use `.js` extensions. Use `moduleResolution: "bundler"` in
+  tsconfig so extensionless imports resolve correctly.
 
 ### III. Tidy Architecture + Pod Pattern
 
@@ -158,4 +155,4 @@ The NativeScript mobile app MUST feel native on each platform.
 - When a principle conflicts with shipping working software, the principle
   yields — but the conflict MUST be noted for future resolution.
 
-**Version**: 2.0.0 | **Ratified**: 2026-03-31 | **Last Amended**: 2026-03-31
+**Version**: 2.0.1 | **Ratified**: 2026-03-31 | **Last Amended**: 2026-03-31
