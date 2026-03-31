@@ -5,6 +5,8 @@
   "description": "day.party monorepo",
   "scripts": {
     "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
     "dev": "turbo dev",
     "clean": "turbo clean",
     "format": "prettier --write .",

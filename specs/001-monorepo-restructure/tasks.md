@@ -19,13 +19,13 @@
 
 **Purpose**: Initialize monorepo workspace, tooling, and shared TypeScript configuration
 
-- [ ] T001 Configure pnpm workspace with `pnpm-workspace.yaml` listing `packages/*` and `apps/*` workspaces at repository root
-- [ ] T002 Set `node-linker=hoisted` in `.npmrc` at repository root for NativeScript compatibility per research.md
-- [ ] T003 Configure `turbo.json` at repository root with build/test/lint/dev task graph per research.md (build→`dependsOn: ["^build"]`, test→`dependsOn: ["build"]`, dev→persistent+uncached, lint→parallel)
-- [ ] T004 Create `packages/typescript-config/` package with `base.json` (strict, `moduleResolution: "bundler"`, `module: "ESNext"`, `target: "ES2022"`), `library.json`, and `app.json` presets per research.md
-- [ ] T004a [P] Create `packages/eslint-config/` package with shared ESLint flat config — base rules for TypeScript (no `any` in packages, consistent imports), and app-specific overrides. Each package/app `eslint.config.js` extends the shared config. Satisfies FR-007.
-- [ ] T005 Configure `vitest.workspace.ts` at repository root with `defineWorkspace(["packages/*/vitest.config.ts", "apps/*/vitest.config.ts"])` per research.md
-- [ ] T006 Add root `package.json` scripts: `build`, `test`, `lint`, `dev` delegating to `turbo run`
+- [x] T001 Configure pnpm workspace with `pnpm-workspace.yaml` listing `packages/*` and `apps/*` workspaces at repository root
+- [x] T002 Set `node-linker=hoisted` in `.npmrc` at repository root for NativeScript compatibility per research.md
+- [x] T003 Configure `turbo.json` at repository root with build/test/lint/dev task graph per research.md (build→`dependsOn: ["^build"]`, test→`dependsOn: ["build"]`, dev→persistent+uncached, lint→parallel)
+- [x] T004 Create `packages/typescript-config/` package with `base.json` (strict, `moduleResolution: "bundler"`, `module: "ESNext"`, `target: "ES2022"`), `library.json`, and `app.json` presets per research.md
+- [x] T004a [P] Create `packages/eslint-config/` package with shared ESLint flat config — base rules for TypeScript (no `any` in packages, consistent imports), and app-specific overrides. Each package/app `eslint.config.js` extends the shared config. Satisfies FR-007.
+- [x] T005 Configure `vitest.workspace.ts` at repository root with `defineWorkspace(["packages/*/vitest.config.ts", "apps/*/vitest.config.ts"])` per research.md
+- [x] T006 Add root `package.json` scripts: `build`, `test`, `lint`, `dev` delegating to `turbo run`
 
 ---
 
