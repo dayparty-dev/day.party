@@ -1,0 +1,58 @@
+installed: []
+settings:
+  auto_execute_hooks: true
+hooks:
+  after_implement:
+  - extension: learn
+    command: speckit.learn.review
+    enabled: true
+    optional: true
+    prompt: Generate a learning guide from this implementation?
+    description: ''
+    condition: null
+  - extension: maqa-ci
+    command: speckit.maqa-ci.check
+    enabled: true
+    optional: true
+    prompt: Check CI pipeline status before moving to review?
+    description: Gate on CI status after implementation completes
+    condition: null
+  - extension: onboard
+    command: speckit.onboard.after-implement
+    enabled: true
+    optional: true
+    prompt: Execute speckit.onboard.after-implement?
+    description: ''
+    condition: null
+  - extension: retrospective
+    command: speckit.retrospective.analyze
+    enabled: true
+    optional: true
+    prompt: Run retrospective analysis now? (spec changes require explicit confirmation)
+    description: Offer a retrospective after implementation without modifying spec
+      unless approved.
+    condition: null
+  before_implement:
+  - extension: onboard
+    command: speckit.onboard.before-implement
+    enabled: true
+    optional: true
+    prompt: Execute speckit.onboard.before-implement?
+    description: ''
+    condition: null
+  after_explain:
+  - extension: onboard
+    command: speckit.onboard.after-explain
+    enabled: true
+    optional: true
+    prompt: Execute speckit.onboard.after-explain?
+    description: ''
+    condition: null
+  after_tasks:
+  - extension: ralph
+    command: speckit.ralph.run
+    enabled: true
+    optional: true
+    prompt: Run ralph loop to implement tasks?
+    description: Start autonomous implementation after task generation
+    condition: null
