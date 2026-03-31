@@ -1,0 +1,10 @@
+{
+  "extends": "@dayparty/typescript-config/library.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "types": ["node"]
+  },
+  "include": ["src"]
+}

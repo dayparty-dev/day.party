@@ -1,0 +1,25 @@
+{
+  "name": "@dayparty/mobile",
+  "main": "src/app.ts",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@dayparty/api-client": "workspace:*",
+    "@dayparty/core": "workspace:*",
+    "@nativescript/core": "~9.0.0",
+    "@nativescript/theme": "^3.1.0"
+  },
+  "devDependencies": {
+    "@dayparty/eslint-config": "workspace:*",
+    "@nativescript/types": "~9.0.0",
+    "@nativescript/webpack": "~5.0.25",
+    "eslint": "^9.0.0",
+    "typescript": "~5.4.0"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "eslint src",
+    "android": "ns run android",
+    "ios": "ns run ios"
+  }
+}

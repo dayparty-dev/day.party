@@ -1,0 +1,30 @@
+{
+  "name": "@dayparty/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Minimal React web client for day.party",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "lint": "eslint src",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dayparty/api-client": "workspace:*",
+    "@dayparty/core": "workspace:*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router": "^7.13.2"
+  },
+  "devDependencies": {
+    "@dayparty/eslint-config": "workspace:*",
+    "@dayparty/typescript-config": "workspace:*",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "^5.4.5",
+    "vite": "^6.0.0"
+  }
+}

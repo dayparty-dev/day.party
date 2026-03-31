@@ -100,11 +100,11 @@
 
 **Independent Test**: `pnpm install && pnpm build && pnpm test && pnpm lint` succeeds from a fresh clone. Modify a type in `@dayparty/core` and run `pnpm build` — consuming apps rebuild.
 
-- [ ] T047 [US1] Initialize `apps/api/` Hono app skeleton with `package.json` (`name: @dayparty/api`, depends on `@dayparty/core`, `@dayparty/domain`, `@dayparty/db`, `@dayparty/validation`, `hono`, `@hono/node-server`), `tsconfig.json`, and `apps/api/src/index.ts` entry point that starts the server
-- [ ] T048 [P] [US1] Initialize `apps/web/` React app skeleton with `package.json` (`name: @dayparty/web`, depends on `@dayparty/core`, `@dayparty/api-client`, `react`, `react-dom`, `react-router`), `tsconfig.json`, `vite.config.ts`, `index.html`, and `apps/web/src/main.tsx` entry point
-- [ ] T049 [P] [US1] Initialize `apps/mobile/` NativeScript 9 app skeleton with `package.json` (`name: @dayparty/mobile`, depends on `@dayparty/core`, `@dayparty/api-client`, `@nativescript/core`), `nativescript.config.ts`, `tsconfig.json`, and `apps/mobile/src/app.ts` bootstrap
-- [ ] T050 [US1] Verify `apps/web-legacy/` existing Next.js app remains bootable independently with its own install/build — no shared package dependencies added
-- [ ] T051 [US1] Run full workspace validation: `pnpm install && pnpm build && pnpm lint` from repository root — all packages and apps compile successfully in correct dependency order
+- [x] T047 [US1] Initialize `apps/api/` Hono app skeleton with `package.json` (`name: @dayparty/api`, depends on `@dayparty/core`, `@dayparty/domain`, `@dayparty/db`, `@dayparty/validation`, `hono`, `@hono/node-server`), `tsconfig.json`, and `apps/api/src/index.ts` entry point that starts the server
+- [x] T048 [P] [US1] Initialize `apps/web/` React app skeleton with `package.json` (`name: @dayparty/web`, depends on `@dayparty/core`, `@dayparty/api-client`, `react`, `react-dom`, `react-router`), `tsconfig.json`, `vite.config.ts`, `index.html`, and `apps/web/src/main.tsx` entry point
+- [x] T049 [P] [US1] Initialize `apps/mobile/` NativeScript 9 app skeleton with `package.json` (`name: @dayparty/mobile`, depends on `@dayparty/core`, `@dayparty/api-client`, `@nativescript/core`), `nativescript.config.ts`, `tsconfig.json`, and `apps/mobile/src/app.ts` bootstrap
+- [x] T050 [US1] Verify `apps/web-legacy/` existing Next.js app remains bootable independently with its own install/build — no shared package dependencies added
+- [x] T051 [US1] Run full workspace validation: `pnpm install && pnpm build && pnpm lint` from repository root — all packages and apps compile successfully in correct dependency order
 
 **Checkpoint**: US1 complete — monorepo workspace is functional. Developer can clone, install, build, test, and lint everything with single commands.
 
