@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import './load-env.js';
 import { closeDb, getDb, MongoTagRepository, MongoTaskRepository, MongoUserRepository } from '@dayparty/db';
 
 function todayLocal(): string {
