@@ -246,7 +246,7 @@ Started: 2026-03-31 05:29:22
 - [x] T050: `web-legacy` still has no `@dayparty/*` package deps (only package name uses scope)
 - [x] T051: `pnpm build`, `pnpm lint`, `pnpm test` from root succeed
       **Tasks Remaining in Story**: None — US1 complete
-      **Commit**: 75107f6
+      **Commit**: 3ccef8b
       **Files Changed**:
 - apps/api/\*\* (new)
 - apps/web/\*\* (new)
