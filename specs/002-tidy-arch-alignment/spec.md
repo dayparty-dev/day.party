@@ -81,13 +81,14 @@ As a maintainer, I need application entrypoints to assemble dependencies from ty
 
 ### Measurable Outcomes
 
-- **SC-001**: The architecture mapping (FR-001) exists, is linked from the feature plan, and passes a peer review (at least one other maintainer approves) as “accurate for current repo layout.”
-- **SC-002**: For each agreed domain slice in scope, 100% of new or intentionally refactored use-cases satisfy FR-002 through FR-005 when checked against a short architecture checklist derived from this spec (binary pass/fail per slice).
-- **SC-003**: For each completed slice, at least one core-level automated test exists that executes primary domain rules without requiring the public HTTP server process (verifiable by test location or documented test taxonomy).
+- **SC-001**: The architecture mapping (FR-001) exists, is linked from the feature plan and maintainer entrypoints (e.g. `AGENTS.md` per implementation tasks), and passes a peer review (at least one other maintainer approves) as “accurate for current repo layout.”
+- **SC-002**: For each agreed domain slice in scope (see **Assumptions → Domain slices (v1)**), 100% of new or intentionally refactored use-cases satisfy FR-002 through FR-005 when checked against a short architecture checklist derived from this spec (binary pass/fail per slice).
+- **SC-003**: For each domain slice **marked complete** in this feature increment, at least one core-level automated test exists that executes primary domain rules without requiring the public HTTP server process (verifiable by test location or documented test taxonomy). The v1 slice list and matching tests are enumerated in `tasks.md`; additional slices add tests when those slices are explicitly completed in follow-up work.
 - **SC-004**: No more than one corrective follow-up PR is needed per slice after initial merge to fix boundary violations caught in review (indicates predictable, reviewable changes).
 
 ## Assumptions
 
+- **Domain slices (v1)**: The **task aggregate** is in scope for this increment: task-related actions in `@dayparty/domain` (including rundown/capacity behavior) plus shared **`apps/api` adapter typing** (`ApiEnv` ports) that serves tasks, tags, and auth routes. **SC-003** for v1 is satisfied by core-level tests covering **at least two** distinct task actions (`create-task` and `get-rundown`)—see `tasks.md`. **Tags** and **auth/session** flows remain subject to **SC-002** whenever touched; add dedicated core tests for those slices when a future increment marks them explicitly complete (not required for v1 unless domain code there is refactored under this feature).
 - **Audience**: Primary readers are engineering maintainers and leads; stories describe their workflows (clarity, safety, speed of change). Wording stays outcome-oriented and avoids naming specific frameworks in requirements.
 - The normative structural reference is `docs/broader_context/004-tidy-architecture-reference.md`; the manifesto (`docs/broader_context/003-tidy-architecture-manifesto.md`) and project constitution remain higher-level guardrails; where they conflict, constitution wins.
 - Scope centers on the “new stack” (shared packages and modern apps under the monorepo restructure), not on lifting legacy apps into pods unless explicitly added later.

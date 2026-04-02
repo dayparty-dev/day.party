@@ -62,14 +62,15 @@ All gates remain **Pass**. Artifacts (`research.md`, `data-model.md`, `quickstar
 ```text
 specs/002-tidy-arch-alignment/
 ├── plan.md              # This file
+├── spec.md
+├── tasks.md             # Implementation checklist (speckit-tasks)
 ├── research.md          # Phase 0
 ├── data-model.md        # Phase 1
 ├── quickstart.md        # Phase 1
 ├── contracts/           # Phase 1
 │   └── architecture-checklist.md
-├── checklists/
-│   └── requirements.md
-└── spec.md
+└── checklists/
+    └── requirements.md
 ```
 
 ### Source Code (repository root)

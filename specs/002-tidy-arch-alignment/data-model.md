@@ -22,7 +22,7 @@ This feature does not introduce new product aggregates. It defines **maintainer-
 | `status`          | planned \| in progress \| done (per team convention)           |
 | `checklistResult` | Pass/fail vs `contracts/architecture-checklist.md`             |
 
-**Relationships**: A slice **uses** multiple ports and **is exercised** by one or more adapters (API routes, future jobs).
+**Relationships**: A slice **uses** multiple ports and **is exercised** by one or more adapters (API routes, future jobs). **V1 slices** for this feature are enumerated in [`spec.md`](./spec.md) (Assumptions) and [`tasks.md`](./tasks.md).
 
 ## Port (repository interface)
 
