@@ -1,4 +1,4 @@
-import type { TaskRundownItemResponse } from '@dayparty/api-client';
+import type { TaskRundownItemResponse, UpdateTaskInput } from '@dayparty/api-client';
 import { taskFocusedElapsedMs } from '@dayparty/core';
 import type { EventData, Page } from '@nativescript/core';
 import { Observable } from '@nativescript/core';
@@ -16,10 +16,28 @@ function todayIso(): string {
 
 const SIZE_MINUTES = 15;
 
+function openSortedTasks(tasks: TaskRundownItemResponse[]): TaskRundownItemResponse[] {
+  return tasks.filter((t) => !t.isComplete).sort((a, b) => a.position - b.position);
+}
+
 function pickFocusTask(tasks: TaskRundownItemResponse[]): TaskRundownItemResponse | null {
-  const open = tasks.filter((t) => !t.isComplete).sort((a, b) => a.position - b.position);
+  const open = openSortedTasks(tasks);
   const inProgress = open.find((t) => t.status === 'in_progress');
   return inProgress ?? open[0] ?? null;
+}
+
+function nextTaskAfterFocus(
+  focus: TaskRundownItemResponse | null,
+  openSorted: TaskRundownItemResponse[],
+): TaskRundownItemResponse | null {
+  if (!focus) {
+    return null;
+  }
+  const i = openSorted.findIndex((t) => t.id === focus.id);
+  if (i < 0) {
+    return null;
+  }
+  return openSorted[i + 1] ?? null;
 }
 
 class OngoingViewModel extends Observable {
@@ -38,6 +56,22 @@ class OngoingViewModel extends Observable {
   private currentFocus: TaskRundownItemResponse | null = null;
   private currentTaskId: string | null = null;
   private currentStatus: string | null = null;
+
+  constructor() {
+    super();
+    this.set('effortMinutes', '');
+    this.set('effortSize', '2');
+    this.set('effortError', '');
+    this.set('effortErrorVisibility', 'collapse');
+    this.set('effortSaving', false);
+    this.set('effortSaveEnabled', true);
+    this.set('effortSaveButtonText', 'Guardar esfuerzo');
+    this.set('nextVisibility', 'collapse');
+    this.set('nextTitle', '');
+    this.set('nextMeta', '');
+    this.set('lastOpenVisibility', 'collapse');
+    this.set('lastOpenHint', '');
+  }
 
   startTicker(): void {
     this.stopTicker();
@@ -86,6 +120,8 @@ class OngoingViewModel extends Observable {
       this.set('errorBannerVisibility', 'visible');
       this.set('emptyVisibility', 'collapse');
       this.set('focusVisibility', 'collapse');
+      this.set('nextVisibility', 'collapse');
+      this.set('lastOpenVisibility', 'collapse');
       return;
     }
 
@@ -100,6 +136,7 @@ class OngoingViewModel extends Observable {
       }
     }
 
+    const open = openSortedTasks(rundownResult.data.tasks);
     const focus = pickFocusTask(rundownResult.data.tasks);
     if (!focus) {
       this.stopTicker();
@@ -109,6 +146,8 @@ class OngoingViewModel extends Observable {
       this.set('emptyVisibility', 'visible');
       this.set('focusVisibility', 'collapse');
       this.set('focusToggleVisibility', 'collapse');
+      this.set('nextVisibility', 'collapse');
+      this.set('lastOpenVisibility', 'collapse');
       return;
     }
 
@@ -123,6 +162,27 @@ class OngoingViewModel extends Observable {
     this.set('title', focus.title);
     const tag = focus.tagKey != null && tagNames.has(focus.tagKey) ? tagNames.get(focus.tagKey) : 'Sin etiqueta';
     this.set('metaLine', `Tamaño ${focus.size} · ${tag}`);
+    this.set('effortMinutes', focus.estimatedMinutes != null ? String(focus.estimatedMinutes) : '');
+    this.set('effortSize', String(focus.size));
+    this.set('effortError', '');
+    this.set('effortErrorVisibility', 'collapse');
+
+    const next = nextTaskAfterFocus(focus, open);
+    if (next) {
+      const nextTag = next.tagKey != null && tagNames.has(next.tagKey) ? tagNames.get(next.tagKey) : 'Sin etiqueta';
+      const approx = next.estimatedMinutes ?? next.size * SIZE_MINUTES;
+      this.set('nextVisibility', 'visible');
+      this.set('nextTitle', next.title);
+      this.set('nextMeta', `~${approx} min · Tamaño ${next.size} · ${nextTag}`);
+      this.set('lastOpenVisibility', 'collapse');
+    } else {
+      this.set('nextVisibility', 'collapse');
+      this.set('nextTitle', '');
+      this.set('nextMeta', '');
+      this.set('lastOpenVisibility', 'visible');
+      this.set('lastOpenHint', 'Última tarea abierta del día: al completarla, habrás cerrado la lista del día.');
+    }
+
     this.startTicker();
   }
 
@@ -161,6 +221,65 @@ class OngoingViewModel extends Observable {
 
   onRetry(): void {
     void this.loadFocus();
+  }
+
+  async onSaveEffort(): Promise<void> {
+    if (!this.currentTaskId || !this.currentFocus) {
+      return;
+    }
+    if (this.get('effortSaving')) {
+      return;
+    }
+    this.set('effortError', '');
+    this.set('effortErrorVisibility', 'collapse');
+    const trimmed = String(this.get('effortMinutes') ?? '').trim();
+    let estimatedMinutes: number | undefined;
+    if (trimmed !== '') {
+      const n = Number(trimmed);
+      if (!Number.isInteger(n) || n < 0 || n > 2880) {
+        this.set('effortError', 'Los minutos deben ser un entero entre 0 y 2880, o déjalo vacío para no cambiarlos.');
+        this.set('effortErrorVisibility', 'visible');
+        return;
+      }
+      estimatedMinutes = n;
+    }
+    const sizeNum = Number(String(this.get('effortSize') ?? '').trim());
+    if (!Number.isInteger(sizeNum) || sizeNum < 1 || sizeNum > 5) {
+      this.set('effortError', 'El tamaño debe ser un entero entre 1 y 5.');
+      this.set('effortErrorVisibility', 'visible');
+      return;
+    }
+    const focus = this.currentFocus;
+    const sizeChanged = sizeNum !== focus.size;
+    const minutesChanged = trimmed !== '' && estimatedMinutes !== focus.estimatedMinutes;
+    if (!sizeChanged && !minutesChanged) {
+      return;
+    }
+    const patch: UpdateTaskInput = { size: sizeNum as 1 | 2 | 3 | 4 | 5 };
+    if (trimmed !== '') {
+      patch.estimatedMinutes = estimatedMinutes;
+    }
+    this.set('effortSaving', true);
+    this.set('effortSaveEnabled', false);
+    this.set('effortSaveButtonText', 'Guardando…');
+    const client = authState.getClient();
+    try {
+      const result = await client.updateTask(this.currentTaskId, patch);
+      if (authState.consumeUnauthorized(result)) {
+        return;
+      }
+      if (result.ok === false) {
+        const net = isLikelyNetworkFailure(result.error);
+        this.set('effortError', net ? 'Sin conexión. Revisa la red o la API.' : result.error.message);
+        this.set('effortErrorVisibility', 'visible');
+        return;
+      }
+      await this.loadFocus();
+    } finally {
+      this.set('effortSaving', false);
+      this.set('effortSaveEnabled', true);
+      this.set('effortSaveButtonText', 'Guardar esfuerzo');
+    }
   }
 
   async onToggleFocus(): Promise<void> {

@@ -105,9 +105,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T018 [US4] Add in-flow edit for `estimatedMinutes` (and/or size) with `client.updateTask` in `apps/web/src/pages/OngoingPage.tsx`
-- [ ] T019 [US4] Render **next** open task preview (title + meta) after **completion** or below current card in `apps/web/src/pages/OngoingPage.tsx`; when the user **skips** / **pauses** focus per product rules, update the preview so **what is next** (or end-of-day) stays obvious per `spec.md` US4 scenario 3
-- [ ] T020 [P] [US4] Mirror T018–T019 (including **skip/next** behavior) in `apps/mobile/src/views/ongoing-view.ts` and `apps/mobile/src/views/ongoing-view.xml`
+- [x] T018 [US4] Add in-flow edit for `estimatedMinutes` (and/or size) with `client.updateTask` in `apps/web/src/pages/OngoingPage.tsx`
+- [x] T019 [US4] Render **next** open task preview (title + meta) after **completion** or below current card in `apps/web/src/pages/OngoingPage.tsx`; when the user **skips** / **pauses** focus per product rules, update the preview so **what is next** (or end-of-day) stays obvious per `spec.md` US4 scenario 3
+- [x] T020 [P] [US4] Mirror T018–T019 (including **skip/next** behavior) in `apps/mobile/src/views/ongoing-view.ts` and `apps/mobile/src/views/ongoing-view.xml`
 
 **Checkpoint**: US4 complete on web + mobile.
 

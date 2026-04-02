@@ -1,9 +1,10 @@
+import type { TaskRundownItemResponse, UpdateTaskInput } from '@dayparty/api-client';
 import { ERROR_CODES, taskFocusedElapsedMs } from '@dayparty/core';
-import type { TaskRundownItemResponse } from '@dayparty/api-client';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
+import { nextTaskAfterFocus, openSortedTasks, pickFocusTask } from '../utils/ongoing-focus';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import { todayLocalDateString } from '../utils/today-local';
 import styles from './OngoingPage.module.css';
@@ -11,21 +12,22 @@ import styles from './OngoingPage.module.css';
 /** Rough focus window per size step (minutes). */
 const SIZE_MINUTES = 15;
 
+const SIZES = [1, 2, 3, 4, 5] as const;
+
 export function OngoingPage(): ReactElement {
   const { client, onUnauthorized } = useAuth();
   const date = useMemo(() => todayLocalDateString(), []);
   const [focusTask, setFocusTask] = useState<TaskRundownItemResponse | null>(null);
+  const [nextTask, setNextTask] = useState<TaskRundownItemResponse | null>(null);
   const [tagColor, setTagColor] = useState<string | undefined>(undefined);
   const [tick, setTick] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [networkBanner, setNetworkBanner] = useState<string | null>(null);
   const [focusBusy, setFocusBusy] = useState(false);
-
-  const pickFocus = useCallback((tasks: TaskRundownItemResponse[]): TaskRundownItemResponse | null => {
-    const open = tasks.filter((t) => !t.isComplete).sort((a, b) => a.position - b.position);
-    const inProgress = open.find((t) => t.status === 'in_progress');
-    return inProgress ?? open[0] ?? null;
-  }, []);
+  const [minutesDraft, setMinutesDraft] = useState('');
+  const [sizeDraft, setSizeDraft] = useState<number>(2);
+  const [effortError, setEffortError] = useState<string | null>(null);
+  const [effortSaving, setEffortSaving] = useState(false);
 
   const load = useCallback(async () => {
     setLoadError(null);
@@ -55,19 +57,33 @@ export function OngoingPage(): ReactElement {
       setLoadError(tRes.error.message);
       return;
     }
-    const next = pickFocus(rRes.data.tasks);
+    const open = openSortedTasks(rRes.data.tasks);
+    const next = pickFocusTask(rRes.data.tasks);
     setFocusTask(next);
+    setNextTask(nextTaskAfterFocus(next, open));
     if (next?.tagKey) {
       const tag = tRes.data.find((x) => x.key === next.tagKey);
       setTagColor(tag?.color);
     } else {
       setTagColor(undefined);
     }
-  }, [client, date, onUnauthorized, pickFocus]);
+  }, [client, date, onUnauthorized]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!focusTask) {
+      setMinutesDraft('');
+      setSizeDraft(2);
+      setEffortError(null);
+      return;
+    }
+    setMinutesDraft(focusTask.estimatedMinutes != null ? String(focusTask.estimatedMinutes) : '');
+    setSizeDraft(focusTask.size);
+    setEffortError(null);
+  }, [focusTask?.id, focusTask?.estimatedMinutes, focusTask?.size]);
 
   useEffect(() => {
     if (!focusTask) {
@@ -115,6 +131,48 @@ export function OngoingPage(): ReactElement {
         return;
       }
       setLoadError(result.error.message);
+      return;
+    }
+    await load();
+  }
+
+  async function saveEffort(): Promise<void> {
+    if (!focusTask || effortSaving) {
+      return;
+    }
+    setEffortError(null);
+    const trimmed = minutesDraft.trim();
+    let estimatedMinutes: number | undefined;
+    if (trimmed !== '') {
+      const n = Number(trimmed);
+      if (!Number.isInteger(n) || n < 0 || n > 2880) {
+        setEffortError('Minutes must be a whole number from 0 to 2880, or leave empty to keep the stored estimate.');
+        return;
+      }
+      estimatedMinutes = n;
+    }
+    const sizeChanged = sizeDraft !== focusTask.size;
+    const patch: UpdateTaskInput = { size: sizeDraft as (typeof SIZES)[number] };
+    if (trimmed !== '') {
+      patch.estimatedMinutes = estimatedMinutes;
+    }
+    const minutesChanged = trimmed !== '' && estimatedMinutes !== focusTask.estimatedMinutes;
+    if (!sizeChanged && !minutesChanged) {
+      return;
+    }
+    setEffortSaving(true);
+    const result = await client.updateTask(focusTask.id, patch);
+    setEffortSaving(false);
+    if (!result.ok) {
+      if (result.error.code === ERROR_CODES.UNAUTHORIZED) {
+        onUnauthorized();
+        return;
+      }
+      if (isLikelyNetworkFailure(result.error)) {
+        setNetworkBanner(result.error.message);
+        return;
+      }
+      setEffortError(result.error.message);
       return;
     }
     await load();
@@ -182,6 +240,56 @@ export function OngoingPage(): ReactElement {
               {focusTask.tagKey ? <span className={styles.tagKey}>{focusTask.tagKey}</span> : null}
             </p>
 
+            <div className={styles.effortPanel}>
+              <p className={styles.effortLabel}>Planned effort</p>
+              <div className={styles.effortRow}>
+                <label className={styles.effortField}>
+                  <span className={styles.effortHint}>Est. minutes (optional)</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className={styles.effortInput}
+                    value={minutesDraft}
+                    onChange={(e) => setMinutesDraft(e.target.value)}
+                    placeholder={`~${focusTask.size * SIZE_MINUTES} from size`}
+                    aria-invalid={effortError ? true : undefined}
+                    aria-describedby={effortError ? 'effort-err' : undefined}
+                  />
+                </label>
+                <label className={styles.effortField}>
+                  <span className={styles.effortHint}>Size</span>
+                  <select
+                    className={styles.effortSelect}
+                    value={sizeDraft}
+                    onChange={(e) => setSizeDraft(Number(e.target.value) as (typeof SIZES)[number])}
+                  >
+                    {SIZES.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              {effortError ? (
+                <p id="effort-err" className={styles.effortErr} role="alert">
+                  {effortError}
+                </p>
+              ) : (
+                <p className={styles.effortFootnote}>
+                  Empty minutes keeps your saved estimate; change size or minutes and save.
+                </p>
+              )}
+              <button
+                type="button"
+                className={styles.effortSave}
+                disabled={effortSaving}
+                onClick={() => void saveEffort()}
+              >
+                {effortSaving ? 'Saving…' : 'Save effort'}
+              </button>
+            </div>
+
             <div className={styles.progressWrap}>
               <div className={styles.progressMeta}>
                 <span>Elapsed</span>
@@ -211,6 +319,23 @@ export function OngoingPage(): ReactElement {
             </button>
           </div>
         </section>
+      ) : null}
+
+      {focusTask && nextTask ? (
+        <section className={styles.nextCard} aria-label="Next after this task">
+          <p className={styles.nextKicker}>Next up</p>
+          <p className={styles.nextTitle}>{nextTask.title}</p>
+          <p className={styles.nextMeta}>
+            ~{nextTask.estimatedMinutes ?? nextTask.size * SIZE_MINUTES} min · Size {nextTask.size}
+            {nextTask.tagKey ? ` · ${nextTask.tagKey}` : ''}
+          </p>
+        </section>
+      ) : null}
+
+      {focusTask && !nextTask ? (
+        <p className={styles.nextNone} role="status">
+          Last open task for today — after this, you&apos;re done with the runway.
+        </p>
       ) : null}
     </div>
   );
