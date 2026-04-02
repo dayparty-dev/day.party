@@ -1,4 +1,5 @@
-import type { Task, TaskEssentiality, TaskStatus } from '@dayparty/core';
+import type { Task, TaskBounty, TaskEssentiality, TaskStatus } from '@dayparty/core';
+import type { LedgerRepository } from '../interfaces/ledger-repository';
 import type { TaskRepository } from '../interfaces/task-repository';
 import type { TagRepository } from '../interfaces/tag-repository';
 
@@ -14,6 +15,8 @@ export type UpdateTaskInput = Partial<{
   deferredToDate: string | null;
   /** Empty string clears stored notes (P3). */
   notesMarkdown: string;
+  /** `null` clears stored bounty (P4). */
+  bounty: TaskBounty | null;
 }>;
 
 function mergeLifecycleFields(
@@ -61,7 +64,7 @@ function mergeLifecycleFields(
   return { isComplete, status, deferredToDate };
 }
 
-export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepository) {
+export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepository, ledgerRepo: LedgerRepository) {
   return async (id: string, input: UpdateTaskInput): Promise<Task> => {
     const task = await taskRepo.findById(id);
     if (!task) {
@@ -76,6 +79,7 @@ export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
     }
 
     const touchesLifecycle = input.isComplete !== undefined || input.status !== undefined || 'deferredToDate' in input;
+    const wasIncomplete = !task.isComplete;
 
     const fields: Partial<Omit<Task, 'id' | 'userId' | 'createdAt'>> = {};
     if (input.title !== undefined) fields.title = input.title;
@@ -85,6 +89,9 @@ export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
     if (input.estimatedMinutes !== undefined) fields.estimatedMinutes = input.estimatedMinutes;
     if (input.essentiality !== undefined) fields.essentiality = input.essentiality;
     if (input.notesMarkdown !== undefined) fields.notesMarkdown = input.notesMarkdown;
+    if ('bounty' in input) {
+      fields.bounty = input.bounty === null ? undefined : input.bounty;
+    }
 
     if (touchesLifecycle) {
       const next = mergeLifecycleFields(task, input);
@@ -96,6 +103,19 @@ export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
     const updated = await taskRepo.update(id, fields);
     if (!updated) {
       throw new Error(`Task "${id}" not found after update`);
+    }
+
+    if (touchesLifecycle && wasIncomplete && updated.isComplete && updated.bounty && updated.bounty.amount > 0) {
+      const correlation = `task-bounty:${task.id}`;
+      const existing = await ledgerRepo.findByCorrelation(task.userId, correlation);
+      if (!existing) {
+        await ledgerRepo.insert({
+          userId: task.userId,
+          amount: updated.bounty.amount,
+          reason: 'task_completion',
+          correlation,
+        });
+      }
     }
 
     return updated;

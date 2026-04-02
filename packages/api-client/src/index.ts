@@ -1,5 +1,7 @@
 export { DayPartyClient } from './client';
 export type {
+  ApiLedgerEntry,
+  ApiRewardDefinition,
   AuthUserResponse,
   ClientOptions,
   CreateTagInput,
@@ -8,6 +10,7 @@ export type {
   DayRundownResponse,
   DaySuggestionsQuery,
   DaySuggestionsResponse,
+  LedgerPageResponse,
   LoginInput,
   PatchUserPreferencesInput,
   ReorderTasksInput,

@@ -2,8 +2,13 @@ import type {
   ApiError,
   DayFit,
   DayWindow,
+  LedgerEntry,
+  LedgerEntryReason,
+  RewardDefinition,
+  RewardDefinitionType,
   Tag,
   Task,
+  TaskBounty,
   TaskSize,
   User,
   UserPreferences,
@@ -11,11 +16,14 @@ import type {
 } from '@dayparty/core';
 import { ERROR_CODES } from '@dayparty/core';
 import {
+  createRewardDefinitionSchema,
   createTagSchema,
   createTaskSchema,
   daySuggestionsQuerySchema,
   fromZodError,
+  ledgerQuerySchema,
   loginSchema,
+  marketplacePurchaseSchema,
   patchUserPreferencesSchema,
   reorderTasksSchema,
   taskTriageSchema,
@@ -23,6 +31,7 @@ import {
   updateTaskSchema,
 } from '@dayparty/validation';
 import type {
+  CreateRewardDefinitionInput,
   CreateTagInput,
   CreateTaskInput,
   DaySuggestionsQuery,
@@ -42,6 +51,15 @@ type ApiTask = Omit<Task, 'userId'>;
 /** Rundown row — no `notesMarkdown`; optional `notesPreview` (contract P3). */
 type ApiRundownTask = Omit<ApiTask, 'notesMarkdown'> & { notesPreview?: string };
 type ApiTag = Omit<Tag, 'userId'>;
+
+type ApiRewardDefinition = Omit<RewardDefinition, 'userId'>;
+type ApiLedgerEntry = Omit<LedgerEntry, 'userId'>;
+
+type LedgerPageResponse = {
+  entries: ApiLedgerEntry[];
+  balance: number;
+  nextCursor?: string;
+};
 
 export type DayCapacityHint = {
   date: string;
@@ -309,6 +327,57 @@ export class DayPartyClient {
     });
   }
 
+  async getRewards(): Promise<Result<ApiRewardDefinition[]>> {
+    return this.request('/rewards', {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseRewardsList,
+    });
+  }
+
+  async createRewardDefinition(input: CreateRewardDefinitionInput): Promise<Result<ApiRewardDefinition>> {
+    const parsed = createRewardDefinitionSchema.safeParse(input);
+    if (!parsed.success) {
+      return this.fail(fromZodError(parsed.error));
+    }
+    return this.request('/rewards', {
+      method: 'POST',
+      requiresAuth: true,
+      body: parsed.data,
+      parse: parseRewardDefinition,
+    });
+  }
+
+  async getLedger(query?: { limit?: number; cursor?: string }): Promise<Result<LedgerPageResponse>> {
+    const parsed = ledgerQuerySchema.safeParse(query ?? {});
+    if (!parsed.success) {
+      return this.fail(fromZodError(parsed.error));
+    }
+    const q = new URLSearchParams();
+    q.set('limit', String(parsed.data.limit));
+    if (parsed.data.cursor) {
+      q.set('cursor', parsed.data.cursor);
+    }
+    return this.request(`/ledger?${q}`, {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseLedgerPage,
+    });
+  }
+
+  async purchaseReward(rewardDefinitionId: string): Promise<Result<{ balance: number }>> {
+    const parsed = marketplacePurchaseSchema.safeParse({ rewardDefinitionId });
+    if (!parsed.success) {
+      return this.fail(fromZodError(parsed.error));
+    }
+    return this.request('/marketplace/purchase', {
+      method: 'POST',
+      requiresAuth: true,
+      body: parsed.data,
+      parse: parsePurchaseBalance,
+    });
+  }
+
   private async request<T>(
     path: string,
     options: {
@@ -433,6 +502,14 @@ function parseTask(input: unknown): ApiTask | null {
   const deferredToDate = typeof input.deferredToDate === 'string' ? input.deferredToDate : undefined;
   const notesMarkdown = typeof input.notesMarkdown === 'string' ? input.notesMarkdown : undefined;
 
+  let bounty: TaskBounty | undefined;
+  if ('bounty' in input && input.bounty != null) {
+    if (!isTaskBounty(input.bounty)) {
+      return null;
+    }
+    bounty = input.bounty;
+  }
+
   return {
     id: input.id,
     title: input.title,
@@ -442,6 +519,7 @@ function parseTask(input: unknown): ApiTask | null {
     ...(estimatedMinutes !== undefined ? { estimatedMinutes } : {}),
     ...(essentiality !== undefined ? { essentiality } : {}),
     ...(notesMarkdown !== undefined ? { notesMarkdown } : {}),
+    ...(bounty !== undefined ? { bounty } : {}),
     tagKey,
     isComplete: input.isComplete,
     scheduledDate: input.scheduledDate,
@@ -637,6 +715,106 @@ function isTaskStatus(value: unknown): value is Task['status'] {
   );
 }
 
+function isTaskBounty(value: unknown): value is TaskBounty {
+  if (!isRecord(value) || typeof value.amount !== 'number' || !Number.isInteger(value.amount) || value.amount < 1) {
+    return false;
+  }
+  if (
+    value.tagKeys !== undefined &&
+    (!Array.isArray(value.tagKeys) || value.tagKeys.some((t) => typeof t !== 'string'))
+  ) {
+    return false;
+  }
+  if (value.highResistance !== undefined && typeof value.highResistance !== 'boolean') {
+    return false;
+  }
+  return true;
+}
+
+function isRewardDefinitionType(value: unknown): value is RewardDefinitionType {
+  return value === 'instant' || value === 'banked' || value === 'scheduled';
+}
+
+function isLedgerEntryReason(value: unknown): value is LedgerEntryReason {
+  return value === 'task_completion' || value === 'purchase' || value === 'adjustment';
+}
+
+function parseRewardDefinition(input: unknown): ApiRewardDefinition | null {
+  if (!isRecord(input) || typeof input.id !== 'string' || typeof input.name !== 'string') {
+    return null;
+  }
+  if (
+    !isRewardDefinitionType(input.type) ||
+    typeof input.costCurrency !== 'number' ||
+    !Number.isInteger(input.costCurrency)
+  ) {
+    return null;
+  }
+  const metadata =
+    input.metadata !== undefined && input.metadata !== null && isRecord(input.metadata) ? input.metadata : undefined;
+  return {
+    id: input.id,
+    name: input.name,
+    type: input.type,
+    costCurrency: input.costCurrency,
+    ...(metadata ? { metadata } : {}),
+  };
+}
+
+function parseRewardsList(input: unknown): ApiRewardDefinition[] | null {
+  if (!isRecord(input) || !Array.isArray(input.rewards)) {
+    return null;
+  }
+  const out: ApiRewardDefinition[] = [];
+  for (const item of input.rewards) {
+    const r = parseRewardDefinition(item);
+    if (!r) return null;
+    out.push(r);
+  }
+  return out;
+}
+
+function parseLedgerEntry(input: unknown): ApiLedgerEntry | null {
+  if (
+    !isRecord(input) ||
+    typeof input.id !== 'string' ||
+    typeof input.amount !== 'number' ||
+    !isLedgerEntryReason(input.reason) ||
+    typeof input.createdAt !== 'string'
+  ) {
+    return null;
+  }
+  const correlation = typeof input.correlation === 'string' ? input.correlation : undefined;
+  return {
+    id: input.id,
+    amount: input.amount,
+    reason: input.reason,
+    createdAt: input.createdAt,
+    ...(correlation ? { correlation } : {}),
+  };
+}
+
+function parseLedgerPage(input: unknown): LedgerPageResponse | null {
+  if (!isRecord(input) || !Array.isArray(input.entries) || typeof input.balance !== 'number') {
+    return null;
+  }
+  const entries: ApiLedgerEntry[] = [];
+  for (const e of input.entries) {
+    const row = parseLedgerEntry(e);
+    if (!row) return null;
+    entries.push(row);
+  }
+  const nextCursor = typeof input.nextCursor === 'string' ? input.nextCursor : undefined;
+  return { entries, balance: input.balance, ...(nextCursor ? { nextCursor } : {}) };
+}
+
+function parsePurchaseBalance(input: unknown): { balance: number } | null {
+  if (!isRecord(input) || typeof input.balance !== 'number' || !Number.isFinite(input.balance)) {
+    return null;
+  }
+  return { balance: input.balance };
+}
+
 function parseDaySuggestions(input: unknown): DaySuggestionsResponse | null {
   if (!isRecord(input) || !Array.isArray(input.hints)) {
     return null;
@@ -764,6 +942,8 @@ function createApiError(code: string, message: string, fields?: Record<string, s
 
 export type {
   ApiDayRundown as DayRundownResponse,
+  ApiLedgerEntry,
+  ApiRewardDefinition,
   ApiRundownTask as TaskRundownItemResponse,
   ApiTag as TagResponse,
   ApiTask as TaskResponse,
@@ -773,6 +953,7 @@ export type {
   CreateTagInput,
   CreateTaskInput,
   DaySuggestionsQuery,
+  LedgerPageResponse,
   LoginInput,
   PatchUserPreferencesInput,
   ReorderTasksInput,

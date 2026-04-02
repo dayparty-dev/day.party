@@ -225,9 +225,14 @@ export function RundownPage(): ReactElement {
             ) : null}
           </p>
         </div>
-        <Link className={styles.ongoingBtn} to="/ongoing">
-          Ongoing
-        </Link>
+        <div className={styles.headerActions}>
+          <Link className={styles.headerLink} to="/rewards">
+            Rewards
+          </Link>
+          <Link className={styles.ongoingBtn} to="/ongoing">
+            Ongoing
+          </Link>
+        </div>
       </header>
 
       {networkBanner ? (

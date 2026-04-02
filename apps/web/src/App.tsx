@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import { LoginPage } from './pages/LoginPage';
 import { LogoutPage } from './pages/LogoutPage';
 import { OngoingPage } from './pages/OngoingPage';
+import { RewardsPage } from './pages/RewardsPage';
 import { RundownPage } from './pages/RundownPage';
 
 function AuthBootSpinner(): ReactElement {
@@ -40,6 +41,7 @@ export function App(): ReactElement {
       <Route path="/logout" element={<LogoutPage />} />
       <Route element={<ProtectedLayout />}>
         <Route path="/rundown" element={<RundownPage />} />
+        <Route path="/rewards" element={<RewardsPage />} />
         <Route path="/ongoing" element={<OngoingPage />} />
       </Route>
       <Route path="/" element={<RootRedirect />} />

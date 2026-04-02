@@ -25,9 +25,31 @@
   color: var(--dp-muted);
 }
 
+.headerActions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  align-self: center;
+}
+
+.headerLink {
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--dp-surface);
+  color: var(--dp-accent);
+  border: 1px solid var(--dp-border);
+}
+
+.headerLink:hover {
+  background: var(--dp-pill-bg);
+}
+
 .ongoingBtn {
   flex-shrink: 0;
-  align-self: center;
   font-size: 0.88rem;
   font-weight: 600;
   text-decoration: none;

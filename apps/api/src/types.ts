@@ -1,7 +1,9 @@
-import type { DayRundown, Task, User, UserPreferences } from '@dayparty/core';
+import type { DayRundown, RewardDefinition, Task, User, UserPreferences } from '@dayparty/core';
 import type {
   CreateTaskInput,
   DaySuggestionsResult,
+  LedgerListParams,
+  LedgerPageResult,
   SessionRepository,
   TagRepository,
   TaskRepository,
@@ -27,6 +29,10 @@ export type ApiEnv = {
   suggestDayCapacities: (userId: string, fromDate: string, toDate: string) => Promise<DaySuggestionsResult>;
   getUserPreferences: (userId: string) => Promise<UserPreferences>;
   patchUserPreferences: (userId: string, patch: UserPreferencesPatch) => Promise<UserPreferences>;
+  listRewardDefinitions: (userId: string) => Promise<RewardDefinition[]>;
+  createRewardDefinition: (userId: string, input: Omit<RewardDefinition, 'id' | 'userId'>) => Promise<RewardDefinition>;
+  getLedgerPage: (userId: string, params: LedgerListParams) => Promise<LedgerPageResult>;
+  purchaseReward: (userId: string, rewardDefinitionId: string) => Promise<{ balance: number }>;
 };
 
 export type ApiVariables = {

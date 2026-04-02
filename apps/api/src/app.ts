@@ -4,6 +4,9 @@ import { registerErrorHandler } from './middleware/error-handler';
 import { createAuthRoutes } from './routes/auth';
 import { createTagRoutes } from './routes/tags';
 import { createPreferenceRoutes } from './routes/preferences';
+import { createLedgerRoutes } from './routes/ledger';
+import { createMarketplaceRoutes } from './routes/marketplace';
+import { createRewardRoutes } from './routes/rewards';
 import { createTaskRoutes } from './routes/tasks';
 import type { ApiEnv, ApiVariables } from './types';
 
@@ -32,5 +35,8 @@ export function createApp(env: ApiEnv): Hono<{ Variables: ApiVariables }> {
   app.route('/api/tasks', createTaskRoutes(env));
   app.route('/api/me/preferences', createPreferenceRoutes(env));
   app.route('/api/tags', createTagRoutes(env));
+  app.route('/api/rewards', createRewardRoutes(env));
+  app.route('/api/ledger', createLedgerRoutes(env));
+  app.route('/api/marketplace', createMarketplaceRoutes(env));
   return app;
 }

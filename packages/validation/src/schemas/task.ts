@@ -9,6 +9,12 @@ export const taskEssentialitySchema = z.enum(['essential', 'normal', 'optional']
 
 export const taskStatusSchema = z.enum(['planned', 'in_progress', 'done', 'skipped', 'deferred']);
 
+export const taskBountySchema = z.object({
+  amount: z.number().int().min(1).max(1_000_000),
+  tagKeys: z.array(z.string()).optional(),
+  highResistance: z.boolean().optional(),
+});
+
 export const createTaskSchema = z.object({
   title: z.string().trim().min(1).max(500),
   size: z.number().int().min(1).max(5) as z.ZodType<1 | 2 | 3 | 4 | 5>,
@@ -17,6 +23,7 @@ export const createTaskSchema = z.object({
   estimatedMinutes: estimatedMinutesSchema.optional(),
   essentiality: taskEssentialitySchema.optional(),
   notesMarkdown: notesMarkdownSchema.optional(),
+  bounty: taskBountySchema.optional(),
 });
 
 export const updateTaskSchema = z
@@ -38,6 +45,7 @@ export const updateTaskSchema = z
       .nullable()
       .optional(),
     notesMarkdown: z.union([notesMarkdownSchema, z.literal('')]).optional(),
+    bounty: z.union([taskBountySchema, z.null()]).optional(),
   })
   .refine((d) => !(d.status === 'deferred' && (d.deferredToDate === undefined || d.deferredToDate === null)), {
     message: 'deferredToDate is required when status is deferred',

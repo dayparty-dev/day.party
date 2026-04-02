@@ -1,5 +1,5 @@
 import { ObjectId, type Db, type Collection } from 'mongodb';
-import { DEFAULT_SIZE_TO_MINUTES, type Task, type TaskStatus } from '@dayparty/core';
+import { DEFAULT_SIZE_TO_MINUTES, type Task, type TaskBounty, type TaskStatus } from '@dayparty/core';
 import type { TaskRepository } from '@dayparty/domain';
 import { bsonIdToString } from '../bson-id';
 
@@ -20,6 +20,7 @@ type TaskDoc = {
   deferredToDate?: string;
   tagKey?: string;
   notesMarkdown?: string;
+  bounty?: TaskBounty;
   isComplete: boolean;
   scheduledDate: string;
   position: number;
@@ -40,6 +41,15 @@ function docToTask(doc: TaskDoc): Task {
   const notesMarkdown =
     typeof rest.notesMarkdown === 'string' && rest.notesMarkdown.length > 0 ? rest.notesMarkdown : undefined;
 
+  const bounty =
+    rest.bounty != null &&
+    typeof rest.bounty === 'object' &&
+    typeof rest.bounty.amount === 'number' &&
+    Number.isFinite(rest.bounty.amount) &&
+    rest.bounty.amount > 0
+      ? rest.bounty
+      : undefined;
+
   return {
     id,
     userId: rest.userId,
@@ -51,6 +61,7 @@ function docToTask(doc: TaskDoc): Task {
     deferredToDate: typeof rest.deferredToDate === 'string' ? rest.deferredToDate : undefined,
     tagKey: rest.tagKey,
     ...(notesMarkdown !== undefined ? { notesMarkdown } : {}),
+    ...(bounty !== undefined ? { bounty } : {}),
     isComplete: rest.isComplete,
     scheduledDate: rest.scheduledDate,
     position: rest.position,
@@ -88,7 +99,7 @@ export class MongoTaskRepository implements TaskRepository {
   async update(id: string, fields: Partial<Omit<Task, 'id' | 'userId' | 'createdAt'>>): Promise<Task | null> {
     if (!ObjectId.isValid(id)) return null;
     const updatedAt = new Date().toISOString();
-    const { notesMarkdown, ...rest } = fields;
+    const { notesMarkdown, bounty, ...rest } = fields;
     const $set: Record<string, unknown> = { ...rest, updatedAt };
     const $unset: Record<string, ''> = {};
     if ('notesMarkdown' in fields) {
@@ -97,6 +108,14 @@ export class MongoTaskRepository implements TaskRepository {
         $set.notesMarkdown = notesMarkdown;
       } else {
         $unset.notesMarkdown = '';
+      }
+    }
+    if ('bounty' in fields) {
+      delete $set.bounty;
+      if (bounty != null && typeof bounty.amount === 'number' && bounty.amount > 0) {
+        $set.bounty = bounty;
+      } else {
+        $unset.bounty = '';
       }
     }
     const updateDoc: { $set: Record<string, unknown>; $unset?: Record<string, ''> } = { $set };
