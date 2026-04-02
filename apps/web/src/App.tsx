@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router';
 import { useAuth } from './hooks/useAuth';
 import { LoginPage } from './pages/LoginPage';
+import { LogoutPage } from './pages/LogoutPage';
 import { OngoingPage } from './pages/OngoingPage';
 import { RundownPage } from './pages/RundownPage';
 
@@ -36,6 +37,7 @@ export function App(): ReactElement {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/logout" element={<LogoutPage />} />
       <Route element={<ProtectedLayout />}>
         <Route path="/rundown" element={<RundownPage />} />
         <Route path="/ongoing" element={<OngoingPage />} />
