@@ -1,10 +1,21 @@
-import type { ApiError, DayFit, DayWindow, Tag, Task, User } from '@dayparty/core';
+import type {
+  ApiError,
+  DayFit,
+  DayWindow,
+  Tag,
+  Task,
+  TaskSize,
+  User,
+  UserPreferences,
+  VisualPreset,
+} from '@dayparty/core';
 import { ERROR_CODES } from '@dayparty/core';
 import {
   createTagSchema,
   createTaskSchema,
   fromZodError,
   loginSchema,
+  patchUserPreferencesSchema,
   reorderTasksSchema,
   updateTagSchema,
   updateTaskSchema,
@@ -13,6 +24,7 @@ import type {
   CreateTagInput,
   CreateTaskInput,
   LoginInput,
+  PatchUserPreferencesInput,
   ReorderTasksInput,
   UpdateTagInput,
   UpdateTaskInput,
@@ -33,6 +45,8 @@ interface ApiDayRundown {
   dayFit: DayFit;
   dayWindow: DayWindow;
 }
+
+type ApiUserPreferences = Omit<UserPreferences, 'userId'>;
 
 interface VerifyResponse {
   token: string;
@@ -114,6 +128,31 @@ export class DayPartyClient {
       method: 'GET',
       requiresAuth: true,
       parse: parseAuthUser,
+    });
+  }
+
+  async getUserPreferences(): Promise<Result<ApiUserPreferences>> {
+    return this.request('/me/preferences', {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseUserPreferences,
+    });
+  }
+
+  async patchUserPreferences(input: PatchUserPreferencesInput): Promise<Result<ApiUserPreferences>> {
+    const parsed = patchUserPreferencesSchema.safeParse(input);
+    if (!parsed.success) {
+      return this.fail(fromZodError(parsed.error));
+    }
+    if (Object.keys(parsed.data).length === 0) {
+      return this.fail(createApiError(ERROR_CODES.VALIDATION_ERROR, 'At least one preference field is required'));
+    }
+
+    return this.request('/me/preferences', {
+      method: 'PATCH',
+      requiresAuth: true,
+      body: parsed.data,
+      parse: parseUserPreferences,
     });
   }
 
@@ -543,6 +582,54 @@ function parseDayWindow(input: unknown): DayWindow | null {
   };
 }
 
+function isVisualPreset(value: unknown): value is VisualPreset {
+  return value === 'default' || value === 'calm' || value === 'playful' || value === 'highContrast';
+}
+
+function parseSizeToMinutesOverrides(input: unknown): Partial<Record<TaskSize, number>> | undefined | null {
+  if (input === undefined) {
+    return undefined;
+  }
+  if (!isRecord(input)) {
+    return null;
+  }
+  const out: Partial<Record<TaskSize, number>> = {};
+  for (const size of [1, 2, 3, 4, 5] as const) {
+    const key = String(size);
+    if (Object.prototype.hasOwnProperty.call(input, key)) {
+      const v = input[key];
+      if (typeof v !== 'number' || !Number.isInteger(v) || v < 1 || v > 2880) {
+        return null;
+      }
+      out[size] = v;
+    }
+  }
+  return out;
+}
+
+function parseUserPreferences(input: unknown): ApiUserPreferences | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+  const dayWindow = parseDayWindow(input.dayWindow);
+  if (!dayWindow) {
+    return null;
+  }
+  if (!isVisualPreset(input.visualPreset) || typeof input.updatedAt !== 'string') {
+    return null;
+  }
+  const sizeToMinutes = parseSizeToMinutesOverrides(input.sizeToMinutes);
+  if (input.sizeToMinutes !== undefined && sizeToMinutes === null) {
+    return null;
+  }
+  return {
+    dayWindow,
+    visualPreset: input.visualPreset,
+    updatedAt: input.updatedAt,
+    ...(sizeToMinutes && Object.keys(sizeToMinutes).length > 0 ? { sizeToMinutes } : {}),
+  };
+}
+
 function parseDayFit(input: unknown): DayFit | null {
   if (!isRecord(input)) {
     return null;
@@ -579,11 +666,13 @@ export type {
   ApiDayRundown as DayRundownResponse,
   ApiTag as TagResponse,
   ApiTask as TaskResponse,
+  ApiUserPreferences as UserPreferencesResponse,
   AuthUser as AuthUserResponse,
   ClientOptions,
   CreateTagInput,
   CreateTaskInput,
   LoginInput,
+  PatchUserPreferencesInput,
   ReorderTasksInput,
   UpdateTagInput,
   UpdateTaskInput,

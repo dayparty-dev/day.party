@@ -1,10 +1,11 @@
-import type { DayRundown, Task, User } from '@dayparty/core';
+import type { DayRundown, Task, User, UserPreferences } from '@dayparty/core';
 import type {
   CreateTaskInput,
   SessionRepository,
   TagRepository,
   TaskRepository,
   UpdateTaskInput,
+  UserPreferencesPatch,
   UserPreferencesRepository,
   UserRepository,
 } from '@dayparty/domain';
@@ -20,6 +21,8 @@ export type ApiEnv = {
   reorderTasks: (userId: string, date: string, taskIds: string[]) => Promise<DayRundown>;
   deleteTask: (id: string) => Promise<void>;
   updateTask: (id: string, input: UpdateTaskInput) => Promise<Task>;
+  getUserPreferences: (userId: string) => Promise<UserPreferences>;
+  patchUserPreferences: (userId: string, patch: UserPreferencesPatch) => Promise<UserPreferences>;
 };
 
 export type ApiVariables = {

@@ -20,6 +20,8 @@ import {
   makeCreateTaskAction,
   makeDeleteTaskAction,
   makeGetRundownAction,
+  makeGetUserPreferencesAction,
+  makePatchUserPreferencesAction,
   makeReorderTasksAction,
   makeUpdateTaskAction,
 } from '@dayparty/domain';
@@ -46,6 +48,8 @@ const env = {
   reorderTasks: makeReorderTasksAction(taskRepo, userPrefsRepo),
   deleteTask: makeDeleteTaskAction(taskRepo),
   updateTask: makeUpdateTaskAction(taskRepo, tagRepo),
+  getUserPreferences: makeGetUserPreferencesAction(userPrefsRepo),
+  patchUserPreferences: makePatchUserPreferencesAction(userPrefsRepo),
 };
 
 const app = createApp(env);

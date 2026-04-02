@@ -6,11 +6,13 @@ export type {
   CreateTaskInput,
   DayRundownResponse,
   LoginInput,
+  PatchUserPreferencesInput,
   ReorderTasksInput,
   Result,
   TagResponse,
   TaskResponse,
   UpdateTagInput,
   UpdateTaskInput,
+  UserPreferencesResponse,
   VerifyResponse,
 } from './client';

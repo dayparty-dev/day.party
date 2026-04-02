@@ -14,3 +14,5 @@ export { makeReorderTasksAction } from './actions/reorder-tasks';
 export { makeDeleteTaskAction } from './actions/delete-task';
 export { makeUpdateTaskAction } from './actions/update-task';
 export type { UpdateTaskInput } from './actions/update-task';
+export { makeGetUserPreferencesAction, makePatchUserPreferencesAction } from './actions/user-preferences-actions';
+export type { UserPreferencesPatch } from './actions/user-preferences-actions';

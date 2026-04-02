@@ -1,0 +1,49 @@
+import {
+  DEFAULT_DAY_WINDOW,
+  type DayWindow,
+  type TaskSize,
+  type UserPreferences,
+  type VisualPreset,
+} from '@dayparty/core';
+import type { UserPreferencesRepository } from '../interfaces/user-preferences-repository';
+
+const DEFAULT_VISUAL_PRESET: VisualPreset = 'default';
+
+function defaultPreferences(userId: string): UserPreferences {
+  return {
+    userId,
+    dayWindow: DEFAULT_DAY_WINDOW,
+    visualPreset: DEFAULT_VISUAL_PRESET,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+/** Partial update (validated at API with Zod). */
+export type UserPreferencesPatch = {
+  dayWindow?: DayWindow;
+  visualPreset?: VisualPreset;
+  sizeToMinutes?: Partial<Record<TaskSize, number>>;
+};
+
+export function makeGetUserPreferencesAction(userPrefsRepo: UserPreferencesRepository) {
+  return async (userId: string): Promise<UserPreferences> => {
+    const existing = await userPrefsRepo.findByUserId(userId);
+    return existing ?? defaultPreferences(userId);
+  };
+}
+
+export function makePatchUserPreferencesAction(userPrefsRepo: UserPreferencesRepository) {
+  return async (userId: string, patch: UserPreferencesPatch): Promise<UserPreferences> => {
+    const existing = await userPrefsRepo.findByUserId(userId);
+    const base = existing ?? defaultPreferences(userId);
+    const next: UserPreferences = {
+      userId,
+      dayWindow: patch.dayWindow ?? base.dayWindow,
+      visualPreset: patch.visualPreset ?? base.visualPreset,
+      sizeToMinutes:
+        patch.sizeToMinutes !== undefined ? { ...base.sizeToMinutes, ...patch.sizeToMinutes } : base.sizeToMinutes,
+      updatedAt: new Date().toISOString(),
+    };
+    return userPrefsRepo.put(next);
+  };
+}

@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { registerErrorHandler } from './middleware/error-handler';
 import { createAuthRoutes } from './routes/auth';
 import { createTagRoutes } from './routes/tags';
+import { createPreferenceRoutes } from './routes/preferences';
 import { createTaskRoutes } from './routes/tasks';
 import type { ApiEnv, ApiVariables } from './types';
 
@@ -29,6 +30,7 @@ export function createApp(env: ApiEnv): Hono<{ Variables: ApiVariables }> {
   app.get('/health', (c) => c.json({ status: 'ok', service: '@dayparty/api' }));
   app.route('/api/auth', createAuthRoutes(env));
   app.route('/api/tasks', createTaskRoutes(env));
+  app.route('/api/me/preferences', createPreferenceRoutes(env));
   app.route('/api/tags', createTagRoutes(env));
   return app;
 }

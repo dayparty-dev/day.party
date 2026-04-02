@@ -1,3 +1,7 @@
+/**
+ * Task CRUD + rundown/reorder. Responses include P1 planning fields: rundown carries `dayFit` and
+ * `dayWindow`; each task may include `estimatedMinutes` and `essentiality` (003 / `day-planning-rest.md`).
+ */
 import type { DayRundown, Task } from '@dayparty/core';
 import { ERROR_CODES } from '@dayparty/core';
 import {
