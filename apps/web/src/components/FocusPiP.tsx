@@ -2,6 +2,7 @@ import type { TaskRundownItemResponse } from '@dayparty/api-client';
 import type { TaskStatus } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createRoot, type Root } from 'react-dom/client';
 import styles from './FocusPiP.module.css';
 
@@ -32,6 +33,7 @@ type PiPInnerProps = {
 };
 
 function PiPChrome(props: PiPInnerProps): ReactElement {
+  const { t } = useTranslation();
   const {
     title,
     tagColor,
@@ -60,7 +62,7 @@ function PiPChrome(props: PiPInnerProps): ReactElement {
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ fontSize: 12, opacity: 0.75 }}>Focus</span>
+        <span style={{ fontSize: 12, opacity: 0.75 }}>{t('focusPip.label')}</span>
         <button
           type="button"
           onClick={onRequestClose}
@@ -74,7 +76,7 @@ function PiPChrome(props: PiPInnerProps): ReactElement {
             fontSize: 12,
           }}
         >
-          Close
+          {t('focusPip.close')}
         </button>
       </div>
       <div
@@ -98,11 +100,11 @@ function PiPChrome(props: PiPInnerProps): ReactElement {
       <p
         style={{ margin: '0 0 4px', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.65 }}
       >
-        Now
+        {t('ongoing.now')}
       </p>
       <h1 style={{ margin: '0 0 8px', fontSize: 18, lineHeight: 1.25, fontWeight: 600 }}>{title}</h1>
       <p style={{ margin: '0 0 16px', fontSize: 13, opacity: 0.8 }}>
-        {elapsedLabel} elapsed · ~{targetMinutes} min target
+        {t('focusPip.elapsedLine', { elapsed: elapsedLabel, minutes: targetMinutes })}
       </p>
       {canToggle ? (
         <button
@@ -121,7 +123,11 @@ function PiPChrome(props: PiPInnerProps): ReactElement {
             cursor: focusBusy ? 'wait' : 'pointer',
           }}
         >
-          {focusBusy ? 'Updating…' : focusStatus === 'in_progress' ? 'Pause' : 'Start'}
+          {focusBusy
+            ? t('ongoing.updating')
+            : focusStatus === 'in_progress'
+              ? t('focusPip.pause')
+              : t('focusPip.resume')}
         </button>
       ) : null}
       <button
@@ -138,15 +144,15 @@ function PiPChrome(props: PiPInnerProps): ReactElement {
           cursor: 'pointer',
         }}
       >
-        Mark complete
+        {t('focusPip.complete')}
       </button>
       {nextTitle ? (
         <section style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
-          <p style={{ margin: '0 0 4px', fontSize: 11, opacity: 0.65 }}>Next up</p>
+          <p style={{ margin: '0 0 4px', fontSize: 11, opacity: 0.65 }}>{t('focusPip.nextUp')}</p>
           <p style={{ margin: 0, fontSize: 14 }}>{nextTitle}</p>
         </section>
       ) : (
-        <p style={{ marginTop: 20, fontSize: 13, opacity: 0.7 }}>Last open task for today.</p>
+        <p style={{ marginTop: 20, fontSize: 13, opacity: 0.7 }}>{t('focusPip.lastOpenShort')}</p>
       )}
     </div>
   );
@@ -168,6 +174,7 @@ export type FocusPiPProps = {
  * Document Picture-in-Picture shell for compact focus (FR-006). Hidden when unsupported.
  */
 export function FocusPiPControl(props: FocusPiPProps): ReactElement | null {
+  const { t } = useTranslation();
   const {
     focusTask,
     nextTask,
@@ -268,7 +275,7 @@ export function FocusPiPControl(props: FocusPiPProps): ReactElement | null {
 
   return (
     <button type="button" className={styles.pipTrigger} onClick={() => void openPip()} disabled={pipActive}>
-      {pipActive ? 'Compact window open' : 'Open compact focus window'}
+      {pipActive ? t('focusPip.compactOpen') : t('focusPip.openCompact')}
     </button>
   );
 }

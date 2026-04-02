@@ -2,6 +2,7 @@ import type { ApiPlanHistoryEvent, DayPartyClient } from '@dayparty/api-client';
 import { ERROR_CODES } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import styles from './PlanHistoryPanel.module.css';
 
@@ -41,6 +42,7 @@ function EventRow({ e }: { e: ApiPlanHistoryEvent }): ReactElement {
 }
 
 export function PlanHistoryPanel({ client, onUnauthorized, onNetworkError }: PlanHistoryPanelProps): ReactElement {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [events, setEvents] = useState<ApiPlanHistoryEvent[]>([]);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
@@ -90,7 +92,7 @@ export function PlanHistoryPanel({ client, onUnauthorized, onNetworkError }: Pla
         return;
       }
       if ('err' in result) {
-        setError(typeof result.err === 'string' ? result.err : 'Request failed');
+        setError(typeof result.err === 'string' ? result.err : t('common.requestFailed'));
         return;
       }
       setEvents(result.data.events);
@@ -113,7 +115,7 @@ export function PlanHistoryPanel({ client, onUnauthorized, onNetworkError }: Pla
       return;
     }
     if ('err' in result) {
-      setError(typeof result.err === 'string' ? result.err : 'Request failed');
+      setError(typeof result.err === 'string' ? result.err : t('common.requestFailed'));
       return;
     }
     setEvents((prev) => [...prev, ...result.data.events]);
@@ -135,13 +137,13 @@ export function PlanHistoryPanel({ client, onUnauthorized, onNetworkError }: Pla
         }
       }}
     >
-      <summary className={styles.summary}>Plan history</summary>
+      <summary className={styles.summary}>{t('planHistory.title')}</summary>
       <div className={styles.body}>
-        <p className={styles.hint}>Recent changes to tasks, order, preferences, and rewards (newest first).</p>
+        <p className={styles.hint}>{t('planHistory.hint')}</p>
         {error ? <p className={styles.err}>{error}</p> : null}
-        {loading ? <p className={styles.empty}>Loading…</p> : null}
+        {loading ? <p className={styles.empty}>{t('common.loading')}</p> : null}
         {!loading && open && initialLoaded && events.length === 0 && !error ? (
-          <p className={styles.empty}>No events yet.</p>
+          <p className={styles.empty}>{t('planHistory.noEvents')}</p>
         ) : null}
         {events.length > 0 ? (
           <ul className={styles.list}>
@@ -152,7 +154,7 @@ export function PlanHistoryPanel({ client, onUnauthorized, onNetworkError }: Pla
         ) : null}
         {cursor ? (
           <button type="button" className={styles.moreBtn} disabled={moreLoading} onClick={() => void loadMore()}>
-            {moreLoading ? 'Loading…' : 'Load more'}
+            {moreLoading ? t('common.loading') : t('planHistory.loadMore')}
           </button>
         ) : null}
       </div>

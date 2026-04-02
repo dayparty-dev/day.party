@@ -3,6 +3,7 @@ import { ERROR_CODES } from '@dayparty/core';
 import type { TaskEssentiality, TaskStatus } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import styles from './TaskEditPanel.module.css';
 
@@ -38,6 +39,7 @@ export function TaskEditPanel({
   onOtherError,
   onSaved,
 }: TaskEditPanelProps): ReactElement {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -129,12 +131,12 @@ export function TaskEditPanel({
     setError(null);
     const trimmed = title.trim();
     if (!trimmed) {
-      setError('Title is required.');
+      setError(t('taskEdit.titleRequired'));
       return;
     }
     if (status === 'deferred') {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(deferredToDate)) {
-        setError('Choose a valid “revisit on” date for deferred tasks.');
+        setError(t('taskEdit.deferredDate'));
         return;
       }
     }
@@ -144,7 +146,7 @@ export function TaskEditPanel({
     if (m !== '') {
       const n = Number(m);
       if (!Number.isInteger(n) || n < 0 || n > 2880) {
-        setError('Estimated minutes must be a whole number from 0 to 2880.');
+        setError(t('taskEdit.errMinutes'));
         return;
       }
       estimatedMinutes = n;
@@ -158,7 +160,7 @@ export function TaskEditPanel({
       if (bRaw !== '') {
         const amt = Number(bRaw);
         if (!Number.isInteger(amt) || amt < 1 || amt > 1_000_000) {
-          setError('Bounty amount must be a whole number from 1 to 1,000,000.');
+          setError(t('taskEdit.errBounty'));
           return;
         }
         const tagKeys = parseBountyTagKeys(bountyTagKeysRaw);
@@ -226,17 +228,17 @@ export function TaskEditPanel({
   return (
     <details className={styles.wrap} open={open} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
       <summary className={styles.summary}>
-        <span className={styles.summaryLabel}>Edit task</span>
+        <span className={styles.summaryLabel}>{t('taskEdit.summary')}</span>
       </summary>
       <div className={styles.body}>
-        <p className={styles.caption}>Fields sync to the server when you save.</p>
-        {loading ? <p className={styles.muted}>Loading…</p> : null}
+        <p className={styles.caption}>{t('taskEdit.caption')}</p>
+        {loading ? <p className={styles.muted}>{t('common.loading')}</p> : null}
         {error ? <p className={styles.err}>{error}</p> : null}
         {!loading && loaded ? (
           <>
             <div className={styles.grid}>
               <label className={styles.field}>
-                <span className={styles.label}>Title</span>
+                <span className={styles.label}>{t('taskEdit.titleField')}</span>
                 <input
                   className={styles.textInput}
                   value={title}
@@ -247,7 +249,7 @@ export function TaskEditPanel({
               </label>
               <div className={styles.row}>
                 <label className={styles.field}>
-                  <span className={styles.label}>Size</span>
+                  <span className={styles.label}>{t('taskEdit.size')}</span>
                   <select
                     className={styles.select}
                     value={size}
@@ -261,18 +263,18 @@ export function TaskEditPanel({
                   </select>
                 </label>
                 <label className={styles.field}>
-                  <span className={styles.label}>Est. minutes</span>
+                  <span className={styles.label}>{t('taskEdit.estMinutes')}</span>
                   <input
                     className={styles.numberInput}
                     inputMode="numeric"
                     value={minutesRaw}
                     onChange={(e) => setMinutesRaw(e.target.value)}
-                    placeholder="From size if empty"
+                    placeholder={t('taskEdit.fromSizePh')}
                   />
                 </label>
               </div>
               <label className={styles.field}>
-                <span className={styles.label}>Essentiality</span>
+                <span className={styles.label}>{t('taskEdit.essentiality')}</span>
                 <select
                   className={styles.select}
                   value={essentiality}
@@ -280,15 +282,15 @@ export function TaskEditPanel({
                 >
                   {ESSENTIALITIES.map((ess) => (
                     <option key={ess} value={ess}>
-                      {ess}
+                      {t(`taskEdit.ess_${ess}`)}
                     </option>
                   ))}
                 </select>
               </label>
               <label className={styles.field}>
-                <span className={styles.label}>Tag</span>
+                <span className={styles.label}>{t('taskEdit.tag')}</span>
                 <select className={styles.select} value={tagKey} onChange={(e) => setTagKey(e.target.value)}>
-                  <option value="">None</option>
+                  <option value="">{t('taskEdit.tagNone')}</option>
                   {tags.map((t) => (
                     <option key={t.key} value={t.key}>
                       {t.displayName}
@@ -297,7 +299,7 @@ export function TaskEditPanel({
                 </select>
               </label>
               <label className={styles.field}>
-                <span className={styles.label}>Scheduled date</span>
+                <span className={styles.label}>{t('taskEdit.scheduledDate')}</span>
                 <input
                   className={styles.dateInput}
                   type="date"
@@ -306,7 +308,7 @@ export function TaskEditPanel({
                 />
               </label>
               <label className={styles.field}>
-                <span className={styles.label}>Status</span>
+                <span className={styles.label}>{t('taskEdit.status')}</span>
                 <select
                   className={styles.select}
                   value={status}
@@ -314,14 +316,14 @@ export function TaskEditPanel({
                 >
                   {STATUSES.map((st) => (
                     <option key={st} value={st}>
-                      {st.replace(/_/g, ' ')}
+                      {t(`taskEdit.status_${st}`)}
                     </option>
                   ))}
                 </select>
               </label>
               {status === 'deferred' ? (
                 <label className={styles.field}>
-                  <span className={styles.label}>Revisit on</span>
+                  <span className={styles.label}>{t('taskEdit.revisitOn')}</span>
                   <input
                     className={styles.dateInput}
                     type="date"
@@ -331,9 +333,9 @@ export function TaskEditPanel({
                 </label>
               ) : null}
               <div className={styles.bountyBlock}>
-                <span className={styles.label}>Bounty</span>
+                <span className={styles.label}>{t('taskEdit.bounty')}</span>
                 <label className={styles.field}>
-                  <span className={styles.label}>Amount (points)</span>
+                  <span className={styles.label}>{t('createTask.bountyAmount')}</span>
                   <input
                     className={styles.numberInput}
                     inputMode="numeric"
@@ -342,16 +344,16 @@ export function TaskEditPanel({
                       setBountyAmountRaw(e.target.value);
                       setClearBounty(false);
                     }}
-                    placeholder="None"
+                    placeholder={t('createTask.bountyNone')}
                   />
                 </label>
                 <label className={styles.field}>
-                  <span className={styles.label}>Scope tags (comma-separated)</span>
+                  <span className={styles.label}>{t('createTask.bountyTags')}</span>
                   <input
                     className={styles.textInput}
                     value={bountyTagKeysRaw}
                     onChange={(e) => setBountyTagKeysRaw(e.target.value)}
-                    placeholder="e.g. work, deep-focus"
+                    placeholder={t('createTask.bountyTagsPh')}
                   />
                 </label>
                 <label className={styles.inlineChecks}>
@@ -360,7 +362,7 @@ export function TaskEditPanel({
                     checked={bountyHighResistance}
                     onChange={(e) => setBountyHighResistance(e.target.checked)}
                   />
-                  High resistance
+                  {t('createTask.highResistance')}
                 </label>
                 {hadBounty ? (
                   <label className={styles.inlineChecks}>
@@ -374,13 +376,13 @@ export function TaskEditPanel({
                         }
                       }}
                     />
-                    Remove bounty
+                    {t('taskEdit.removeBounty')}
                   </label>
                 ) : null}
               </div>
             </div>
             <button type="button" className={styles.saveBtn} disabled={saving} onClick={() => void save()}>
-              {saving ? 'Saving…' : 'Save changes'}
+              {saving ? t('common.saving') : t('taskEdit.saveChanges')}
             </button>
           </>
         ) : null}

@@ -3,6 +3,7 @@ import { ERROR_CODES } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { useTranslation } from 'react-i18next';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import styles from './TaskNotesPanel.module.css';
 
@@ -23,6 +24,7 @@ export function TaskNotesPanel({
   onUnauthorized,
   onSaved,
 }: TaskNotesPanelProps): ReactElement {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [loaded, setLoaded] = useState(false);
@@ -96,19 +98,19 @@ export function TaskNotesPanel({
   return (
     <details className={styles.wrap} open={open} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
       <summary className={styles.summary}>
-        <span className={styles.summaryLabel}>Notes</span>
+        <span className={styles.summaryLabel}>{t('taskNotes.label')}</span>
         {summaryHint ? <span className={styles.summaryPreview}>{summaryHint}</span> : null}
       </summary>
       <div className={styles.body}>
         <p className={styles.caption} id={`notes-heading-${taskId}`}>
-          Notes for “{taskTitle}”
+          {t('taskNotes.forTitle', { title: taskTitle })}
         </p>
-        {loading ? <p className={styles.muted}>Loading…</p> : null}
+        {loading ? <p className={styles.muted}>{t('common.loading')}</p> : null}
         {error ? <p className={styles.err}>{error}</p> : null}
         {!loading && loaded ? (
           <>
             <label className={styles.editorLabel}>
-              Markdown
+              {t('taskNotes.markdown')}
               <textarea
                 className={styles.textarea}
                 value={draft}
@@ -119,17 +121,17 @@ export function TaskNotesPanel({
               />
             </label>
             <div className={styles.previewBlock}>
-              <span className={styles.previewLabel}>Preview</span>
+              <span className={styles.previewLabel}>{t('taskNotes.preview')}</span>
               <div className={styles.preview}>
                 {draft.trim() ? (
                   <ReactMarkdown>{draft}</ReactMarkdown>
                 ) : (
-                  <p className={styles.muted}>Nothing to preview yet.</p>
+                  <p className={styles.muted}>{t('taskNotes.previewEmpty')}</p>
                 )}
               </div>
             </div>
             <button type="button" className={styles.saveBtn} disabled={saving} onClick={() => void save()}>
-              {saving ? 'Saving…' : 'Save notes'}
+              {saving ? t('common.saving') : t('taskNotes.save')}
             </button>
           </>
         ) : null}

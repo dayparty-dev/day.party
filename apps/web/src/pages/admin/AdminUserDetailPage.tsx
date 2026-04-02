@@ -3,12 +3,14 @@ import type { ReactElement } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import type { TaskResponse } from '@dayparty/api-client';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../../utils/network-error';
 import { todayLocalDateString } from '../../utils/today-local';
 import styles from './admin-shared.module.css';
 
 export function AdminUserDetailPage(): ReactElement {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { client, onUnauthorized } = useAuth();
   const [email, setEmail] = useState('');
@@ -82,7 +84,7 @@ export function AdminUserDetailPage(): ReactElement {
 
   return (
     <div>
-      <h1 className={styles.title}>{email || 'User'}</h1>
+      <h1 className={styles.title}>{email || t('admin.userFallback')}</h1>
       {err ? (
         <p className={styles.err} role="alert">
           {err}
@@ -93,24 +95,24 @@ export function AdminUserDetailPage(): ReactElement {
         <input id="admin-date" className={styles.input} value={date} onChange={(e) => setDate(e.target.value)} />
       </div>
       <button type="button" className={styles.btn} onClick={() => void loadTasks()}>
-        Reload tasks
+        {t('admin.reloadTasks')}
       </button>
       <ul className={styles.list}>
-        {tasks.map((t) => (
-          <li key={t.id} className={styles.row}>
-            <strong>{t.title}</strong>
+        {tasks.map((task) => (
+          <li key={task.id} className={styles.row}>
+            <strong>{task.title}</strong>
             <span className={styles.muted}>
               {' '}
-              · {t.id} · {t.scheduledDate}
+              · {task.id} · {task.scheduledDate}
             </span>
-            {patchId === t.id ? (
+            {patchId === task.id ? (
               <div className={styles.field}>
                 <input className={styles.input} value={patchTitle} onChange={(e) => setPatchTitle(e.target.value)} />
-                <button type="button" className={styles.btn} onClick={() => void applyPatch(t.id)}>
-                  Save title
+                <button type="button" className={styles.btn} onClick={() => void applyPatch(task.id)}>
+                  {t('admin.saveTitle')}
                 </button>
                 <button type="button" className={styles.btn} onClick={() => setPatchId(null)}>
-                  Cancel
+                  {t('admin.cancel')}
                 </button>
               </div>
             ) : (
@@ -118,11 +120,11 @@ export function AdminUserDetailPage(): ReactElement {
                 type="button"
                 className={styles.btn}
                 onClick={() => {
-                  setPatchId(t.id);
-                  setPatchTitle(t.title);
+                  setPatchId(task.id);
+                  setPatchTitle(task.title);
                 }}
               >
-                Edit title
+                {t('admin.editTitle')}
               </button>
             )}
           </li>

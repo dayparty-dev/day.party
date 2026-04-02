@@ -2,6 +2,7 @@ import type { TaskRundownItemResponse, UpdateTaskInput } from '@dayparty/api-cli
 import { ERROR_CODES, taskFocusedElapsedMs } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
@@ -17,6 +18,7 @@ const SIZE_MINUTES = 15;
 const SIZES = [1, 2, 3, 4, 5] as const;
 
 export function OngoingPage(): ReactElement {
+  const { t } = useTranslation();
   const { client, onUnauthorized } = useAuth();
   const date = useMemo(() => todayLocalDateString(), []);
   const [focusTask, setFocusTask] = useState<TaskRundownItemResponse | null>(null);
@@ -137,7 +139,7 @@ export function OngoingPage(): ReactElement {
       setLoadError(result.error.message);
       return;
     }
-    toast.success('Task completed');
+    toast.success(t('ongoing.taskComplete'));
     await load();
   }
 
@@ -151,7 +153,7 @@ export function OngoingPage(): ReactElement {
     if (trimmed !== '') {
       const n = Number(trimmed);
       if (!Number.isInteger(n) || n < 0 || n > 2880) {
-        setEffortError('Minutes must be a whole number from 0 to 2880, or leave empty to keep the stored estimate.');
+        setEffortError(t('ongoing.errMinutes'));
         return;
       }
       estimatedMinutes = n;
@@ -182,7 +184,7 @@ export function OngoingPage(): ReactElement {
       setEffortError(result.error.message);
       return;
     }
-    toast.success('Effort saved');
+    toast.success(t('ongoing.effortSaved'));
     await load();
   }
 
@@ -211,7 +213,7 @@ export function OngoingPage(): ReactElement {
       setLoadError(result.error.message);
       return;
     }
-    toast.success(nextStatus === 'planned' ? 'Paused' : 'Focus started');
+    toast.success(nextStatus === 'planned' ? t('ongoing.paused') : t('ongoing.focusStarted'));
     await load();
   }
 
@@ -219,56 +221,56 @@ export function OngoingPage(): ReactElement {
     <div className={styles.page}>
       <header className={styles.top}>
         <Link className={styles.back} to="/rundown">
-          ← Rundown
+          {t('common.backToRundown')}
         </Link>
       </header>
 
       {networkBanner ? (
         <div className={styles.banner} role="status">
-          <p className={styles.bannerText}>Network error: {networkBanner}</p>
+          <p className={styles.bannerText}>
+            {t('common.networkErrorPrefix')} {networkBanner}
+          </p>
           <button type="button" className={styles.retry} onClick={() => void load()}>
-            Retry
+            {t('common.retry')}
           </button>
         </div>
       ) : null}
 
       {loadError ? <p className={styles.err}>{loadError}</p> : null}
 
-      {!focusTask && !loadError && !networkBanner ? (
-        <p className={styles.celebrate}>You’re all caught up for today.</p>
-      ) : null}
+      {!focusTask && !loadError && !networkBanner ? <p className={styles.celebrate}>{t('ongoing.caughtUp')}</p> : null}
 
       {focusTask ? (
         <section className={styles.card} aria-live="polite">
           <div className={styles.strip} style={{ background: tagColor ?? 'var(--dp-tag-unknown)' }} aria-hidden />
           <div className={styles.inner}>
-            <p className={styles.kicker}>Now</p>
+            <p className={styles.kicker}>{t('ongoing.now')}</p>
             <h1 className={styles.taskTitle}>{focusTask.title}</h1>
             <p className={styles.subRow}>
               <span className={styles.sizeBadge} data-size={focusTask.size}>
-                Size {focusTask.size}
+                {t('ongoing.size', { size: focusTask.size })}
               </span>
               {focusTask.tagKey ? <span className={styles.tagKey}>{focusTask.tagKey}</span> : null}
             </p>
 
             <div className={styles.effortPanel}>
-              <p className={styles.effortLabel}>Planned effort</p>
+              <p className={styles.effortLabel}>{t('ongoing.plannedEffort')}</p>
               <div className={styles.effortRow}>
                 <label className={styles.effortField}>
-                  <span className={styles.effortHint}>Est. minutes (optional)</span>
+                  <span className={styles.effortHint}>{t('ongoing.estMinutesHint')}</span>
                   <input
                     type="text"
                     inputMode="numeric"
                     className={styles.effortInput}
                     value={minutesDraft}
                     onChange={(e) => setMinutesDraft(e.target.value)}
-                    placeholder={`~${focusTask.size * SIZE_MINUTES} from size`}
+                    placeholder={t('ongoing.minutesFromSizePh', { minutes: focusTask.size * SIZE_MINUTES })}
                     aria-invalid={effortError ? true : undefined}
                     aria-describedby={effortError ? 'effort-err' : undefined}
                   />
                 </label>
                 <label className={styles.effortField}>
-                  <span className={styles.effortHint}>Size</span>
+                  <span className={styles.effortHint}>{t('ongoing.sizeLabel')}</span>
                   <select
                     className={styles.effortSelect}
                     value={sizeDraft}
@@ -287,9 +289,7 @@ export function OngoingPage(): ReactElement {
                   {effortError}
                 </p>
               ) : (
-                <p className={styles.effortFootnote}>
-                  Empty minutes keeps your saved estimate; change size or minutes and save.
-                </p>
+                <p className={styles.effortFootnote}>{t('ongoing.effortFootnote')}</p>
               )}
               <button
                 type="button"
@@ -297,21 +297,19 @@ export function OngoingPage(): ReactElement {
                 disabled={effortSaving}
                 onClick={() => void saveEffort()}
               >
-                {effortSaving ? 'Saving…' : 'Save effort'}
+                {effortSaving ? t('common.saving') : t('ongoing.saveEffort')}
               </button>
             </div>
 
             <div className={styles.progressWrap}>
               <div className={styles.progressMeta}>
-                <span>Elapsed</span>
+                <span>{t('ongoing.elapsed')}</span>
                 <span>{elapsedLabel}</span>
               </div>
               <div className={styles.progressTrack}>
                 <div className={styles.progressFill} style={{ width: `${progress}%` }} />
               </div>
-              <p className={styles.progressHint}>
-                Progress is a gentle guide (~{targetMinutes} min target; synced across your devices).
-              </p>
+              <p className={styles.progressHint}>{t('ongoing.progressHint', { minutes: targetMinutes })}</p>
             </div>
 
             {focusTask.status === 'planned' || focusTask.status === 'in_progress' ? (
@@ -321,12 +319,16 @@ export function OngoingPage(): ReactElement {
                 disabled={focusBusy}
                 onClick={() => void toggleFocusStatus()}
               >
-                {focusBusy ? 'Updating…' : focusTask.status === 'in_progress' ? 'Pause' : 'Start'}
+                {focusBusy
+                  ? t('ongoing.updating')
+                  : focusTask.status === 'in_progress'
+                    ? t('taskCard.pause')
+                    : t('taskCard.start')}
               </button>
             ) : null}
 
             <button type="button" className={styles.doneBtn} onClick={() => void markComplete()}>
-              Mark complete
+              {t('ongoing.markComplete')}
             </button>
             {isDocumentPiPSupported() ? (
               <FocusPiPControl
@@ -347,18 +349,21 @@ export function OngoingPage(): ReactElement {
 
       {focusTask && nextTask ? (
         <section className={styles.nextCard} aria-label="Next after this task">
-          <p className={styles.nextKicker}>Next up</p>
+          <p className={styles.nextKicker}>{t('ongoing.nextUp')}</p>
           <p className={styles.nextTitle}>{nextTask.title}</p>
           <p className={styles.nextMeta}>
-            ~{nextTask.estimatedMinutes ?? nextTask.size * SIZE_MINUTES} min · Size {nextTask.size}
-            {nextTask.tagKey ? ` · ${nextTask.tagKey}` : ''}
+            {t('ongoing.nextMeta', {
+              minutes: nextTask.estimatedMinutes ?? nextTask.size * SIZE_MINUTES,
+              size: nextTask.size,
+              tagSuffix: nextTask.tagKey ? ` · ${nextTask.tagKey}` : '',
+            })}
           </p>
         </section>
       ) : null}
 
       {focusTask && !nextTask ? (
         <p className={styles.nextNone} role="status">
-          Last open task for today — after this, you&apos;re done with the runway.
+          {t('ongoing.lastOpen')}
         </p>
       ) : null}
     </div>

@@ -1,20 +1,37 @@
 import type { DayPartyClient } from '@dayparty/api-client';
-import { DEFAULT_VISUAL_PRESET, ERROR_CODES, type VisualPreset } from '@dayparty/core';
-import { Frame, type Page } from '@nativescript/core';
+import {
+  DEFAULT_COLOR_SCHEME,
+  DEFAULT_LOCALE,
+  DEFAULT_VISUAL_PRESET,
+  ERROR_CODES,
+  type ColorScheme,
+  type UserLocale,
+  type VisualPreset,
+} from '@dayparty/core';
+import { Application, Frame, type Page } from '@nativescript/core';
+
+import { setMobileLocale } from './i18n';
 
 const PRESET_CLASSES = ['preset-calm', 'preset-playful', 'preset-highContrast'] as const;
 
 let cachedPreset: VisualPreset = DEFAULT_VISUAL_PRESET;
+let cachedScheme: ColorScheme = DEFAULT_COLOR_SCHEME;
 
 export function getCachedVisualPreset(): VisualPreset {
   return cachedPreset;
 }
 
+export function getCachedColorScheme(): ColorScheme {
+  return cachedScheme;
+}
+
 export function resetVisualPresetCache(): void {
   cachedPreset = DEFAULT_VISUAL_PRESET;
+  cachedScheme = DEFAULT_COLOR_SCHEME;
+  setMobileLocale(DEFAULT_LOCALE);
   const page = Frame.topmost()?.currentPage;
   if (page) {
-    applyVisualPresetToPage(page);
+    applyAppearanceToPage(page);
   }
 }
 
@@ -27,15 +44,43 @@ function stripPresetClasses(className: string): string {
     .trim();
 }
 
-/** Syncs {@link Page} `className` with {@link cachedPreset} (non-default → `preset-<name>`). */
-export function applyVisualPresetToPage(page: Page): void {
-  const base = stripPresetClasses(page.className ?? '');
-  const suffix = cachedPreset !== 'default' ? ` preset-${cachedPreset}` : '';
-  page.className = `${base}${suffix}`.replace(/\s+/g, ' ').trim();
+function stripDarkClass(className: string): string {
+  return className
+    .split(/\s+/)
+    .filter((c) => c && c !== 'ns-dark')
+    .join(' ')
+    .trim();
+}
+
+function effectiveDark(scheme: ColorScheme): boolean {
+  if (scheme === 'dark') {
+    return true;
+  }
+  if (scheme === 'light') {
+    return false;
+  }
+  return Application.systemAppearance() === 'dark';
 }
 
 /**
- * Loads `visualPreset` from the API and applies it to the current page when present.
+ * Applies {@link cachedPreset} (gamification look) and {@link cachedScheme} (`ns-dark` when effective theme is dark).
+ */
+export function applyAppearanceToPage(page: Page): void {
+  let base = page.className ?? '';
+  base = stripDarkClass(base);
+  base = stripPresetClasses(base);
+  const presetSuffix = cachedPreset !== 'default' ? ` preset-${cachedPreset}` : '';
+  const darkSuffix = effectiveDark(cachedScheme) ? ' ns-dark' : '';
+  page.className = `${base}${presetSuffix}${darkSuffix}`.replace(/\s+/g, ' ').trim();
+}
+
+/** @deprecated Use {@link applyAppearanceToPage} */
+export function applyVisualPresetToPage(page: Page): void {
+  applyAppearanceToPage(page);
+}
+
+/**
+ * Loads preferences from the API and applies visual preset, color scheme, and in-app locale.
  */
 export async function refreshVisualPresetFromApi(client: DayPartyClient, onUnauthorized?: () => void): Promise<void> {
   const res = await client.getUserPreferences();
@@ -46,8 +91,10 @@ export async function refreshVisualPresetFromApi(client: DayPartyClient, onUnaut
     return;
   }
   cachedPreset = res.data.visualPreset;
+  cachedScheme = (res.data.colorScheme ?? DEFAULT_COLOR_SCHEME) as ColorScheme;
+  setMobileLocale((res.data.locale ?? DEFAULT_LOCALE) as UserLocale);
   const page = Frame.topmost()?.currentPage;
   if (page) {
-    applyVisualPresetToPage(page);
+    applyAppearanceToPage(page);
   }
 }

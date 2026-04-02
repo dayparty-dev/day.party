@@ -9,6 +9,7 @@ import type { EventData, Page } from '@nativescript/core';
 import { Observable, ObservableArray } from '@nativescript/core';
 
 import { authState } from '../services/auth-state';
+import { mt } from '../services/i18n';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 
 type TaskRow = {
@@ -95,7 +96,7 @@ function showTriageForTask(task: TaskRundownItemResponse, dayFit: DayRundownResp
 
 function hintLabelForDate(hints: DayCapacityHint[], date: string): string {
   const h = hints.find((x) => x.date === date);
-  return h != null ? `≈ ${h.remainingMinutes} min libres` : '';
+  return h != null ? mt('rundown.moveFree', { m: h.remainingMinutes }) : '';
 }
 
 function formatMinuteOfDay(m: number): string {
@@ -161,7 +162,7 @@ class RundownViewModel extends Observable {
     this.set('windowSaveError', '');
     this.set('windowSaving', false);
     this.set('saveWindowEnabled', true);
-    this.set('saveButtonText', 'Guardar ventana');
+    this.set('saveButtonText', mt('rundown.saveWindow'));
     this.set('newTaskTitle', '');
     this.set('newTaskSize', '2');
     this.set('newTaskMinutes', '');
@@ -173,7 +174,7 @@ class RundownViewModel extends Observable {
     this.set('createTaskError', '');
     this.set('createTaskSaving', false);
     this.set('createTaskEnabled', true);
-    this.set('createTaskButtonText', 'Añadir tarea');
+    this.set('createTaskButtonText', mt('rundown.addTask'));
     this.set('planningDate', todayIso());
     this.set('dateTodayBtnVisibility', 'collapse');
   }
@@ -221,12 +222,7 @@ class RundownViewModel extends Observable {
     }
     if (rundownResult.ok === false) {
       const net = isLikelyNetworkFailure(rundownResult.error);
-      this.set(
-        'errorMessage',
-        net
-          ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.'
-          : rundownResult.error.message,
-      );
+      this.set('errorMessage', net ? mt('rundown.network') : rundownResult.error.message);
       this.set('errorBannerVisibility', 'visible');
       return;
     }
@@ -251,15 +247,22 @@ class RundownViewModel extends Observable {
     }
     this.capacityHints = sug.ok ? sug.data.hints : [];
 
-    this.set('summaryText', `${completed}/${capacity} completadas · ${date}`);
+    this.set('summaryText', mt('rundown.summaryLine', { done: completed, cap: capacity, date }));
 
     const start = formatMinuteOfDay(dayWindow.startMinuteOfDay);
     const end = formatMinuteOfDay(dayWindow.endMinuteOfDay);
-    const cross = dayWindow.crossesMidnight ? ' · cruza medianoche' : '';
-    const over = dayFit.overflowUnresolved ? ' · Esencial fuera de ventana' : '';
+    const cross = dayWindow.crossesMidnight ? mt('rundown.crossMidnight') : '';
+    const over = dayFit.overflowUnresolved ? mt('rundown.overflow') : '';
     this.set(
       'planFootnote',
-      `Ventana ${start}–${end}${cross} · ${dayFit.plannedMinutes}/${dayFit.availableMinutes} min previstos${over}`,
+      mt('rundown.planFoot', {
+        start,
+        end,
+        cross,
+        planned: dayFit.plannedMinutes,
+        avail: dayFit.availableMinutes,
+        overflow: over,
+      }),
     );
 
     this.set('windowStartInput', formatMinuteOfDayForInput(dayWindow.startMinuteOfDay));
@@ -276,24 +279,24 @@ class RundownViewModel extends Observable {
       const t = sorted[i]!;
       const parts: string[] = [];
       if (t.estimatedMinutes != null) {
-        parts.push(`${t.estimatedMinutes} min`);
+        parts.push(mt('rundown.metaMin', { m: t.estimatedMinutes }));
       }
-      parts.push(`tam. ${t.size}`);
+      parts.push(mt('rundown.sizeAbbr', { size: t.size }));
       if (t.essentiality === 'essential') {
-        parts.push('Esencial');
+        parts.push(mt('rundown.essential'));
       }
       if (t.essentiality === 'optional') {
-        parts.push('Opcional');
+        parts.push(mt('rundown.optional'));
       }
       if (t.status === 'skipped') {
-        parts.push('Omitida hoy');
+        parts.push(mt('rundown.skipped'));
       }
       if (t.status === 'in_progress') {
-        parts.push('En curso');
+        parts.push(mt('rundown.inProgress'));
       }
       let runwayLabel = '';
       if (!t.isComplete) {
-        runwayLabel = dayFit.outsideRunwayTaskIds.includes(t.id) ? 'Extra' : 'En ventana';
+        runwayLabel = dayFit.outsideRunwayTaskIds.includes(t.id) ? mt('rundown.extra') : mt('rundown.onRunway');
       }
       const canFocus = !t.isComplete && (t.status === 'planned' || t.status === 'in_progress');
       const taskId = t.id;
@@ -318,14 +321,14 @@ class RundownViewModel extends Observable {
         notesPreviewLine: preview,
         notesPreviewVisibility: preview.length > 0 ? 'visible' : 'collapse',
         runwayLabel,
-        focusBtnText: t.status === 'in_progress' ? 'Pausa' : 'Enfoque',
+        focusBtnText: t.status === 'in_progress' ? mt('rundown.focusPause') : mt('rundown.focusStart'),
         focusBtnVisibility: canFocus ? 'visible' : 'collapse',
         triageVisibility: showTriage ? 'visible' : 'collapse',
         canDemote,
         deferTomorrowEnabled: tomorrow !== scheduledDate,
         demoteEnabled: canDemote,
         skipTriageEnabled: true,
-        skipBtnText: t.status === 'skipped' ? 'Deshacer omisión' : 'Omitir hoy',
+        skipBtnText: t.status === 'skipped' ? mt('rundown.skipUndo') : mt('rundown.skipToday'),
         moveDateInput,
         moveHint,
         moveEnabled: isValidLocalIsoDate(moveDateInput) && moveDateInput !== scheduledDate,
@@ -417,10 +420,7 @@ class RundownViewModel extends Observable {
     }
     if (res.ok === false) {
       const net = isLikelyNetworkFailure(res.error);
-      this.set(
-        'errorMessage',
-        net ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.' : res.error.message,
-      );
+      this.set('errorMessage', net ? mt('rundown.network') : res.error.message);
       this.set('errorBannerVisibility', 'visible');
       return;
     }
@@ -455,12 +455,7 @@ class RundownViewModel extends Observable {
       }
       if (result.ok === false) {
         const net = isLikelyNetworkFailure(result.error);
-        this.set(
-          'errorMessage',
-          net
-            ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.'
-            : result.error.message,
-        );
+        this.set('errorMessage', net ? mt('rundown.network') : result.error.message);
         this.set('errorBannerVisibility', 'visible');
         return;
       }
@@ -486,10 +481,7 @@ class RundownViewModel extends Observable {
     }
     if (result.ok === false) {
       const net = isLikelyNetworkFailure(result.error);
-      this.set(
-        'errorMessage',
-        net ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.' : result.error.message,
-      );
+      this.set('errorMessage', net ? mt('rundown.network') : result.error.message);
       this.set('errorBannerVisibility', 'visible');
       return;
     }
@@ -508,10 +500,7 @@ class RundownViewModel extends Observable {
     }
     if (result.ok === false) {
       const net = isLikelyNetworkFailure(result.error);
-      this.set(
-        'errorMessage',
-        net ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.' : result.error.message,
-      );
+      this.set('errorMessage', net ? mt('rundown.network') : result.error.message);
       this.set('errorBannerVisibility', 'visible');
       return;
     }
@@ -579,12 +568,12 @@ class RundownViewModel extends Observable {
     this.set('createTaskError', '');
     const title = String(this.get('newTaskTitle') ?? '').trim();
     if (!title) {
-      this.set('createTaskError', 'Escribe un título.');
+      this.set('createTaskError', mt('rundown.titleRequired'));
       return;
     }
     const sizeNum = Number(String(this.get('newTaskSize') ?? '2').trim());
     if (!Number.isInteger(sizeNum) || sizeNum < 1 || sizeNum > 5) {
-      this.set('createTaskError', 'El tamaño debe ser un entero entre 1 y 5.');
+      this.set('createTaskError', mt('rundown.badSize'));
       return;
     }
     const minutesStr = String(this.get('newTaskMinutes') ?? '').trim();
@@ -592,7 +581,7 @@ class RundownViewModel extends Observable {
     if (minutesStr !== '') {
       const m = Number(minutesStr);
       if (!Number.isInteger(m) || m < 0 || m > 2880) {
-        this.set('createTaskError', 'Los minutos deben ser un entero entre 0 y 2880.');
+        this.set('createTaskError', mt('rundown.badMinutes'));
         return;
       }
       estimatedMinutes = m;
@@ -611,7 +600,7 @@ class RundownViewModel extends Observable {
     if (bRaw !== '') {
       const amt = Number(bRaw);
       if (!Number.isInteger(amt) || amt < 1 || amt > 1_000_000) {
-        this.set('createTaskError', 'La recompensa debe ser un entero entre 1 y 1.000.000.');
+        this.set('createTaskError', mt('rundown.badBounty'));
         return;
       }
       const tagKeys = parseBountyTagKeys(String(this.get('newTaskBountyTagKeys') ?? ''));
@@ -635,18 +624,18 @@ class RundownViewModel extends Observable {
 
     this.set('createTaskSaving', true);
     this.set('createTaskEnabled', false);
-    this.set('createTaskButtonText', 'Añadiendo…');
+    this.set('createTaskButtonText', mt('rundown.adding'));
     const result = await client.createTask(body);
     this.set('createTaskSaving', false);
     this.set('createTaskEnabled', true);
-    this.set('createTaskButtonText', 'Añadir tarea');
+    this.set('createTaskButtonText', mt('rundown.addTask'));
 
     if (authState.consumeUnauthorized(result)) {
       return;
     }
     if (result.ok === false) {
       const net = isLikelyNetworkFailure(result.error);
-      this.set('createTaskError', net ? 'Sin conexión. Revisa la red o la API.' : result.error.message);
+      this.set('createTaskError', net ? mt('network.offlineShort') : result.error.message);
       return;
     }
     this.set('newTaskTitle', '');
@@ -663,21 +652,21 @@ class RundownViewModel extends Observable {
     const endMin = parseTimeInput(String(this.get('windowEndInput') ?? ''));
     const crosses = Boolean(this.get('windowCrosses'));
     if (startMin === null || endMin === null) {
-      this.set('windowSaveError', 'Formato inválido. Usa HH:MM en 24h (ej. 09:00).');
+      this.set('windowSaveError', mt('rundown.badTimeFormat'));
       return;
     }
     if (!crosses && startMin >= endMin) {
-      this.set('windowSaveError', 'Si no cruza medianoche, el inicio debe ser antes del fin.');
+      this.set('windowSaveError', mt('rundown.windowOrder'));
       return;
     }
     if (crosses && startMin <= endMin) {
-      this.set('windowSaveError', 'Si cruza medianoche, el inicio (tarde) debe ser después del fin (mañana).');
+      this.set('windowSaveError', mt('rundown.windowCross'));
       return;
     }
 
     this.set('windowSaving', true);
     this.set('saveWindowEnabled', false);
-    this.set('saveButtonText', 'Guardando…');
+    this.set('saveButtonText', mt('rundown.savingWindow'));
     const client = authState.getClient();
     const res = await client.patchUserPreferences({
       dayWindow: {
@@ -688,14 +677,14 @@ class RundownViewModel extends Observable {
     });
     this.set('windowSaving', false);
     this.set('saveWindowEnabled', true);
-    this.set('saveButtonText', 'Guardar ventana');
+    this.set('saveButtonText', mt('rundown.saveWindow'));
 
     if (authState.consumeUnauthorized(res)) {
       return;
     }
     if (res.ok === false) {
       const net = isLikelyNetworkFailure(res.error);
-      this.set('windowSaveError', net ? 'Sin conexión. Revisa la red o la API.' : res.error.message);
+      this.set('windowSaveError', net ? mt('network.offlineShort') : res.error.message);
       return;
     }
 

@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { useAppHotkeys } from './hooks/useAppHotkeys';
 import { useAuth } from './hooks/useAuth';
 import { LandingPage } from './pages/LandingPage';
@@ -8,6 +9,7 @@ import { LogoutPage } from './pages/LogoutPage';
 import { OngoingPage } from './pages/OngoingPage';
 import { RewardsPage } from './pages/RewardsPage';
 import { RundownPage } from './pages/RundownPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { TagManagerPage } from './pages/TagManagerPage';
 import { AdminAuditPage } from './pages/admin/AdminAuditPage';
 import { AdminFeedbackPage } from './pages/admin/AdminFeedbackPage';
@@ -18,9 +20,10 @@ import { HelpShortcutsPage } from './pages/HelpShortcutsPage';
 import { VisualPresetProvider } from './context/visual-preset-context';
 
 function AuthBootSpinner(): ReactElement {
+  const { t } = useTranslation();
   return (
     <div className="auth-loading" aria-busy="true" aria-live="polite">
-      Loading…
+      {t('common.loading')}
     </div>
   );
 }
@@ -87,6 +90,7 @@ export function App(): ReactElement {
           <Route path="/rewards" element={<RewardsPage />} />
           <Route path="/ongoing" element={<OngoingPage />} />
           <Route path="/help/shortcuts" element={<HelpShortcutsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
         <Route path="/" element={<HomeRoute />} />
         <Route path="*" element={<WildcardRoute />} />

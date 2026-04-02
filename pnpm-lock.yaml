@@ -120,6 +120,9 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@19.2.4)
+      i18next:
+        specifier: ^24.2.3
+        version: 24.2.3(typescript@5.7.3)
       react:
         specifier: ^19.0.0
         version: 19.2.4
@@ -129,6 +132,9 @@ importers:
       react-hotkeys-hook:
         specifier: ^5.2.4
         version: 5.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-i18next:
+        specifier: ^15.7.4
+        version: 15.7.4(i18next@24.2.3(typescript@5.7.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.7.3)
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.0.3)(react@19.2.4)
@@ -10856,6 +10862,12 @@ snapshots:
     optionalDependencies:
       typescript: 5.7.2
 
+  i18next@24.2.3(typescript@5.7.3):
+    dependencies:
+      '@babel/runtime': 7.29.2
+    optionalDependencies:
+      typescript: 5.7.3
+
   iconv-lite@0.7.2:
     dependencies:
       safer-buffer: 2.1.2
@@ -12400,6 +12412,16 @@ snapshots:
     optionalDependencies:
       react-dom: 19.2.4(react@19.2.4)
       typescript: 5.7.2
+
+  react-i18next@15.7.4(i18next@24.2.3(typescript@5.7.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.7.3):
+    dependencies:
+      '@babel/runtime': 7.29.2
+      html-parse-stringify: 3.0.1
+      i18next: 24.2.3(typescript@5.7.3)
+      react: 19.2.4
+    optionalDependencies:
+      react-dom: 19.2.4(react@19.2.4)
+      typescript: 5.7.3
 
   react-icons@5.6.0(react@19.2.4):
     dependencies:

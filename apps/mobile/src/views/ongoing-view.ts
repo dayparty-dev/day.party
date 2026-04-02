@@ -4,6 +4,7 @@ import type { EventData, Page } from '@nativescript/core';
 import { Observable } from '@nativescript/core';
 
 import { authState } from '../services/auth-state';
+import { mt } from '../services/i18n';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 
 function todayIso(): string {
@@ -65,7 +66,12 @@ class OngoingViewModel extends Observable {
     this.set('effortErrorVisibility', 'collapse');
     this.set('effortSaving', false);
     this.set('effortSaveEnabled', true);
-    this.set('effortSaveButtonText', 'Guardar esfuerzo');
+    this.set('effortSaveButtonText', mt('ongoing.saveEffort'));
+    this.set('emptyHint', mt('ongoing.caughtUp'));
+    this.set('effortTitle', mt('ongoing.plannedEffort'));
+    this.set('effortEstHint', mt('ongoing.estHint'));
+    this.set('effortSizeHint', mt('ongoing.sizeRange'));
+    this.set('nextSectionLabel', mt('ongoing.nextSection'));
     this.set('nextVisibility', 'collapse');
     this.set('nextTitle', '');
     this.set('nextMeta', '');
@@ -98,7 +104,7 @@ class OngoingViewModel extends Observable {
     const targetMin = focus.estimatedMinutes ?? focus.size * SIZE_MINUTES;
     const targetMs = Math.max(1, targetMin) * 60 * 1000;
     const pct = Math.min(100, Math.round((elapsedMs / targetMs) * 100));
-    this.set('elapsedLabel', `Tiempo en esta tarea: ${m}m ${String(s).padStart(2, '0')}s`);
+    this.set('elapsedLabel', mt('ongoing.elapsed', { m, s: String(s).padStart(2, '0') }));
     this.set('progressValue', pct);
   }
 
@@ -111,12 +117,7 @@ class OngoingViewModel extends Observable {
     }
     if (rundownResult.ok === false) {
       const net = isLikelyNetworkFailure(rundownResult.error);
-      this.set(
-        'errorMessage',
-        net
-          ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.'
-          : rundownResult.error.message,
-      );
+      this.set('errorMessage', net ? mt('ongoing.network') : rundownResult.error.message);
       this.set('errorBannerVisibility', 'visible');
       this.set('emptyVisibility', 'collapse');
       this.set('focusVisibility', 'collapse');
@@ -158,10 +159,10 @@ class OngoingViewModel extends Observable {
     this.set('focusVisibility', 'visible');
     const canFocus = focus.status === 'planned' || focus.status === 'in_progress';
     this.set('focusToggleVisibility', canFocus ? 'visible' : 'collapse');
-    this.set('focusToggleText', focus.status === 'in_progress' ? 'Pausa' : 'Enfoque');
+    this.set('focusToggleText', focus.status === 'in_progress' ? mt('ongoing.pause') : mt('ongoing.focus'));
     this.set('title', focus.title);
-    const tag = focus.tagKey != null && tagNames.has(focus.tagKey) ? tagNames.get(focus.tagKey) : 'Sin etiqueta';
-    this.set('metaLine', `Tamaño ${focus.size} · ${tag}`);
+    const tag = focus.tagKey != null && tagNames.has(focus.tagKey) ? tagNames.get(focus.tagKey) : mt('ongoing.noTag');
+    this.set('metaLine', mt('ongoing.metaSize', { size: focus.size, tag: tag ?? '' }));
     this.set('effortMinutes', focus.estimatedMinutes != null ? String(focus.estimatedMinutes) : '');
     this.set('effortSize', String(focus.size));
     this.set('effortError', '');
@@ -169,18 +170,19 @@ class OngoingViewModel extends Observable {
 
     const next = nextTaskAfterFocus(focus, open);
     if (next) {
-      const nextTag = next.tagKey != null && tagNames.has(next.tagKey) ? tagNames.get(next.tagKey) : 'Sin etiqueta';
+      const nextTag =
+        next.tagKey != null && tagNames.has(next.tagKey) ? tagNames.get(next.tagKey) : mt('ongoing.noTag');
       const approx = next.estimatedMinutes ?? next.size * SIZE_MINUTES;
       this.set('nextVisibility', 'visible');
       this.set('nextTitle', next.title);
-      this.set('nextMeta', `~${approx} min · Tamaño ${next.size} · ${nextTag}`);
+      this.set('nextMeta', mt('ongoing.nextMeta', { min: approx, size: next.size, tag: nextTag ?? '' }));
       this.set('lastOpenVisibility', 'collapse');
     } else {
       this.set('nextVisibility', 'collapse');
       this.set('nextTitle', '');
       this.set('nextMeta', '');
       this.set('lastOpenVisibility', 'visible');
-      this.set('lastOpenHint', 'Última tarea abierta del día: al completarla, habrás cerrado la lista del día.');
+      this.set('lastOpenHint', mt('ongoing.lastHint'));
     }
 
     this.startTicker();
@@ -209,10 +211,7 @@ class OngoingViewModel extends Observable {
     }
     if (result.ok === false) {
       const net = isLikelyNetworkFailure(result.error);
-      this.set(
-        'errorMessage',
-        net ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.' : result.error.message,
-      );
+      this.set('errorMessage', net ? mt('ongoing.network') : result.error.message);
       this.set('errorBannerVisibility', 'visible');
       return;
     }
@@ -237,7 +236,7 @@ class OngoingViewModel extends Observable {
     if (trimmed !== '') {
       const n = Number(trimmed);
       if (!Number.isInteger(n) || n < 0 || n > 2880) {
-        this.set('effortError', 'Los minutos deben ser un entero entre 0 y 2880, o déjalo vacío para no cambiarlos.');
+        this.set('effortError', mt('ongoing.badMinutesNoEmpty'));
         this.set('effortErrorVisibility', 'visible');
         return;
       }
@@ -245,7 +244,7 @@ class OngoingViewModel extends Observable {
     }
     const sizeNum = Number(String(this.get('effortSize') ?? '').trim());
     if (!Number.isInteger(sizeNum) || sizeNum < 1 || sizeNum > 5) {
-      this.set('effortError', 'El tamaño debe ser un entero entre 1 y 5.');
+      this.set('effortError', mt('ongoing.badSize'));
       this.set('effortErrorVisibility', 'visible');
       return;
     }
@@ -261,7 +260,7 @@ class OngoingViewModel extends Observable {
     }
     this.set('effortSaving', true);
     this.set('effortSaveEnabled', false);
-    this.set('effortSaveButtonText', 'Guardando…');
+    this.set('effortSaveButtonText', mt('ongoing.savingEffort'));
     const client = authState.getClient();
     try {
       const result = await client.updateTask(this.currentTaskId, patch);
@@ -270,7 +269,7 @@ class OngoingViewModel extends Observable {
       }
       if (result.ok === false) {
         const net = isLikelyNetworkFailure(result.error);
-        this.set('effortError', net ? 'Sin conexión. Revisa la red o la API.' : result.error.message);
+        this.set('effortError', net ? mt('network.offlineShort') : result.error.message);
         this.set('effortErrorVisibility', 'visible');
         return;
       }
@@ -278,7 +277,7 @@ class OngoingViewModel extends Observable {
     } finally {
       this.set('effortSaving', false);
       this.set('effortSaveEnabled', true);
-      this.set('effortSaveButtonText', 'Guardar esfuerzo');
+      this.set('effortSaveButtonText', mt('ongoing.saveEffort'));
     }
   }
 
@@ -299,10 +298,7 @@ class OngoingViewModel extends Observable {
     }
     if (result.ok === false) {
       const net = isLikelyNetworkFailure(result.error);
-      this.set(
-        'errorMessage',
-        net ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.' : result.error.message,
-      );
+      this.set('errorMessage', net ? mt('ongoing.network') : result.error.message);
       this.set('errorBannerVisibility', 'visible');
       return;
     }

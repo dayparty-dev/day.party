@@ -11,7 +11,7 @@
       </StackLayout>
 
       <StackLayout visibility="{{ emptyVisibility }}">
-        <Label text="No hay tareas pendientes para hoy." class="h3" textWrap="true" />
+        <Label text="{{ emptyHint }}" class="h3" textWrap="true" />
         <Button text="Volver al resumen" tap="{{ onBack }}" class="-primary m-t-12" />
       </StackLayout>
 
@@ -19,10 +19,10 @@
         <Label text="{{ title }}" class="h1" textWrap="true" />
         <Label text="{{ metaLine }}" class="h3 m-t-8" textWrap="true" />
 
-        <Label text="Esfuerzo planificado" class="h3 m-t-16" />
-        <Label text="Minutos estimados (opcional)" class="footnote m-t-4" textWrap="true" />
+        <Label text="{{ effortTitle }}" class="h3 m-t-16" />
+        <Label text="{{ effortEstHint }}" class="footnote m-t-4" textWrap="true" />
         <TextField text="{{ effortMinutes }}" hint="Vacío = no cambiar" keyboardType="number" class="input m-t-4" />
-        <Label text="Tamaño (1–5)" class="footnote m-t-8" textWrap="true" />
+        <Label text="{{ effortSizeHint }}" class="footnote m-t-8" textWrap="true" />
         <TextField text="{{ effortSize }}" keyboardType="number" class="input m-t-4" />
         <StackLayout visibility="{{ effortErrorVisibility }}" class="m-t-8">
           <Label text="{{ effortError }}" textWrap="true" class="error-text" />
@@ -38,7 +38,7 @@
         </StackLayout>
 
         <StackLayout visibility="{{ nextVisibility }}" class="m-t-20">
-          <Label text="Siguiente" class="footnote" />
+          <Label text="{{ nextSectionLabel }}" class="footnote" />
           <Label text="{{ nextTitle }}" class="h3 m-t-4" textWrap="true" />
           <Label text="{{ nextMeta }}" class="footnote m-t-4" textWrap="true" />
         </StackLayout>

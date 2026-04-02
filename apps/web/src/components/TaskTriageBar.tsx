@@ -1,6 +1,7 @@
 import type { DayCapacityHint, TaskRundownItemResponse } from '@dayparty/api-client';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './TaskTriageBar.module.css';
 
 type TaskTriageBarProps = {
@@ -28,13 +29,14 @@ export function TaskTriageBar({
   onMarkSkipped,
   onClearSkipped,
 }: TaskTriageBarProps): ReactElement {
+  const { t } = useTranslation();
   const [pickDate, setPickDate] = useState(tomorrowDate);
 
   const hintForPick = hints.find((h) => h.date === pickDate);
-  const hintLabel = hintForPick != null ? `≈ ${hintForPick.remainingMinutes}m free` : null;
+  const hintLabel = hintForPick != null ? t('triage.hintFree', { minutes: hintForPick.remainingMinutes }) : null;
 
   return (
-    <div className={styles.wrap} aria-label={`Triage actions for ${task.title}`}>
+    <div className={styles.wrap} aria-label={t('triage.ariaTask', { title: task.title })}>
       <div className={styles.row}>
         <button
           type="button"
@@ -42,30 +44,30 @@ export function TaskTriageBar({
           disabled={busy || tomorrowDate === task.scheduledDate}
           onClick={() => void onDeferTomorrow()}
         >
-          Tomorrow
+          {t('triage.tomorrow')}
         </button>
         <button
           type="button"
           className={styles.btn}
           disabled={busy || task.essentiality === 'optional'}
           onClick={() => void onDemote()}
-          title="Mark as optional to ease runway pressure"
+          title={t('triage.lowerTitle')}
         >
-          Lower priority
+          {t('triage.lowerPriority')}
         </button>
         {task.status === 'skipped' ? (
           <button type="button" className={styles.btn} disabled={busy} onClick={() => void onClearSkipped()}>
-            Undo skip
+            {t('triage.undoSkip')}
           </button>
         ) : (
           <button type="button" className={styles.btnGhost} disabled={busy} onClick={() => void onMarkSkipped()}>
-            Skip today
+            {t('triage.skipToday')}
           </button>
         )}
       </div>
       <div className={styles.moveRow}>
         <label className={styles.moveLabel}>
-          Move to date
+          {t('triage.moveToDate')}
           <input
             type="date"
             className={styles.dateInput}
@@ -81,7 +83,7 @@ export function TaskTriageBar({
           disabled={busy || pickDate === task.scheduledDate}
           onClick={() => void onDeferToDate(pickDate)}
         >
-          Move
+          {t('triage.move')}
         </button>
       </div>
     </div>

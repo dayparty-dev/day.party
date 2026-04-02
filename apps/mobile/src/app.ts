@@ -9,7 +9,7 @@ import { Application, Frame } from '@nativescript/core';
 
 import { registerDeepLinkHandlers } from './deep-link-handlers';
 import { authState } from './services/auth-state';
-import { applyVisualPresetToPage, refreshVisualPresetFromApi } from './services/visual-preset';
+import { applyAppearanceToPage, refreshVisualPresetFromApi } from './services/visual-preset';
 
 import './app.css';
 
@@ -22,7 +22,13 @@ Application.run({
     frame.on(Frame.navigatedToEvent, () => {
       const page = frame.currentPage;
       if (page) {
-        applyVisualPresetToPage(page);
+        applyAppearanceToPage(page);
+      }
+    });
+    Application.on(Application.systemAppearanceChangedEvent, () => {
+      const page = frame.currentPage;
+      if (page) {
+        applyAppearanceToPage(page);
       }
     });
     const start = authState.isAuthenticated() ? 'views/rundown-view' : 'views/login-view';

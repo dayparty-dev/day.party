@@ -1,6 +1,7 @@
 import { ERROR_CODES } from '@dayparty/core';
 import type { FormEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../utils/network-error';
@@ -28,6 +29,7 @@ function extractMagicToken(search: string): string | null {
 }
 
 export function LoginPage(): ReactElement {
+  const { t } = useTranslation();
   const { login, verifyFromToken, isAuthenticated, authReady, onUnauthorized } = useAuth();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<string | null>(null);
@@ -64,7 +66,7 @@ export function LoginPage(): ReactElement {
       if (ok) {
         navigate('/rundown', { replace: true });
       } else {
-        setError('This sign-in link is invalid or has expired.');
+        setError(t('auth.invalidMagicLink'));
       }
     })();
     return () => {
@@ -96,7 +98,7 @@ export function LoginPage(): ReactElement {
   if (!authReady) {
     return (
       <div className={styles.boot} aria-busy="true" aria-live="polite">
-        Loading…
+        {t('common.loading')}
       </div>
     );
   }
@@ -104,22 +106,22 @@ export function LoginPage(): ReactElement {
   return (
     <div className={styles.layout}>
       <header className={styles.header}>
-        <h1 className={styles.title}>day.party</h1>
-        <p className={styles.sub}>Sign in with a magic link sent to your email.</p>
+        <h1 className={styles.title}>{t('auth.title')}</h1>
+        <p className={styles.sub}>{t('auth.subtitle')}</p>
       </header>
 
       {networkBanner ? (
         <div className={styles.banner} role="status">
-          <p className={styles.bannerText}>Cannot reach the API ({networkBanner}).</p>
+          <p className={styles.bannerText}>{t('auth.cannotReachApi', { detail: networkBanner })}</p>
           <button type="button" className={styles.retry} onClick={() => setNetworkBanner(null)}>
-            Dismiss
+            {t('common.dismiss')}
           </button>
         </div>
       ) : null}
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <label className={styles.label}>
-          Email
+          {t('auth.email')}
           <input
             className={styles.input}
             type="email"
@@ -131,17 +133,14 @@ export function LoginPage(): ReactElement {
           />
         </label>
         <button className={styles.submit} type="submit">
-          Send magic link
+          {t('auth.sendMagicLink')}
         </button>
       </form>
 
       {status ? <p className={styles.ok}>{status}</p> : null}
       {error ? <p className={styles.err}>{error}</p> : null}
 
-      <p className={styles.hint}>
-        Local dev note: no real email is sent. Use the magic link printed in the API logs; opening it here should sign
-        you in and redirect to your rundown.
-      </p>
+      <p className={styles.hint}>{t('auth.devHint')}</p>
     </div>
   );
 }

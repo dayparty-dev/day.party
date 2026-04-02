@@ -9,6 +9,7 @@ import type {
 import { ERROR_CODES } from '@dayparty/core';
 import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
+import { useTranslation } from 'react-i18next';
 import {
   SortableContext,
   arrayMove,
@@ -212,6 +213,7 @@ export function RunwayTaskList({
   toggleTaskFocus,
   runTriage,
 }: RunwayTaskListProps): ReactElement {
+  const { t } = useTranslation();
   const [items, setItems] = useState<TaskRundownItemResponse[]>(sortedTasks);
   const [reorderBusy, setReorderBusy] = useState(false);
 
@@ -327,7 +329,7 @@ export function RunwayTaskList({
           </ul>
         </SortableContext>
       </DndContext>
-      {items.length === 0 ? <p className={rundownStyles.empty}>No tasks for this day yet.</p> : null}
+      {items.length === 0 ? <p className={rundownStyles.empty}>{t('rundown.emptyDay')}</p> : null}
     </>
   );
 }

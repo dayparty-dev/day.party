@@ -2,11 +2,13 @@ import { ERROR_CODES } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import type { AdminFeedbackRow } from '@dayparty/api-client';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../../utils/network-error';
 import styles from './admin-shared.module.css';
 
 export function AdminFeedbackPage(): ReactElement {
+  const { t } = useTranslation();
   const { client, onUnauthorized } = useAuth();
   const [rows, setRows] = useState<AdminFeedbackRow[]>([]);
   const [next, setNext] = useState<string | null>(null);
@@ -64,7 +66,7 @@ export function AdminFeedbackPage(): ReactElement {
 
   return (
     <div>
-      <h1 className={styles.title}>Feedback</h1>
+      <h1 className={styles.title}>{t('admin.feedback')}</h1>
       {err ? (
         <p className={styles.err} role="alert">
           {err}
@@ -75,7 +77,7 @@ export function AdminFeedbackPage(): ReactElement {
           <li key={r.id} className={styles.row}>
             <div>{r.message}</div>
             <div className={styles.muted}>
-              {r.createdAt} · user {r.userId}
+              {r.createdAt} · {t('admin.submitter')} {r.userId}
               {r.category ? ` · ${r.category}` : ''}
             </div>
           </li>
@@ -83,7 +85,7 @@ export function AdminFeedbackPage(): ReactElement {
       </ul>
       {next ? (
         <button type="button" className={styles.btn} disabled={loading} onClick={() => void loadMore()}>
-          {loading ? 'Loading…' : 'Load more'}
+          {loading ? t('common.loading') : t('planHistory.loadMore')}
         </button>
       ) : null}
     </div>

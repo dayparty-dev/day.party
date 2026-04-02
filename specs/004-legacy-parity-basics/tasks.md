@@ -175,12 +175,12 @@
 
 ### Implementation for User Story 8
 
-- [ ] T036 [P] [US8] Add `react-i18next` + `i18next` deps in `apps/web/package.json`; add `apps/web/src/i18n/index.ts`, `apps/web/src/i18n/en.json`, `apps/web/src/i18n/es.json`; initialize in `apps/web/src/main.tsx`
-- [ ] T037 [US8] Replace user-visible strings with `t()` keys for **SC-005 sweep**: `apps/web/src/pages/LandingPage.tsx`, `LoginPage.tsx`, `LogoutPage.tsx`, `RundownPage.tsx`, `OngoingPage.tsx`, `RewardsPage.tsx`, `SettingsPage.tsx`, plus primary copy in `apps/web/src/components/CreateTaskPanel.tsx`, `TaskEditPanel.tsx`, `TaskTriageBar.tsx`, `TaskNotesPanel.tsx`, `PlanHistoryPanel.tsx`, `FeedbackForm.tsx` (when added), and admin pages under `apps/web/src/pages/admin/`
-- [ ] T038 [P] [US8] Implement global color scheme: `prefers-color-scheme` when `colorScheme===system`, else `data-color-scheme` on `document.documentElement`, synced from prefs in `apps/web/src/context/theme-context.tsx` (new) or extended preset context; update `apps/web/src/index.css` tokens
-- [ ] T039 [P] [US8] Add settings UI (locale + appearance + visual preset) persisting via `patchUserPreferences` in `apps/web/src/pages/SettingsPage.tsx` and link from `apps/web/src/pages/RundownPage.tsx` header or profile menu
-- [ ] T040 [P] [US8] Add mobile i18n JSON + small loader in `apps/mobile/src/services/i18n.ts` and apply to `apps/mobile/src/views/rundown-view.ts`, `ongoing-view.ts`, and auth views
-- [ ] T041 [P] [US8] Sync `locale`/`colorScheme` from API preferences + OS theme hooks in `apps/mobile/src/app.ts` or root `Frame` styling
+- [x] T036 [P] [US8] Add `react-i18next` + `i18next` deps in `apps/web/package.json`; add `apps/web/src/i18n/index.ts`, `apps/web/src/i18n/en.json`, `apps/web/src/i18n/es.json`; initialize in `apps/web/src/main.tsx`
+- [x] T037 [US8] Replace user-visible strings with `t()` keys for **SC-005 sweep**: `apps/web/src/pages/LandingPage.tsx`, `LoginPage.tsx`, `LogoutPage.tsx`, `RundownPage.tsx`, `OngoingPage.tsx`, `RewardsPage.tsx`, `SettingsPage.tsx`, plus primary copy in `apps/web/src/components/CreateTaskPanel.tsx`, `TaskEditPanel.tsx`, `TaskTriageBar.tsx`, `TaskNotesPanel.tsx`, `PlanHistoryPanel.tsx`, `FeedbackForm.tsx` (when added), and admin pages under `apps/web/src/pages/admin/`
+- [x] T038 [P] [US8] Implement global color scheme: `prefers-color-scheme` when `colorScheme===system`, else `data-color-scheme` on `document.documentElement`, synced from prefs in `apps/web/src/context/theme-context.tsx` (new) or extended preset context; update `apps/web/src/index.css` tokens
+- [x] T039 [P] [US8] Add settings UI (locale + appearance + visual preset) persisting via `patchUserPreferences` in `apps/web/src/pages/SettingsPage.tsx` and link from `apps/web/src/pages/RundownPage.tsx` header or profile menu
+- [x] T040 [P] [US8] Add mobile i18n JSON + small loader in `apps/mobile/src/services/i18n.ts` and apply to `apps/mobile/src/views/rundown-view.ts`, `ongoing-view.ts`, and auth views
+- [x] T041 [P] [US8] Sync `locale`/`colorScheme` from API preferences + OS theme hooks in `apps/mobile/src/app.ts` or root `Frame` styling
 
 **Checkpoint**: US8 across web + mobile (constitution: platform-specific UI, shared prefs contract).
 
@@ -228,7 +228,7 @@
 **Purpose**: Manual QA and docs consistency.
 
 - [ ] T053 [P] Walk through `specs/004-legacy-parity-basics/quickstart.md` on web + mobile including **SC-004** (`curl` 403 + audit list) and **SC-005** locale sweep checklist; file issues or fix gaps in the same feature branch
-- [ ] T054 [P] Align `specs/004-legacy-parity-basics/contracts/legacy-parity-rest.md` with implemented paths and bodies if drift appears during implementation
+- [x] T054 [P] Align `specs/004-legacy-parity-basics/contracts/legacy-parity-rest.md` with implemented paths and bodies if drift appears during implementation
 
 ---
 

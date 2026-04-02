@@ -2,6 +2,7 @@ import type { ApiLedgerEntry, ApiRewardDefinition } from '@dayparty/api-client';
 import { ERROR_CODES } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../utils/network-error';
@@ -14,6 +15,7 @@ function formatLedgerLine(e: ApiLedgerEntry): string {
 }
 
 export function RewardsPage(): ReactElement {
+  const { t } = useTranslation();
   const { client, onUnauthorized } = useAuth();
   const [rewards, setRewards] = useState<ApiRewardDefinition[] | null>(null);
   const [entries, setEntries] = useState<ApiLedgerEntry[]>([]);
@@ -111,18 +113,20 @@ export function RewardsPage(): ReactElement {
     <div className={styles.page}>
       <header className={styles.top}>
         <Link className={styles.back} to="/rundown">
-          ← Rundown
+          {t('common.backToRundown')}
         </Link>
         <span className={styles.balance} aria-live="polite">
-          Balance: {balance}
+          {t('rewards.balance', { balance })}
         </span>
       </header>
 
       {networkBanner ? (
         <div className={styles.banner} role="status">
-          <p className={styles.bannerText}>Network error: {networkBanner}</p>
+          <p className={styles.bannerText}>
+            {t('common.networkErrorPrefix')} {networkBanner}
+          </p>
           <button type="button" className={styles.retry} onClick={() => void load()}>
-            Retry
+            {t('common.retry')}
           </button>
         </div>
       ) : null}
@@ -131,16 +135,14 @@ export function RewardsPage(): ReactElement {
 
       <section className={styles.section} aria-labelledby="catalog-heading">
         <h2 id="catalog-heading" className={styles.sectionTitle}>
-          Catalog
+          {t('rewards.catalog')}
         </h2>
-        {rewards && rewards.length === 0 ? <p className={styles.meta}>No rewards yet — add one below.</p> : null}
+        {rewards && rewards.length === 0 ? <p className={styles.meta}>{t('rewards.noRewards')}</p> : null}
         {rewards?.map((r) => (
           <div key={r.id} className={styles.card}>
             <div className={styles.cardMain}>
               <p className={styles.rewardName}>{r.name}</p>
-              <p className={styles.meta}>
-                {r.type} · costs {r.costCurrency}
-              </p>
+              <p className={styles.meta}>{t('rewards.costs', { type: r.type, cost: r.costCurrency })}</p>
             </div>
             <button
               type="button"
@@ -148,7 +150,7 @@ export function RewardsPage(): ReactElement {
               disabled={balance < r.costCurrency || purchaseBusyId === r.id}
               onClick={() => void onPurchase(r.id)}
             >
-              {purchaseBusyId === r.id ? '…' : 'Buy'}
+              {purchaseBusyId === r.id ? '…' : t('rewards.buy')}
             </button>
           </div>
         ))}
@@ -156,15 +158,15 @@ export function RewardsPage(): ReactElement {
 
       <section className={styles.section} aria-labelledby="add-heading">
         <h2 id="add-heading" className={styles.sectionTitle}>
-          Add reward
+          {t('rewards.addReward')}
         </h2>
         <form className={styles.form} onSubmit={(e) => void onCreateReward(e)}>
           <label>
-            Name
+            {t('rewards.name')}
             <input value={newName} onChange={(ev) => setNewName(ev.target.value)} maxLength={200} required />
           </label>
           <label>
-            Type
+            {t('rewards.type')}
             <select value={newType} onChange={(ev) => setNewType(ev.target.value as typeof newType)}>
               <option value="instant">instant</option>
               <option value="banked">banked</option>
@@ -172,18 +174,18 @@ export function RewardsPage(): ReactElement {
             </select>
           </label>
           <label>
-            Cost (currency)
+            {t('rewards.costCurrency')}
             <input type="number" min={0} value={newCost} onChange={(ev) => setNewCost(Number(ev.target.value))} />
           </label>
           <button type="submit" className={styles.submit}>
-            Save to catalog
+            {t('rewards.saveCatalog')}
           </button>
         </form>
       </section>
 
       <section className={styles.section} aria-labelledby="ledger-heading">
         <h2 id="ledger-heading" className={styles.sectionTitle}>
-          Recent ledger
+          {t('rewards.recentLedger')}
         </h2>
         <ul className={styles.ledgerList}>
           {entries.map((e) => (

@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import styles from './HelpShortcutsPage.module.css';
 
@@ -6,20 +7,21 @@ const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigat
 const mod = isMac ? '⌘' : 'Ctrl';
 
 export function HelpShortcutsPage(): ReactElement {
+  const { t } = useTranslation();
   return (
     <div className={styles.page}>
       <header className={styles.header}>
         <Link className={styles.back} to="/rundown">
-          ← Rundown
+          {t('common.backToRundown')}
         </Link>
-        <h1 className={styles.title}>Keyboard shortcuts</h1>
-        <p className={styles.lead}>These work when you are not typing in a field (inputs, text areas, or selects).</p>
+        <h1 className={styles.title}>{t('shortcutsHelp.title')}</h1>
+        <p className={styles.lead}>{t('shortcutsHelp.lead')}</p>
       </header>
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Shortcut</th>
-            <th>Goes to</th>
+            <th>{t('shortcutsHelp.colShortcut')}</th>
+            <th>{t('shortcutsHelp.colGoesTo')}</th>
           </tr>
         </thead>
         <tbody>
@@ -27,25 +29,25 @@ export function HelpShortcutsPage(): ReactElement {
             <td>
               <kbd>{mod}</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>
             </td>
-            <td>Rundown (planner)</td>
+            <td>{t('shortcutsHelp.rundown')}</td>
           </tr>
           <tr>
             <td>
               <kbd>{mod}</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd>
             </td>
-            <td>Ongoing (focus)</td>
+            <td>{t('shortcutsHelp.ongoingFocus')}</td>
           </tr>
           <tr>
             <td>
               <kbd>{mod}</kbd> + <kbd>Shift</kbd> + <kbd>W</kbd>
             </td>
-            <td>Rewards</td>
+            <td>{t('shortcutsHelp.rewards')}</td>
           </tr>
           <tr>
             <td>
               <kbd>{mod}</kbd> + <kbd>Shift</kbd> + <kbd>/</kbd>
             </td>
-            <td>This help page</td>
+            <td>{t('shortcutsHelp.thisPage')}</td>
           </tr>
         </tbody>
       </table>

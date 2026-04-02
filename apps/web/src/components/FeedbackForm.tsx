@@ -1,12 +1,14 @@
 import { ERROR_CODES } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import styles from './FeedbackForm.module.css';
 
 export function FeedbackForm(): ReactElement {
+  const { t } = useTranslation();
   const { client, onUnauthorized } = useAuth();
   const [message, setMessage] = useState('');
   const [category, setCategory] = useState<string>('');
@@ -32,7 +34,7 @@ export function FeedbackForm(): ReactElement {
       toast.error(res.error.message);
       return;
     }
-    toast.success('Thanks — your feedback was sent.');
+    toast.success(t('feedback.thanks'));
     setMessage('');
     setCategory('');
   }
@@ -40,7 +42,7 @@ export function FeedbackForm(): ReactElement {
   return (
     <form className={styles.form} onSubmit={(e) => void onSubmit(e)}>
       <label className={styles.label}>
-        Message
+        {t('feedback.message')}
         <textarea
           className={styles.textarea}
           value={message}
@@ -51,16 +53,16 @@ export function FeedbackForm(): ReactElement {
         />
       </label>
       <label className={styles.label}>
-        Category (optional)
+        {t('feedback.categoryOptional')}
         <select className={styles.select} value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="">—</option>
-          <option value="bug">Bug</option>
-          <option value="idea">Idea</option>
-          <option value="other">Other</option>
+          <option value="bug">{t('feedback.catBug')}</option>
+          <option value="idea">{t('feedback.catIdea')}</option>
+          <option value="other">{t('feedback.catOther')}</option>
         </select>
       </label>
       <button type="submit" className={styles.btn} disabled={saving}>
-        {saving ? 'Sending…' : 'Send feedback'}
+        {saving ? t('feedback.sending') : t('feedback.send')}
       </button>
     </form>
   );

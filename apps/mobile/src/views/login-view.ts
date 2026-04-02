@@ -3,6 +3,7 @@ import { Frame, Observable } from '@nativescript/core';
 
 import { parseTokenFromUrl } from '../utils/parse-token-from-url';
 import { authState } from '../services/auth-state';
+import { mt } from '../services/i18n';
 import { refreshVisualPresetFromApi } from '../services/visual-preset';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 
@@ -18,6 +19,18 @@ class LoginViewModel extends Observable {
 
   constructor() {
     super();
+    this.applyChromeStrings();
+  }
+
+  private applyChromeStrings(): void {
+    this.set('actionBarTitle', mt('login.actionTitle'));
+    this.set('emailLabel', mt('login.emailLabel'));
+    this.set('emailHint', mt('login.emailHint'));
+    this.set('sendMagicLabel', mt('login.sendMagic'));
+    this.set('tokenLabel', mt('login.tokenLabel'));
+    this.set('tokenHint', mt('login.tokenHint'));
+    this.set('verifyLabel', mt('login.verify'));
+    this.set('retryLabel', mt('login.retry'));
   }
 
   clearError(): void {
@@ -41,19 +54,16 @@ class LoginViewModel extends Observable {
   async sendLinkAsync(): Promise<void> {
     this.clearError();
     this.set('statusVisibility', 'visible');
-    this.set('statusMessage', 'Enviando…');
+    this.set('statusMessage', mt('login.sending'));
     const result = await authState.login(this.email.trim());
     if (result.ok === false) {
       this.set('statusMessage', '');
       this.set('statusVisibility', 'collapse');
       const net = isLikelyNetworkFailure(result.error);
-      this.showError(
-        net ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.' : result.error.message,
-        net ? 'send' : null,
-      );
+      this.showError(net ? mt('network.unreachable') : result.error.message, net ? 'send' : null);
       return;
     }
-    this.set('statusMessage', 'Si el servidor está en marcha, revisa la consola de la API para el enlace mágico.');
+    this.set('statusMessage', mt('login.magicHint'));
   }
 
   onVerify(): void {
@@ -65,20 +75,17 @@ class LoginViewModel extends Observable {
     const raw = this.tokenOrUrl.trim();
     const token = parseTokenFromUrl(raw) ?? raw;
     if (!token) {
-      this.showError('Introduce un token o una URL con ?token=', null);
+      this.showError(mt('login.needToken'), null);
       return;
     }
     this.set('statusVisibility', 'visible');
-    this.set('statusMessage', 'Verificando…');
+    this.set('statusMessage', mt('login.verifyStatus'));
     const result = await authState.verifyMagicLinkToken(token);
     this.set('statusMessage', '');
     this.set('statusVisibility', 'collapse');
     if (result.ok === false) {
       const net = isLikelyNetworkFailure(result.error);
-      this.showError(
-        net ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.' : result.error.message,
-        net ? 'verify' : null,
-      );
+      this.showError(net ? mt('network.unreachable') : result.error.message, net ? 'verify' : null);
       return;
     }
     await refreshVisualPresetFromApi(authState.getClient(), () => {

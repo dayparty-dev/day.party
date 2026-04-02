@@ -2,11 +2,13 @@ import { ERROR_CODES } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import type { AdminAuditRow } from '@dayparty/api-client';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../../utils/network-error';
 import styles from './admin-shared.module.css';
 
 export function AdminAuditPage(): ReactElement {
+  const { t } = useTranslation();
   const { client, onUnauthorized } = useAuth();
   const [rows, setRows] = useState<AdminAuditRow[]>([]);
   const [next, setNext] = useState<string | null>(null);
@@ -64,7 +66,7 @@ export function AdminAuditPage(): ReactElement {
 
   return (
     <div>
-      <h1 className={styles.title}>Audit log</h1>
+      <h1 className={styles.title}>{t('admin.auditLog')}</h1>
       {err ? (
         <p className={styles.err} role="alert">
           {err}
@@ -77,15 +79,15 @@ export function AdminAuditPage(): ReactElement {
               <strong>{r.action}</strong> · {r.summary}
             </div>
             <div className={styles.muted}>
-              {r.createdAt} · actor {r.actorUserId}
-              {r.targetId ? ` · target ${r.targetId}` : ''}
+              {r.createdAt} · {t('admin.actor')} {r.actorUserId}
+              {r.targetId ? ` · ${t('admin.target')} ${r.targetId}` : ''}
             </div>
           </li>
         ))}
       </ul>
       {next ? (
         <button type="button" className={styles.btn} disabled={loading} onClick={() => void loadMore()}>
-          {loading ? 'Loading…' : 'Load more'}
+          {loading ? t('common.loading') : t('planHistory.loadMore')}
         </button>
       ) : null}
     </div>

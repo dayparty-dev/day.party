@@ -5,41 +5,35 @@ import type {
   TaskRundownItemResponse,
   TaskTriageInput,
 } from '@dayparty/api-client';
-import { ERROR_CODES, type VisualPreset } from '@dayparty/core';
+import { ERROR_CODES } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 import { CreateTaskPanel } from '../components/CreateTaskPanel';
 import { FeedbackForm } from '../components/FeedbackForm';
 import { PlanHistoryPanel } from '../components/PlanHistoryPanel';
 import { RunwayTaskList } from '../components/RunwayTaskList';
-import { useVisualPreset } from '../context/visual-preset-context';
 import { useAuth } from '../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import { minutesToTimeInput, timeInputToMinutes } from '../utils/time-of-day';
 import { addLocalCalendarDays, isValidLocalIsoDate, todayLocalDateString } from '../utils/today-local';
 import styles from './RundownPage.module.css';
 
-const PRESET_OPTIONS: { value: VisualPreset; label: string }[] = [
-  { value: 'default', label: 'Default' },
-  { value: 'calm', label: 'Calm' },
-  { value: 'playful', label: 'Playful' },
-  { value: 'highContrast', label: 'High contrast' },
-];
-
-function planningDayLabel(iso: string, todayIso: string): string {
+function planningDayLabel(iso: string, todayIso: string, lang: string, todayLabel: string): string {
   if (iso === todayIso) {
-    return 'Today';
+    return todayLabel;
   }
   const [y, m, d] = iso.split('-').map(Number);
   const dt = new Date(y, m - 1, d);
-  return dt.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  const loc = lang === 'es' ? 'es' : 'en-US';
+  return dt.toLocaleDateString(loc, { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
 export function RundownPage(): ReactElement {
+  const { t, i18n } = useTranslation();
   const { client, onUnauthorized, user } = useAuth();
-  const { visualPreset, presetError, savingPreset, saveVisualPreset } = useVisualPreset();
   const [searchParams, setSearchParams] = useSearchParams();
   const todayIso = useMemo(() => todayLocalDateString(), []);
 
@@ -60,7 +54,10 @@ export function RundownPage(): ReactElement {
 
   const dateParam = searchParams.get('date');
   const date = dateParam && isValidLocalIsoDate(dateParam) ? dateParam : todayIso;
-  const dayTitle = useMemo(() => planningDayLabel(date, todayIso), [date, todayIso]);
+  const dayTitle = useMemo(
+    () => planningDayLabel(date, todayIso, i18n.language, t('common.today')),
+    [date, todayIso, i18n.language, t],
+  );
 
   const setPlanningDate = useCallback(
     (nextIso: string) => {
@@ -223,7 +220,7 @@ export function RundownPage(): ReactElement {
       setLoadError(result.error.message);
       return;
     }
-    toast.success('Triage updated');
+    toast.success(t('rundown.triageUpdated'));
     await load();
   }
 
@@ -232,11 +229,11 @@ export function RundownPage(): ReactElement {
     const startMin = timeInputToMinutes(winStart);
     const endMin = timeInputToMinutes(winEnd);
     if (!winCrosses && startMin >= endMin) {
-      setWindowError('When the window does not cross midnight, start must be before end.');
+      setWindowError(t('rundown.windowNoCrossError'));
       return;
     }
     if (winCrosses && startMin <= endMin) {
-      setWindowError('When crossing midnight, start (evening) must be after end (morning).');
+      setWindowError(t('rundown.windowCrossError'));
       return;
     }
     setSavingWindow(true);
@@ -261,7 +258,7 @@ export function RundownPage(): ReactElement {
       setWindowError(res.error.message);
       return;
     }
-    toast.success('Day window saved');
+    toast.success(t('rundown.windowSaved'));
     await load();
   }
 
@@ -284,11 +281,11 @@ export function RundownPage(): ReactElement {
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>{dayTitle}</h1>
-          <nav className={styles.dateNav} aria-label="Planning date">
+          <nav className={styles.dateNav} aria-label={t('rundown.planningDateAria')}>
             <button
               type="button"
               className={styles.dateStep}
-              aria-label="Previous day"
+              aria-label={t('rundown.prevDayAria')}
               onClick={() => setPlanningDate(addLocalCalendarDays(date, -1))}
             >
               ←
@@ -303,19 +300,19 @@ export function RundownPage(): ReactElement {
                   setPlanningDate(v);
                 }
               }}
-              aria-label="Select planning date"
+              aria-label={t('rundown.pickDateAria')}
             />
             <button
               type="button"
               className={styles.dateStep}
-              aria-label="Next day"
+              aria-label={t('rundown.nextDayAria')}
               onClick={() => setPlanningDate(addLocalCalendarDays(date, 1))}
             >
               →
             </button>
             {date !== todayIso ? (
               <button type="button" className={styles.dateToday} onClick={() => setPlanningDate(todayIso)}>
-                Today
+                {t('common.today')}
               </button>
             ) : null}
           </nav>
@@ -324,7 +321,7 @@ export function RundownPage(): ReactElement {
             {rundown ? (
               <>
                 {' · '}
-                {rundown.completed}/{rundown.capacity} done
+                {t('rundown.metaDone', { completed: rundown.completed, capacity: rundown.capacity })}
               </>
             ) : null}
           </p>
@@ -332,29 +329,34 @@ export function RundownPage(): ReactElement {
         <div className={styles.headerActions}>
           {user?.role === 'admin' ? (
             <Link className={styles.headerLink} to="/admin">
-              Admin
+              {t('common.admin')}
             </Link>
           ) : null}
           <Link className={styles.headerLink} to="/help/shortcuts">
-            Shortcuts
+            {t('common.shortcuts')}
+          </Link>
+          <Link className={styles.headerLink} to="/settings">
+            {t('common.settings')}
           </Link>
           <Link className={styles.headerLink} to="/tags">
-            Tags
+            {t('common.tags')}
           </Link>
           <Link className={styles.headerLink} to="/rewards">
-            Rewards
+            {t('common.rewards')}
           </Link>
           <Link className={styles.ongoingBtn} to="/ongoing">
-            Ongoing
+            {t('common.ongoing')}
           </Link>
         </div>
       </header>
 
       {networkBanner ? (
         <div className={styles.banner} role="status">
-          <p className={styles.bannerText}>Network error: {networkBanner}</p>
+          <p className={styles.bannerText}>
+            {t('common.networkErrorPrefix')} {networkBanner}
+          </p>
           <button type="button" className={styles.retry} onClick={() => void load()}>
-            Retry
+            {t('common.retry')}
           </button>
         </div>
       ) : null}
@@ -364,29 +366,23 @@ export function RundownPage(): ReactElement {
       {rundown ? (
         <section className={styles.planPanel} aria-label="Day plan and window">
           <div className={styles.planStats}>
-            <span>
-              <strong>{rundown.dayFit.plannedMinutes}</strong> min planned
-            </span>
+            <span>{t('rundown.minPlanned', { minutes: rundown.dayFit.plannedMinutes })}</span>
             <span className={styles.planSep}>·</span>
-            <span>
-              <strong>{rundown.dayFit.availableMinutes}</strong> min in window
-            </span>
+            <span>{t('rundown.minInWindow', { minutes: rundown.dayFit.availableMinutes })}</span>
             {rundown.dayFit.overflowUnresolved ? (
-              <span className={styles.planWarn}>Essential work does not fit — use triage actions below each task.</span>
+              <span className={styles.planWarn}>{t('rundown.overflowWarn')}</span>
             ) : null}
           </div>
           <div className={styles.planBar} role="presentation">
             <div className={styles.planBarFill} style={{ width: `${planLoadPercent}%` }} />
           </div>
           <details className={styles.windowDetails}>
-            <summary className={styles.windowSummary}>Day window</summary>
+            <summary className={styles.windowSummary}>{t('rundown.dayWindow')}</summary>
             <div className={styles.windowForm}>
-              <p className={styles.windowHint}>
-                Adjust when your planning day runs. Times use a 24-hour clock in your local timezone.
-              </p>
+              <p className={styles.windowHint}>{t('rundown.windowHint')}</p>
               <div className={styles.windowRow}>
                 <label className={styles.windowLabel}>
-                  Start
+                  {t('rundown.start')}
                   <input
                     type="time"
                     className={styles.timeInput}
@@ -396,7 +392,7 @@ export function RundownPage(): ReactElement {
                   />
                 </label>
                 <label className={styles.windowLabel}>
-                  End
+                  {t('rundown.end')}
                   <input
                     type="time"
                     className={styles.timeInput}
@@ -408,7 +404,7 @@ export function RundownPage(): ReactElement {
               </div>
               <label className={styles.crossesLabel}>
                 <input type="checkbox" checked={winCrosses} onChange={(e) => setWinCrosses(e.target.checked)} />
-                Window crosses midnight (night shift)
+                {t('rundown.crossesMidnight')}
               </label>
               {windowError ? <p className={styles.windowErr}>{windowError}</p> : null}
               <button
@@ -417,31 +413,8 @@ export function RundownPage(): ReactElement {
                 disabled={savingWindow}
                 onClick={() => void saveDayWindow()}
               >
-                {savingWindow ? 'Saving…' : 'Save window'}
+                {savingWindow ? t('common.saving') : t('rundown.saveWindow')}
               </button>
-              <div className={styles.presetRow}>
-                <label className={styles.presetLabel} htmlFor="visual-preset">
-                  Look &amp; feel
-                  <select
-                    id="visual-preset"
-                    className={styles.presetSelect}
-                    value={visualPreset ?? 'default'}
-                    disabled={visualPreset === null || savingPreset}
-                    onChange={(e) => {
-                      const next = e.target.value as VisualPreset;
-                      void saveVisualPreset(next);
-                    }}
-                  >
-                    {PRESET_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <p className={styles.presetHint}>Applies across Today, Ongoing, and Rewards while signed in.</p>
-                {presetError ? <p className={styles.presetErr}>{presetError}</p> : null}
-              </div>
             </div>
           </details>
           <PlanHistoryPanel
@@ -453,7 +426,7 @@ export function RundownPage(): ReactElement {
       ) : null}
 
       <details className={styles.feedbackDetails}>
-        <summary className={styles.feedbackSummary}>Send feedback</summary>
+        <summary className={styles.feedbackSummary}>{t('rundown.sendFeedback')}</summary>
         <div className={styles.feedbackBody}>
           <FeedbackForm />
         </div>

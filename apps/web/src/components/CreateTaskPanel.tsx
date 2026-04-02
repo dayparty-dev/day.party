@@ -2,6 +2,7 @@ import type { CreateTaskInput, DayPartyClient } from '@dayparty/api-client';
 import { ERROR_CODES, type TaskEssentiality } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import styles from './CreateTaskPanel.module.css';
 
@@ -31,6 +32,7 @@ export function CreateTaskPanel({
   onOtherError,
   onSuccess,
 }: CreateTaskPanelProps): ReactElement {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [size, setSize] = useState<(typeof SIZES)[number]>(2);
   const [minutesRaw, setMinutesRaw] = useState('');
@@ -45,7 +47,7 @@ export function CreateTaskPanel({
     setLocalError(null);
     const trimmed = title.trim();
     if (!trimmed) {
-      setLocalError('Add a title for the task.');
+      setLocalError(t('createTask.errTitle'));
       return;
     }
 
@@ -54,7 +56,7 @@ export function CreateTaskPanel({
     if (m !== '') {
       const n = Number(m);
       if (!Number.isInteger(n) || n < 0 || n > 2880) {
-        setLocalError('Estimated minutes must be a whole number from 0 to 2880.');
+        setLocalError(t('createTask.errMinutes'));
         return;
       }
       estimatedMinutes = n;
@@ -65,7 +67,7 @@ export function CreateTaskPanel({
     if (bRaw !== '') {
       const amt = Number(bRaw);
       if (!Number.isInteger(amt) || amt < 1 || amt > 1_000_000) {
-        setLocalError('Bounty amount must be a whole number from 1 to 1,000,000.');
+        setLocalError(t('createTask.errBounty'));
         return;
       }
       const tagKeys = parseBountyTagKeys(bountyTagKeysRaw);
@@ -111,23 +113,23 @@ export function CreateTaskPanel({
   }
 
   return (
-    <section className={styles.panel} aria-label="Create task">
-      <h2 className={styles.title}>New task</h2>
+    <section className={styles.panel} aria-label={t('rundown.ariaCreateTask')}>
+      <h2 className={styles.title}>{t('createTask.title')}</h2>
       <div className={styles.form}>
         <label className={styles.field}>
-          <span className={styles.label}>Title</span>
+          <span className={styles.label}>{t('createTask.fieldTitle')}</span>
           <input
             className={styles.textInput}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={500}
-            placeholder="What needs doing?"
+            placeholder={t('createTask.placeholderTitle')}
             autoComplete="off"
           />
         </label>
         <div className={styles.row}>
           <label className={styles.field}>
-            <span className={styles.label}>Size</span>
+            <span className={styles.label}>{t('createTask.size')}</span>
             <select
               className={styles.select}
               value={size}
@@ -141,7 +143,7 @@ export function CreateTaskPanel({
             </select>
           </label>
           <label className={styles.field}>
-            <span className={styles.label}>Minutes (optional)</span>
+            <span className={styles.label}>{t('createTask.minutesOptional')}</span>
             <input
               className={styles.numberInput}
               type="number"
@@ -150,41 +152,41 @@ export function CreateTaskPanel({
               step={1}
               value={minutesRaw}
               onChange={(e) => setMinutesRaw(e.target.value)}
-              placeholder="Infer from size if empty"
+              placeholder={t('createTask.minutesPlaceholder')}
             />
           </label>
           <label className={styles.field}>
-            <span className={styles.label}>Importance</span>
+            <span className={styles.label}>{t('createTask.importance')}</span>
             <select
               className={styles.select}
               value={essentiality}
               onChange={(e) => setEssentiality(e.target.value as TaskEssentiality)}
             >
-              <option value="normal">Normal</option>
-              <option value="essential">Essential</option>
-              <option value="optional">Optional</option>
+              <option value="normal">{t('createTask.importanceNormal')}</option>
+              <option value="essential">{t('createTask.importanceEssential')}</option>
+              <option value="optional">{t('createTask.importanceOptional')}</option>
             </select>
           </label>
         </div>
         <div className={styles.bountyBlock}>
-          <span className={styles.label}>Bounty (optional)</span>
+          <span className={styles.label}>{t('createTask.bountyOptional')}</span>
           <label className={styles.field}>
-            <span className={styles.label}>Amount (points)</span>
+            <span className={styles.label}>{t('createTask.bountyAmount')}</span>
             <input
               className={styles.numberInput}
               inputMode="numeric"
               value={bountyAmountRaw}
               onChange={(e) => setBountyAmountRaw(e.target.value)}
-              placeholder="None"
+              placeholder={t('createTask.bountyNone')}
             />
           </label>
           <label className={styles.field}>
-            <span className={styles.label}>Scope tags (comma-separated)</span>
+            <span className={styles.label}>{t('createTask.bountyTags')}</span>
             <input
               className={styles.textInput}
               value={bountyTagKeysRaw}
               onChange={(e) => setBountyTagKeysRaw(e.target.value)}
-              placeholder="e.g. work, deep-focus"
+              placeholder={t('createTask.bountyTagsPh')}
             />
           </label>
           <label className={styles.inlineChecks}>
@@ -193,12 +195,12 @@ export function CreateTaskPanel({
               checked={bountyHighResistance}
               onChange={(e) => setBountyHighResistance(e.target.checked)}
             />
-            High resistance
+            {t('createTask.highResistance')}
           </label>
         </div>
         {localError ? <p className={styles.err}>{localError}</p> : null}
         <button type="button" className={styles.submit} disabled={submitting} onClick={() => void submit()}>
-          {submitting ? 'Adding…' : 'Add task'}
+          {submitting ? t('createTask.adding') : t('createTask.addTask')}
         </button>
       </div>
     </section>

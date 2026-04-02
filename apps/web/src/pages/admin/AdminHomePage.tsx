@@ -1,12 +1,14 @@
 import { ERROR_CODES } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useAuth } from '../../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../../utils/network-error';
 import styles from './admin-shared.module.css';
 
 export function AdminHomePage(): ReactElement {
+  const { t } = useTranslation();
   const { client, onUnauthorized } = useAuth();
   const [q, setQ] = useState('');
   const [err, setErr] = useState<string | null>(null);
@@ -35,10 +37,10 @@ export function AdminHomePage(): ReactElement {
 
   return (
     <div>
-      <h1 className={styles.title}>User search</h1>
-      <p className={styles.muted}>Enter at least two characters of an email address.</p>
+      <h1 className={styles.title}>{t('admin.userSearch')}</h1>
+      <p className={styles.muted}>{t('admin.emailHint')}</p>
       <div className={styles.field}>
-        <label htmlFor="admin-q">Email contains</label>
+        <label htmlFor="admin-q">{t('admin.emailContains')}</label>
         <input
           id="admin-q"
           className={styles.input}
@@ -48,7 +50,7 @@ export function AdminHomePage(): ReactElement {
         />
       </div>
       <button type="button" className={styles.btn} disabled={loading} onClick={() => void search()}>
-        {loading ? 'Searching…' : 'Search'}
+        {loading ? t('admin.searching') : t('admin.search')}
       </button>
       {err ? (
         <p className={styles.err} role="alert">

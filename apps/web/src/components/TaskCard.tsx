@@ -1,5 +1,6 @@
 import type { TaskRundownItemResponse } from '@dayparty/api-client';
 import type { ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './TaskCard.module.css';
 
 export type TaskRunwayPlacement = 'in-runway' | 'outside-runway' | 'complete';
@@ -21,6 +22,7 @@ export function TaskCard({
   focusBusy = false,
   onToggleFocus,
 }: TaskCardProps): ReactElement {
+  const { t } = useTranslation();
   const cardClass =
     runwayPlacement === 'outside-runway'
       ? `${styles.card} ${styles.cardOutside}`
@@ -45,25 +47,29 @@ export function TaskCard({
               className={styles.check}
               checked={task.isComplete}
               onChange={() => onToggleComplete(task)}
-              aria-label={task.isComplete ? `Mark “${task.title}” incomplete` : `Mark “${task.title}” complete`}
+              aria-label={
+                task.isComplete
+                  ? t('taskCard.markIncomplete', { title: task.title })
+                  : t('taskCard.markComplete', { title: task.title })
+              }
             />
             <span className={`${styles.title} ${task.isComplete ? styles.titleDone : ''}`}>{task.title}</span>
           </label>
           <div className={styles.tagRow}>
             {task.essentiality === 'essential' ? (
-              <span className={styles.essTag} title="Essential — keep in the runway if possible">
-                Essential
+              <span className={styles.essTag} title={t('taskCard.essentialTitle')}>
+                {t('taskCard.essential')}
               </span>
             ) : null}
-            {task.essentiality === 'optional' ? <span className={styles.optTag}>Optional</span> : null}
-            {task.status === 'skipped' ? <span className={styles.skipTag}>Skipped today</span> : null}
+            {task.essentiality === 'optional' ? <span className={styles.optTag}>{t('taskCard.optional')}</span> : null}
+            {task.status === 'skipped' ? <span className={styles.skipTag}>{t('taskCard.skippedToday')}</span> : null}
             {task.status === 'in_progress' ? (
-              <span className={styles.focusTag} title="Currently in focus">
-                In progress
+              <span className={styles.focusTag} title={t('taskCard.inFocusTitle')}>
+                {t('taskCard.inProgress')}
               </span>
             ) : null}
             {runwayPlacement === 'outside-runway' && !task.isComplete ? (
-              <span className={styles.runwayTag}>Outside window</span>
+              <span className={styles.runwayTag}>{t('taskCard.outsideWindow')}</span>
             ) : null}
             {task.notesPreview ? (
               <p className={styles.notesPreview} title={task.notesPreview}>
@@ -74,7 +80,7 @@ export function TaskCard({
         </div>
         <div className={styles.badges}>
           {task.estimatedMinutes != null ? (
-            <span className={styles.minutesBadge} title="Estimated minutes">
+            <span className={styles.minutesBadge} title={t('taskCard.estMinutesTitle')}>
               {task.estimatedMinutes}m
             </span>
           ) : null}
@@ -83,7 +89,7 @@ export function TaskCard({
           </span>
           {!task.isComplete && (task.status === 'planned' || task.status === 'in_progress') && onToggleFocus ? (
             <button type="button" className={styles.focusBtn} disabled={focusBusy} onClick={() => onToggleFocus(task)}>
-              {focusBusy ? '…' : task.status === 'in_progress' ? 'Pause' : 'Start'}
+              {focusBusy ? '…' : task.status === 'in_progress' ? t('taskCard.pause') : t('taskCard.start')}
             </button>
           ) : null}
         </div>
