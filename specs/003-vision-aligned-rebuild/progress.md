@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Create task bounty (T053)**: Web `CreateTaskPanel` optional bounty block: amount (points), comma-separated scope tags, **High resistance** checkbox; omitted from POST when amount empty; same bounds as `taskBountySchema` / `TaskEditPanel`.
 - **Focus `planned` ↔ `in_progress` (T052 / T055)**: Web `TaskCard` exposes optional `onToggleFocus` + `focusBusy`; `RundownPage` calls `updateTask` with flipped `status`; `OngoingPage` prefers the first incomplete task with `status === 'in_progress'`, then offers **Start** / **Pause** (`updateTask`). Mobile rundown rows use **Enfoque** / **Pausa** (`toggleFocusFor`); `ongoing-view` mirrors pick + toggle. **In progress** badge on web `TaskCard` (`focusTag`).
 - **Mobile task detail (T054)**: `apps/mobile/src/views/task-detail-view.{ts,xml}` — `authState.navigateToTaskDetail(taskId)` passes `Frame` `context`; `onNavigatingTo` reads `args.context` / `page.navigationContext`. Full edit + `notesMarkdown` + bounty (Spanish copy); `ListPicker` for status / essentiality / tag; `Observable.propertyChangeEvent` on `statusIndex` toggles deferred date visibility.
 - **Rewards / ledger (US4 T024–T030)**: `RewardDefinition` / `RewardDefinitionType` in `@dayparty/core` (`models/reward.ts`); `LedgerEntry` / `LedgerEntryReason` in `models/ledger.ts`. `Task.bounty?: TaskBounty` (`amount`, optional `tagKeys`, `highResistance`). Domain ports: `RewardDefinitionRepository` (`listByUserId`, `findById`, `create`), `LedgerRepository` (`insert` append-only omitting `id`/`createdAt`, `listByUserId` with `limit` + optional cursor, `findByCorrelation`, `sumAmountByUserId`). Mongo: `reward_definitions`, `ledger_entries`. Re-export document types from interface modules via `@dayparty/core` (avoid duplicate domain copies).
@@ -460,5 +461,29 @@ Started: 2026-04-02 15:10:01
 
 - Rundown list rows use per-row `tap` handlers (`onToggleComplete` on status icon, **Editar** / **Enfoque** buttons) instead of `ListView.itemTap` so inner buttons do not conflict with row-level toggle.
 - Mobile `task-detail` save always sends `notesMarkdown` from the `TextView` (aligned with full-detail surface; web still splits notes via `TaskNotesPanel`).
+
+---
+
+## Iteration 14 - 2026-04-02
+
+**User Story**: Gap closure — US4 web bounty on create (**T053**)
+
+**Tasks Completed**:
+
+- [x] T053 [P] [US4]: `CreateTaskPanel` optional bounty (amount 1–1M, comma-separated `tagKeys`, `highResistance`); payload matches `createTaskSchema`; clear bounty fields on success; matrix row updated
+
+**Tasks Remaining in Story**: Gap block still has **T056** (mobile bounty on create/edit); other phases unchanged
+
+**Commit**: c76713c31aea005c8f500e3e83561ce02ea3d24d
+
+**Files Changed**:
+
+- `apps/web/src/components/CreateTaskPanel.tsx`
+- `apps/web/src/components/CreateTaskPanel.module.css`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Reuse the same bounty validation rules as `TaskEditPanel` (integer amount range, `parseBountyTagKeys`); omit `bounty` from `createTask` body when amount field is empty.
 
 ---
