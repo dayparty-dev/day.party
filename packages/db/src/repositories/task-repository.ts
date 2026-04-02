@@ -19,6 +19,7 @@ type TaskDoc = {
   status?: TaskStatus;
   deferredToDate?: string;
   tagKey?: string;
+  notesMarkdown?: string;
   isComplete: boolean;
   scheduledDate: string;
   position: number;
@@ -36,6 +37,9 @@ function docToTask(doc: TaskDoc): Task {
 
   const status: TaskStatus = rest.isComplete ? 'done' : isStoredStatus(rest.status) ? rest.status : 'planned';
 
+  const notesMarkdown =
+    typeof rest.notesMarkdown === 'string' && rest.notesMarkdown.length > 0 ? rest.notesMarkdown : undefined;
+
   return {
     id,
     userId: rest.userId,
@@ -46,6 +50,7 @@ function docToTask(doc: TaskDoc): Task {
     status,
     deferredToDate: typeof rest.deferredToDate === 'string' ? rest.deferredToDate : undefined,
     tagKey: rest.tagKey,
+    ...(notesMarkdown !== undefined ? { notesMarkdown } : {}),
     isComplete: rest.isComplete,
     scheduledDate: rest.scheduledDate,
     position: rest.position,
@@ -83,11 +88,24 @@ export class MongoTaskRepository implements TaskRepository {
   async update(id: string, fields: Partial<Omit<Task, 'id' | 'userId' | 'createdAt'>>): Promise<Task | null> {
     if (!ObjectId.isValid(id)) return null;
     const updatedAt = new Date().toISOString();
-    const result = await this.collection.findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { $set: { ...fields, updatedAt } },
-      { returnDocument: 'after' },
-    );
+    const { notesMarkdown, ...rest } = fields;
+    const $set: Record<string, unknown> = { ...rest, updatedAt };
+    const $unset: Record<string, ''> = {};
+    if ('notesMarkdown' in fields) {
+      delete $set.notesMarkdown;
+      if (notesMarkdown && notesMarkdown.length > 0) {
+        $set.notesMarkdown = notesMarkdown;
+      } else {
+        $unset.notesMarkdown = '';
+      }
+    }
+    const updateDoc: { $set: Record<string, unknown>; $unset?: Record<string, ''> } = { $set };
+    if (Object.keys($unset).length > 0) {
+      updateDoc.$unset = $unset;
+    }
+    const result = await this.collection.findOneAndUpdate({ _id: new ObjectId(id) }, updateDoc, {
+      returnDocument: 'after',
+    });
     return result ? docToTask(result) : null;
   }
 

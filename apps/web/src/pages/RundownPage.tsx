@@ -2,7 +2,7 @@ import type {
   DayCapacityHint,
   DayRundownResponse,
   TagResponse,
-  TaskResponse,
+  TaskRundownItemResponse,
   TaskTriageInput,
 } from '@dayparty/api-client';
 import { ERROR_CODES } from '@dayparty/core';
@@ -10,6 +10,7 @@ import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { TaskCard, type TaskRunwayPlacement } from '../components/TaskCard';
+import { TaskNotesPanel } from '../components/TaskNotesPanel';
 import { TaskTriageBar } from '../components/TaskTriageBar';
 import { useAuth } from '../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../utils/network-error';
@@ -17,14 +18,17 @@ import { minutesToTimeInput, timeInputToMinutes } from '../utils/time-of-day';
 import { addLocalCalendarDays, todayLocalDateString } from '../utils/today-local';
 import styles from './RundownPage.module.css';
 
-function runwayPlacementForTask(task: TaskResponse, dayFit: DayRundownResponse['dayFit']): TaskRunwayPlacement {
+function runwayPlacementForTask(
+  task: TaskRundownItemResponse,
+  dayFit: DayRundownResponse['dayFit'],
+): TaskRunwayPlacement {
   if (task.isComplete) {
     return 'complete';
   }
   return dayFit.outsideRunwayTaskIds.includes(task.id) ? 'outside-runway' : 'in-runway';
 }
 
-function showTriageForTask(task: TaskResponse, dayFit: DayRundownResponse['dayFit']): boolean {
+function showTriageForTask(task: TaskRundownItemResponse, dayFit: DayRundownResponse['dayFit']): boolean {
   if (task.isComplete) {
     return false;
   }
@@ -103,6 +107,8 @@ export function RundownPage(): ReactElement {
     }
   }, [client, date, onUnauthorized]);
 
+  const onNotesSaved = useCallback(() => void load(), [load]);
+
   useEffect(() => {
     void load();
   }, [load]);
@@ -117,7 +123,7 @@ export function RundownPage(): ReactElement {
     setWinCrosses(dayWindow.crossesMidnight);
   }, [rundown]);
 
-  async function toggleTask(task: TaskResponse): Promise<void> {
+  async function toggleTask(task: TaskRundownItemResponse): Promise<void> {
     const result = await client.updateTask(task.id, { isComplete: !task.isComplete });
     if (!result.ok) {
       if (result.error.code === ERROR_CODES.UNAUTHORIZED) {
@@ -320,6 +326,14 @@ export function RundownPage(): ReactElement {
                 onClearSkipped={() => runTriage(task.id, { action: 'clear_skipped' })}
               />
             ) : null}
+            <TaskNotesPanel
+              client={client}
+              taskId={task.id}
+              taskTitle={task.title}
+              notesPreview={task.notesPreview}
+              onUnauthorized={onUnauthorized}
+              onSaved={onNotesSaved}
+            />
           </li>
         ))}
       </ul>

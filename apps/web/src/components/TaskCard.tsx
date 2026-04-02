@@ -1,14 +1,14 @@
-import type { TaskResponse } from '@dayparty/api-client';
+import type { TaskRundownItemResponse } from '@dayparty/api-client';
 import type { ReactElement } from 'react';
 import styles from './TaskCard.module.css';
 
 export type TaskRunwayPlacement = 'in-runway' | 'outside-runway' | 'complete';
 
 type TaskCardProps = {
-  task: TaskResponse;
+  task: TaskRundownItemResponse;
   tagColor?: string;
   runwayPlacement: TaskRunwayPlacement;
-  onToggleComplete: (task: TaskResponse) => void;
+  onToggleComplete: (task: TaskRundownItemResponse) => void;
 };
 
 export function TaskCard({ task, tagColor, runwayPlacement, onToggleComplete }: TaskCardProps): ReactElement {
@@ -50,6 +50,11 @@ export function TaskCard({ task, tagColor, runwayPlacement, onToggleComplete }: 
             {task.status === 'skipped' ? <span className={styles.skipTag}>Skipped today</span> : null}
             {runwayPlacement === 'outside-runway' && !task.isComplete ? (
               <span className={styles.runwayTag}>Outside window</span>
+            ) : null}
+            {task.notesPreview ? (
+              <p className={styles.notesPreview} title={task.notesPreview}>
+                {task.notesPreview}
+              </p>
             ) : null}
           </div>
         </div>

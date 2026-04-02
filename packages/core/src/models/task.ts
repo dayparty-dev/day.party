@@ -21,6 +21,8 @@ export interface Task {
   isComplete: boolean;
   scheduledDate: string;
   position: number;
+  /** Markdown source for expanded notes (FR-006); omitted from rundown JSON. */
+  notesMarkdown?: string;
   createdAt: string;
   updatedAt: string;
 }

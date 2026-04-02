@@ -12,6 +12,8 @@ export type UpdateTaskInput = Partial<{
   essentiality: TaskEssentiality;
   status: TaskStatus;
   deferredToDate: string | null;
+  /** Empty string clears stored notes (P3). */
+  notesMarkdown: string;
 }>;
 
 function mergeLifecycleFields(
@@ -82,6 +84,7 @@ export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
     if (input.scheduledDate !== undefined) fields.scheduledDate = input.scheduledDate;
     if (input.estimatedMinutes !== undefined) fields.estimatedMinutes = input.estimatedMinutes;
     if (input.essentiality !== undefined) fields.essentiality = input.essentiality;
+    if (input.notesMarkdown !== undefined) fields.notesMarkdown = input.notesMarkdown;
 
     if (touchesLifecycle) {
       const next = mergeLifecycleFields(task, input);

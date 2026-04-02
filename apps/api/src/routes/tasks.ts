@@ -1,7 +1,7 @@
 /**
  * Task CRUD + rundown/reorder + US2 triage/suggestions (`day-planning-rest.md` P2).
  */
-import type { DayRundown, Task } from '@dayparty/core';
+import type { DayRundown, Task, TaskRundownItem } from '@dayparty/core';
 import { ERROR_CODES } from '@dayparty/core';
 import {
   createApiError,
@@ -16,7 +16,7 @@ import { Hono } from 'hono';
 import { createAuthMiddleware } from '../middleware/auth-middleware';
 import type { ApiEnv, ApiVariables } from '../types';
 
-function taskPublic(task: Task): Omit<Task, 'userId'> {
+function taskPublic(task: Task | TaskRundownItem): Omit<Task, 'userId'> | Omit<TaskRundownItem, 'userId'> {
   const { userId: _u, ...rest } = task;
   return rest;
 }
@@ -111,6 +111,16 @@ export function createTaskRoutes(env: ApiEnv) {
       }
       throw e;
     }
+  });
+
+  tasks.get('/:id', async (c) => {
+    const id = c.req.param('id');
+    const user = c.get('user');
+    const existing = await env.taskRepo.findById(id);
+    if (!existing || existing.userId !== user.id) {
+      return c.json(createApiError(ERROR_CODES.NOT_FOUND, 'Task not found'), 404);
+    }
+    return c.json(taskPublic(existing));
   });
 
   tasks.post('/:id/triage', async (c) => {

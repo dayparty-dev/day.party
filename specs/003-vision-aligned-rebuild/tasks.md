@@ -89,9 +89,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T021 [P] [US3] Add `notesMarkdown` to `Task` in `packages/core/src/models/task.ts`, validation in `packages/validation/src/schemas/task.ts`, and BSON mapping in `packages/db/src/repositories/task-repository.ts`; ensure rundown serialization **omits** `notesMarkdown` (see `contracts/day-planning-rest.md` P3)
-- [ ] T022 [US3] Add `GET /api/tasks/:id` in `apps/api/src/routes/tasks.ts` returning **full** task including `notesMarkdown`; ensure **route order** registers `GET /`, `PATCH /reorder`, etc. **before** `GET /:id` per `contracts/day-planning-rest.md`. Rundown **`GET /api/tasks?date=`** MUST omit `notesMarkdown` (optional `notesPreview` only per contract)
-- [ ] T023 [US3] Add notes editor/detail UI in new `apps/web/src/components/TaskNotesPanel.tsx` (or similar) and integrate from `apps/web/src/pages/RundownPage.tsx` with lightweight markdown rendering
+- [x] T021 [P] [US3] Add `notesMarkdown` to `Task` in `packages/core/src/models/task.ts`, validation in `packages/validation/src/schemas/task.ts`, and BSON mapping in `packages/db/src/repositories/task-repository.ts`; ensure rundown serialization **omits** `notesMarkdown` (see `contracts/day-planning-rest.md` P3)
+- [x] T022 [US3] Add `GET /api/tasks/:id` in `apps/api/src/routes/tasks.ts` returning **full** task including `notesMarkdown`; ensure **route order** registers `GET /`, `PATCH /reorder`, etc. **before** `GET /:id` per `contracts/day-planning-rest.md`. Rundown **`GET /api/tasks?date=`** MUST omit `notesMarkdown` (optional `notesPreview` only per contract)
+- [x] T023 [US3] Add notes editor/detail UI in new `apps/web/src/components/TaskNotesPanel.tsx` (or similar) and integrate from `apps/web/src/pages/RundownPage.tsx` with lightweight markdown rendering
 
 ---
 

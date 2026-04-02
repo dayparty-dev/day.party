@@ -14,6 +14,7 @@ export type {
   Result,
   TagResponse,
   TaskResponse,
+  TaskRundownItemResponse,
   TaskTriageInput,
   UpdateTagInput,
   UpdateTaskInput,

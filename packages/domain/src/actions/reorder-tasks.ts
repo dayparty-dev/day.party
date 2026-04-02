@@ -1,4 +1,4 @@
-import { DEFAULT_DAY_WINDOW, type DayRundown } from '@dayparty/core';
+import { DEFAULT_DAY_WINDOW, taskToRundownItem, type DayRundown } from '@dayparty/core';
 import type { TaskRepository } from '../interfaces/task-repository';
 import type { UserPreferencesRepository } from '../interfaces/user-preferences-repository';
 import { computeDayFit } from '../day-fit';
@@ -31,7 +31,7 @@ export function makeReorderTasksAction(taskRepo: TaskRepository, userPrefsRepo: 
     return {
       date,
       userId,
-      tasks: reorderedTasks,
+      tasks: reorderedTasks.map(taskToRundownItem),
       capacity,
       completed,
       dayFit,

@@ -1,5 +1,5 @@
 import type { DayWindow } from './user-preferences';
-import type { Task } from './task';
+import type { TaskRundownItem } from './task-rundown';
 
 /** Derived fit metadata for a day (contract P1); computed in domain (`computeDayFit`). */
 export type DayFit = {
@@ -22,7 +22,7 @@ export const EMPTY_DAY_FIT: DayFit = {
 export interface DayRundown {
   date: string;
   userId: string;
-  tasks: Task[];
+  tasks: TaskRundownItem[];
   capacity: number;
   completed: number;
   dayFit: DayFit;

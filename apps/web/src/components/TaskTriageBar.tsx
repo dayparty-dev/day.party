@@ -1,10 +1,10 @@
-import type { DayCapacityHint, TaskResponse } from '@dayparty/api-client';
+import type { DayCapacityHint, TaskRundownItemResponse } from '@dayparty/api-client';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 import styles from './TaskTriageBar.module.css';
 
 type TaskTriageBarProps = {
-  task: TaskResponse;
+  task: TaskRundownItemResponse;
   listDate: string;
   tomorrowDate: string;
   hints: DayCapacityHint[];

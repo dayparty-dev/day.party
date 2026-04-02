@@ -1,4 +1,6 @@
 export type { Task, TaskEssentiality, TaskStatus } from './models/task';
+export type { TaskRundownItem } from './models/task-rundown';
+export { taskToRundownItem } from './models/task-rundown';
 export type { User } from './models/user';
 export type { Session } from './models/session';
 export type { Tag } from './models/tag';

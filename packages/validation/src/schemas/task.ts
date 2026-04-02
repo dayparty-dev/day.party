@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 const estimatedMinutesSchema = z.number().int().min(0).max(2880);
 
+/** P3 notes — size cap per data-model / research.md §6 */
+const notesMarkdownSchema = z.string().max(32_000);
+
 export const taskEssentialitySchema = z.enum(['essential', 'normal', 'optional']);
 
 export const taskStatusSchema = z.enum(['planned', 'in_progress', 'done', 'skipped', 'deferred']);
@@ -13,6 +16,7 @@ export const createTaskSchema = z.object({
   scheduledDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD'),
   estimatedMinutes: estimatedMinutesSchema.optional(),
   essentiality: taskEssentialitySchema.optional(),
+  notesMarkdown: notesMarkdownSchema.optional(),
 });
 
 export const updateTaskSchema = z
@@ -33,6 +37,7 @@ export const updateTaskSchema = z
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD')
       .nullable()
       .optional(),
+    notesMarkdown: z.union([notesMarkdownSchema, z.literal('')]).optional(),
   })
   .refine((d) => !(d.status === 'deferred' && (d.deferredToDate === undefined || d.deferredToDate === null)), {
     message: 'deferredToDate is required when status is deferred',

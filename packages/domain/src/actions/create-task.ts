@@ -10,6 +10,7 @@ export interface CreateTaskInput {
   scheduledDate: string;
   estimatedMinutes?: number;
   essentiality?: TaskEssentiality;
+  notesMarkdown?: string;
 }
 
 export function makeCreateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepository) {
@@ -35,6 +36,9 @@ export function makeCreateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
       position,
       ...(input.estimatedMinutes !== undefined ? { estimatedMinutes: input.estimatedMinutes } : {}),
       ...(input.essentiality !== undefined ? { essentiality: input.essentiality } : {}),
+      ...(input.notesMarkdown !== undefined && input.notesMarkdown.trim() !== ''
+        ? { notesMarkdown: input.notesMarkdown.trim() }
+        : {}),
     });
   };
 }

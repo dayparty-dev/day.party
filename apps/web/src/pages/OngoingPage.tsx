@@ -1,5 +1,5 @@
 import { ERROR_CODES } from '@dayparty/core';
-import type { TaskResponse } from '@dayparty/api-client';
+import type { TaskRundownItemResponse } from '@dayparty/api-client';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
@@ -14,14 +14,14 @@ const SIZE_MINUTES = 15;
 export function OngoingPage(): ReactElement {
   const { client, onUnauthorized } = useAuth();
   const date = useMemo(() => todayLocalDateString(), []);
-  const [focusTask, setFocusTask] = useState<TaskResponse | null>(null);
+  const [focusTask, setFocusTask] = useState<TaskRundownItemResponse | null>(null);
   const [tagColor, setTagColor] = useState<string | undefined>(undefined);
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [tick, setTick] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [networkBanner, setNetworkBanner] = useState<string | null>(null);
 
-  const pickFocus = useCallback((tasks: TaskResponse[]): TaskResponse | null => {
+  const pickFocus = useCallback((tasks: TaskRundownItemResponse[]): TaskRundownItemResponse | null => {
     const open = tasks.filter((t) => !t.isComplete).sort((a, b) => a.position - b.position);
     return open[0] ?? null;
   }, []);

@@ -76,4 +76,33 @@ describe('makeGetRundownAction', () => {
     expect(rundown.dayFit.outsideRunwayTaskIds).toEqual([]);
     expect(rundown.dayFit.overflowUnresolved).toBe(false);
   });
+
+  it('omits notesMarkdown from rundown tasks and adds notesPreview from first line', async () => {
+    const date = '2026-04-03';
+    const userId = 'u1';
+    const longFirstLine = `${'x'.repeat(130)} rest`;
+    const tasks: Task[] = [
+      {
+        id: 'n1',
+        userId,
+        title: 'With notes',
+        size: 1,
+        status: 'planned',
+        isComplete: false,
+        scheduledDate: date,
+        position: 0,
+        notesMarkdown: `${longFirstLine}\nmore`,
+        createdAt: iso,
+        updatedAt: iso,
+      },
+    ];
+    const taskRepo = createTaskRepoWithTasks(date, userId, tasks);
+    const getRundown = makeGetRundownAction(taskRepo, createNoopUserPrefsRepo());
+
+    const rundown = await getRundown(userId, date);
+
+    const row = rundown.tasks[0]!;
+    expect('notesMarkdown' in row).toBe(false);
+    expect(row.notesPreview).toBe(`${'x'.repeat(120)}…`);
+  });
 });

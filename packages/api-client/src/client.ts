@@ -39,6 +39,8 @@ export type Result<T, E = ApiError> = { ok: true; data: T } | { ok: false; error
 type AuthUser = Pick<User, 'id' | 'email' | 'displayName' | 'role'>;
 
 type ApiTask = Omit<Task, 'userId'>;
+/** Rundown row — no `notesMarkdown`; optional `notesPreview` (contract P3). */
+type ApiRundownTask = Omit<ApiTask, 'notesMarkdown'> & { notesPreview?: string };
 type ApiTag = Omit<Tag, 'userId'>;
 
 export type DayCapacityHint = {
@@ -52,7 +54,7 @@ export type DaySuggestionsResponse = { hints: DayCapacityHint[] };
 
 interface ApiDayRundown {
   date: string;
-  tasks: ApiTask[];
+  tasks: ApiRundownTask[];
   capacity: number;
   completed: number;
   dayFit: DayFit;
@@ -175,6 +177,14 @@ export class DayPartyClient {
       method: 'GET',
       requiresAuth: true,
       parse: parseDayRundown,
+    });
+  }
+
+  async getTask(id: string): Promise<Result<ApiTask>> {
+    return this.request(`/tasks/${encodeURIComponent(id)}`, {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseTask,
     });
   }
 
@@ -421,6 +431,7 @@ function parseTask(input: unknown): ApiTask | null {
   const estimatedMinutes = typeof input.estimatedMinutes === 'number' ? input.estimatedMinutes : undefined;
   const essentiality = isTaskEssentiality(input.essentiality) ? input.essentiality : undefined;
   const deferredToDate = typeof input.deferredToDate === 'string' ? input.deferredToDate : undefined;
+  const notesMarkdown = typeof input.notesMarkdown === 'string' ? input.notesMarkdown : undefined;
 
   return {
     id: input.id,
@@ -430,6 +441,7 @@ function parseTask(input: unknown): ApiTask | null {
     ...(deferredToDate !== undefined ? { deferredToDate } : {}),
     ...(estimatedMinutes !== undefined ? { estimatedMinutes } : {}),
     ...(essentiality !== undefined ? { essentiality } : {}),
+    ...(notesMarkdown !== undefined ? { notesMarkdown } : {}),
     tagKey,
     isComplete: input.isComplete,
     scheduledDate: input.scheduledDate,
@@ -437,6 +449,17 @@ function parseTask(input: unknown): ApiTask | null {
     createdAt: input.createdAt,
     updatedAt: input.updatedAt,
   };
+}
+
+function parseRundownTaskRow(input: unknown): ApiRundownTask | null {
+  const t = parseTask(input);
+  if (!t) {
+    return null;
+  }
+  const { notesMarkdown: _drop, ...rest } = t;
+  const rec = input as Record<string, unknown>;
+  const notesPreview = typeof rec.notesPreview === 'string' ? rec.notesPreview : undefined;
+  return notesPreview !== undefined ? { ...rest, notesPreview } : { ...rest };
 }
 
 function parseTag(input: unknown): ApiTag | null {
@@ -505,9 +528,9 @@ function parseDayRundown(input: unknown): ApiDayRundown | null {
     return null;
   }
 
-  const tasks: ApiTask[] = [];
+  const tasks: ApiRundownTask[] = [];
   for (const task of input.tasks) {
-    const parsed = parseTask(task);
+    const parsed = parseRundownTaskRow(task);
     if (!parsed) {
       return null;
     }
@@ -741,6 +764,7 @@ function createApiError(code: string, message: string, fields?: Record<string, s
 
 export type {
   ApiDayRundown as DayRundownResponse,
+  ApiRundownTask as TaskRundownItemResponse,
   ApiTag as TagResponse,
   ApiTask as TaskResponse,
   ApiUserPreferences as UserPreferencesResponse,
