@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Mobile visual preset (T046 / US5)**: `services/visual-preset.ts` caches `visualPreset` from `getUserPreferences`, applies `preset-calm` / `preset-playful` / `preset-highContrast` via `Page.className` (strip + append). Root `Frame` listens to `Frame.navigatedToEvent` in `app.ts`; authed cold start + post–magic-link `refreshVisualPresetFromApi`; `resetVisualPresetCache` on logout / `clearSessionAndGoToLogin`. `app.css` mirrors web `presets.css` tokens (page bg, **ActionBar**, inputs, triage/reward cards, **Button.-primary**).
 - **Mobile rewards (T045 / US4)**: `views/rewards-view` loads `getRewards` + `getLedger({ limit: 30 })` in parallel; **Comprar** uses `purchaseReward`; create form uses `createRewardDefinition` (Spanish copy). **Repeater** (not nested **ListView**) inside **ScrollView** for catalog + ledger rows. `authState.navigateToRewards()`; rundown **ActionBar** **Recompensas** `ActionItem`. `.reward-touch` **min-height: 48** for marketplace buttons. Shell route list in `app.ts` file comment.
 - **Mobile notes (T044 / US3)**: Rundown `TaskRow` includes optional `notesPreviewLine` + `notesPreviewVisibility` from `TaskRundownItemResponse.notesPreview`; **Notas** → `authState.navigateToTaskDetail(taskId, { notesFocus: true })`. `task-detail-view` reads `context.notesFocus`, sets `pageTitle` **Notas** vs **Editar tarea**, `notesEditorHeight` 220 vs 150; notes **TextView** after **Título** with `.notes-text` (monospace) and short helper copy.
 - **Quickstart (Phase 9 T042/T048)**: `specs/003-vision-aligned-rebuild/quickstart.md` documents API env vars (`MONGODB_*`, `PORT`, `API_PUBLIC_URL`, `WEB_PUBLIC_URL`, `CORS_ORIGIN`, `MAGIC_LINK_SECRET`), auth → JWT flow, curl samples for tasks/prefs/triage/suggestions/rewards/ledger/marketplace/history, **FR-011** cross-session checklist, and **Session / offline (v1)** scope (server-authoritative; retry + refresh; no offline queue / merge UI in 003 v1).
@@ -693,5 +694,33 @@ Started: 2026-04-02 15:10:01
 
 - Use `result.ok === false` before reading `Result.error` so TypeScript narrows (same as other mobile views).
 - Avoid **ListView** inside **ScrollView**; **Repeater** + **ObservableArray** keeps one scroll container.
+
+---
+
+## Iteration 22 - 2026-04-02
+
+**User Story**: Phase 10 — US5 mobile visual preset (**T046**)
+
+**Tasks Completed**:
+
+- [x] T046 [P] [US5]: `visual-preset.ts` + `app.ts` `navigatedToEvent` + authed/login refresh; `app.css` preset-\* chrome; cache reset on session clear; `tasks.md` marked complete
+
+**Tasks Remaining in Story**: None — story complete
+
+**Commit**: b182d419c56ae0d631be6360163c7debf42b0713
+
+**Files Changed**:
+
+- `apps/mobile/src/services/visual-preset.ts`
+- `apps/mobile/src/app.ts`
+- `apps/mobile/src/app.css`
+- `apps/mobile/src/services/auth-state.ts`
+- `apps/mobile/src/views/login-view.ts`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- NativeScript 9 exposes `Frame.navigatedToEvent` (not `navigatedEvent`); narrow `Result` with `res.ok === false` before reading `error`.
+- Mobile users pick up `visualPreset` from the API (e.g. set on web **Look & feel**); changing preset on-device only would need a future PATCH UI.
 
 ---
