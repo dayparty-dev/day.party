@@ -129,9 +129,11 @@ export function OngoingPage(): ReactElement {
         return;
       }
       if (isLikelyNetworkFailure(result.error)) {
+        toast.error(result.error.message);
         setNetworkBanner(result.error.message);
         return;
       }
+      toast.error(result.error.message);
       setLoadError(result.error.message);
       return;
     }
@@ -172,9 +174,11 @@ export function OngoingPage(): ReactElement {
         return;
       }
       if (isLikelyNetworkFailure(result.error)) {
+        toast.error(result.error.message);
         setNetworkBanner(result.error.message);
         return;
       }
+      toast.error(result.error.message);
       setEffortError(result.error.message);
       return;
     }
@@ -199,9 +203,11 @@ export function OngoingPage(): ReactElement {
         return;
       }
       if (isLikelyNetworkFailure(result.error)) {
+        toast.error(result.error.message);
         setNetworkBanner(result.error.message);
         return;
       }
+      toast.error(result.error.message);
       setLoadError(result.error.message);
       return;
     }

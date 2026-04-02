@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router';
+import { useAppHotkeys } from './hooks/useAppHotkeys';
 import { useAuth } from './hooks/useAuth';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
@@ -13,6 +14,7 @@ import { AdminFeedbackPage } from './pages/admin/AdminFeedbackPage';
 import { AdminHomePage } from './pages/admin/AdminHomePage';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminUserDetailPage } from './pages/admin/AdminUserDetailPage';
+import { HelpShortcutsPage } from './pages/HelpShortcutsPage';
 import { VisualPresetProvider } from './context/visual-preset-context';
 
 function AuthBootSpinner(): ReactElement {
@@ -50,6 +52,11 @@ function HomeRoute(): ReactElement {
   return <LandingPage />;
 }
 
+function HotkeysBridge(): null {
+  useAppHotkeys();
+  return null;
+}
+
 function WildcardRoute(): ReactElement {
   const { authReady, isAuthenticated } = useAuth();
   if (!authReady) {
@@ -63,23 +70,27 @@ function WildcardRoute(): ReactElement {
 
 export function App(): ReactElement {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/logout" element={<LogoutPage />} />
-      <Route element={<ProtectedLayout />}>
-        <Route path="/rundown" element={<RundownPage />} />
-        <Route path="/tags" element={<TagManagerPage />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminHomePage />} />
-          <Route path="audit" element={<AdminAuditPage />} />
-          <Route path="feedback" element={<AdminFeedbackPage />} />
-          <Route path="users/:id" element={<AdminUserDetailPage />} />
+    <>
+      <HotkeysBridge />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/logout" element={<LogoutPage />} />
+        <Route element={<ProtectedLayout />}>
+          <Route path="/rundown" element={<RundownPage />} />
+          <Route path="/tags" element={<TagManagerPage />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminHomePage />} />
+            <Route path="audit" element={<AdminAuditPage />} />
+            <Route path="feedback" element={<AdminFeedbackPage />} />
+            <Route path="users/:id" element={<AdminUserDetailPage />} />
+          </Route>
+          <Route path="/rewards" element={<RewardsPage />} />
+          <Route path="/ongoing" element={<OngoingPage />} />
+          <Route path="/help/shortcuts" element={<HelpShortcutsPage />} />
         </Route>
-        <Route path="/rewards" element={<RewardsPage />} />
-        <Route path="/ongoing" element={<OngoingPage />} />
-      </Route>
-      <Route path="/" element={<HomeRoute />} />
-      <Route path="*" element={<WildcardRoute />} />
-    </Routes>
+        <Route path="/" element={<HomeRoute />} />
+        <Route path="*" element={<WildcardRoute />} />
+      </Routes>
+    </>
   );
 }

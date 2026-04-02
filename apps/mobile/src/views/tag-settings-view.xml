@@ -1,0 +1,38 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" loaded="onLoaded" class="page">
+  <ActionBar title="Etiquetas">
+    <NavigationButton text="Atrás" tap="{{ onBack }}" android.systemIcon="ic_menu_back" />
+  </ActionBar>
+  <ScrollView>
+    <StackLayout class="p-16">
+      <StackLayout visibility="{{ networkBannerVisibility }}" class="error-banner m-b-12">
+        <Label text="{{ networkBanner }}" textWrap="true" class="error-text" />
+        <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8 reward-touch" />
+      </StackLayout>
+
+      <Label text="Tus etiquetas" class="h3 m-b-8" />
+      <Repeater items="{{ tagRows }}">
+        <Repeater.itemTemplate>
+          <GridLayout columns="8, *, auto, auto" class="p-12 reward-card">
+            <StackLayout col="0" width="8" backgroundColor="{{ stripColor }}" verticalAlignment="stretch" />
+            <StackLayout col="1">
+              <Label text="{{ lineTitle }}" textWrap="true" class="task-title" />
+              <Label text="{{ lineMeta }}" textWrap="true" class="task-meta m-t-4" />
+            </StackLayout>
+            <Button col="2" text="Editar" tap="{{ onEditTap }}" class="-outline reward-touch m-r-8" />
+            <Button col="3" text="Eliminar" tap="{{ onDeleteTap }}" class="-outline reward-touch" />
+          </GridLayout>
+        </Repeater.itemTemplate>
+      </Repeater>
+
+      <Label text="Nueva etiqueta" class="h3 m-t-20" />
+      <Label text="Clave (minúsculas, guiones)" class="footnote m-t-8" />
+      <TextField text="{{ newTagKey }}" hint="deep-work" class="input m-t-4" maxLength="50" />
+      <Label text="Nombre visible" class="footnote m-t-8" />
+      <TextField text="{{ newTagName }}" hint="Deep work" class="input m-t-4" maxLength="100" />
+      <Label text="Color (#RRGGBB)" class="footnote m-t-8" />
+      <TextField text="{{ newTagColor }}" hint="#5b8cff" class="input m-t-4" />
+      <Label text="{{ formError }}" textWrap="true" class="window-error m-t-8" />
+      <Button text="{{ createButtonText }}" tap="{{ onCreateTag }}" isEnabled="{{ createEnabled }}" class="-primary m-t-12 reward-touch" />
+    </StackLayout>
+  </ScrollView>
+</Page>

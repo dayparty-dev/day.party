@@ -140,7 +140,7 @@
 - [x] T024 [US6] Add `POST /api/tags/:id/delete-with-policy` with Zod body in `apps/api/src/routes/tags.ts` per `contracts/legacy-parity-rest.md`
 - [x] T025 [US6] Add `deleteTagWithPolicy` (or named) method to `packages/api-client/src/client.ts`
 - [x] T026 [P] [US6] Build tag manager UI (list/create/edit color/delete flow with confirmation) in `apps/web/src/components/TagManagerPanel.tsx` and surface from `apps/web/src/pages/RundownPage.tsx` or new settings route
-- [ ] T027 [P] [US6] Add tag management + delete confirmation UX in `apps/mobile/src/views/rundown-view.ts` or `apps/mobile/src/views/tag-settings-view.ts` + XML
+- [x] T027 [P] [US6] Add tag management + delete confirmation UX in `apps/mobile/src/views/rundown-view.ts` or `apps/mobile/src/views/tag-settings-view.ts` + XML
 
 **Checkpoint**: US6 complete on web + mobile.
 
@@ -200,8 +200,8 @@
 - [x] T045 [US9] Add `submitFeedback` and admin list method to `packages/api-client/src/client.ts`
 - [x] T046 [P] [US9] Implement `GET /api/admin/feedback` with cursor/limit in `apps/api/src/routes/admin/feedback.ts` using `requireAdmin`
 - [x] T047 [P] [US9] Add `sonner` (or chosen) toaster root in `apps/web/src/main.tsx` / `App.tsx` and `apps/web/src/components/FeedbackForm.tsx` with submit wired to `client.submitFeedback`
-- [ ] T048 [P] [US9] Fire **non-blocking** toasts on **successful** saves (window, triage, notes, etc.) and on **failed** mutations (network/validation) in `apps/web/src/pages/RundownPage.tsx`, `apps/web/src/pages/OngoingPage.tsx`, and `apps/web/src/components/FeedbackForm.tsx` — same pattern: brief message, no focus trap (FR-011)
-- [ ] T049 [P] [US9] Add feedback submission UI (modal or page) in `apps/mobile/src/views/rundown-view.ts` calling new client method
+- [x] T048 [P] [US9] Fire **non-blocking** toasts on **successful** saves (window, triage, notes, etc.) and on **failed** mutations (network/validation) in `apps/web/src/pages/RundownPage.tsx`, `apps/web/src/pages/OngoingPage.tsx`, and `apps/web/src/components/FeedbackForm.tsx` — same pattern: brief message, no focus trap (FR-011)
+- [x] T049 [P] [US9] Add feedback submission UI (modal or page) in `apps/mobile/src/views/rundown-view.ts` calling new client method
 - [x] T050 [US9] Build `apps/web/src/pages/admin/AdminFeedbackPage.tsx` listing submissions; link from `apps/web/src/pages/admin/AdminHomePage.tsx`
 
 **Checkpoint**: US9 end-to-end; triage web-only.
@@ -216,8 +216,8 @@
 
 ### Implementation for User Story 10
 
-- [ ] T051 [P] [US10] Add `react-hotkeys-hook` (or equivalent) in `apps/web/package.json` and implement `apps/web/src/hooks/useAppHotkeys.ts` bound in `apps/web/src/App.tsx` (modifier keys, ignore when typing in inputs)
-- [ ] T052 [US10] Add `apps/web/src/pages/HelpShortcutsPage.tsx` (or settings section) documenting shortcuts; add route + link from header in `apps/web/src/App.tsx` or `RundownPage.tsx`
+- [x] T051 [P] [US10] Add `react-hotkeys-hook` (or equivalent) in `apps/web/package.json` and implement `apps/web/src/hooks/useAppHotkeys.ts` bound in `apps/web/src/App.tsx` (modifier keys, ignore when typing in inputs)
+- [x] T052 [US10] Add `apps/web/src/pages/HelpShortcutsPage.tsx` (or settings section) documenting shortcuts; add route + link from header in `apps/web/src/App.tsx` or `RundownPage.tsx`
 
 **Checkpoint**: US10 web-only.
 

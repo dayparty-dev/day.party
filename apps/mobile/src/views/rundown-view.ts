@@ -530,6 +530,14 @@ class RundownViewModel extends Observable {
     authState.navigateToHistory();
   }
 
+  onTags(): void {
+    authState.navigateToTagSettings();
+  }
+
+  onFeedback(): void {
+    authState.navigateToFeedback();
+  }
+
   async onLogout(): Promise<void> {
     await authState.logout();
   }

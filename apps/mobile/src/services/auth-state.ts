@@ -80,6 +80,22 @@ class AuthStateService {
     });
   }
 
+  navigateToTagSettings(): void {
+    Frame.topmost()?.navigate({
+      moduleName: 'views/tag-settings-view',
+      clearHistory: false,
+      animated: true,
+    });
+  }
+
+  navigateToFeedback(): void {
+    Frame.topmost()?.navigate({
+      moduleName: 'views/feedback-view',
+      clearHistory: false,
+      animated: true,
+    });
+  }
+
   navigateToTaskDetail(taskId: string, options?: { notesFocus?: boolean }): void {
     Frame.topmost()?.navigate({
       moduleName: 'views/task-detail-view',

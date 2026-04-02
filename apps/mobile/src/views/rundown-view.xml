@@ -1,5 +1,7 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" loaded="onLoaded" class="page">
   <ActionBar title="Resumen del día">
+    <ActionItem text="Etiquetas" ios.position="right" android.position="actionBar" tap="{{ onTags }}" />
+    <ActionItem text="Ideas" ios.position="right" android.position="actionBar" tap="{{ onFeedback }}" />
     <ActionItem text="Historial" ios.position="right" android.position="actionBar" tap="{{ onHistory }}" />
     <ActionItem text="Recompensas" ios.position="right" android.position="actionBar" tap="{{ onRewards }}" />
     <ActionItem text="Salir" ios.position="right" android.position="actionBar" tap="{{ onLogout }}" />

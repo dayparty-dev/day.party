@@ -166,9 +166,11 @@ export function RundownPage(): ReactElement {
         return;
       }
       if (isLikelyNetworkFailure(result.error)) {
+        toast.error(result.error.message);
         setNetworkBanner(result.error.message);
         return;
       }
+      toast.error(result.error.message);
       setLoadError(result.error.message);
       return;
     }
@@ -192,9 +194,11 @@ export function RundownPage(): ReactElement {
         return;
       }
       if (isLikelyNetworkFailure(result.error)) {
+        toast.error(result.error.message);
         setNetworkBanner(result.error.message);
         return;
       }
+      toast.error(result.error.message);
       setLoadError(result.error.message);
       return;
     }
@@ -211,9 +215,11 @@ export function RundownPage(): ReactElement {
         return;
       }
       if (isLikelyNetworkFailure(result.error)) {
+        toast.error(result.error.message);
         setNetworkBanner(result.error.message);
         return;
       }
+      toast.error(result.error.message);
       setLoadError(result.error.message);
       return;
     }
@@ -251,6 +257,7 @@ export function RundownPage(): ReactElement {
         setNetworkBanner(res.error.message);
         return;
       }
+      toast.error(res.error.message);
       setWindowError(res.error.message);
       return;
     }
@@ -328,6 +335,9 @@ export function RundownPage(): ReactElement {
               Admin
             </Link>
           ) : null}
+          <Link className={styles.headerLink} to="/help/shortcuts">
+            Shortcuts
+          </Link>
           <Link className={styles.headerLink} to="/tags">
             Tags
           </Link>
@@ -454,7 +464,10 @@ export function RundownPage(): ReactElement {
         scheduledDate={date}
         onUnauthorized={onUnauthorized}
         onNetworkError={(msg) => setNetworkBanner(msg)}
-        onOtherError={(msg) => setLoadError(msg)}
+        onOtherError={(msg) => {
+          toast.error(msg);
+          setLoadError(msg);
+        }}
         onSuccess={load}
       />
 
@@ -472,7 +485,10 @@ export function RundownPage(): ReactElement {
           client={client}
           onUnauthorized={onUnauthorized}
           onNetworkError={(msg) => setNetworkBanner(msg)}
-          onOtherError={(msg) => setLoadError(msg)}
+          onOtherError={(msg) => {
+            toast.error(msg);
+            setLoadError(msg);
+          }}
           load={load}
           onNotesSaved={onNotesSaved}
           toggleTask={toggleTask}

@@ -1,0 +1,16 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" class="page">
+  <ActionBar title="Comentarios">
+    <NavigationButton text="Atrás" tap="{{ onBack }}" android.systemIcon="ic_menu_back" />
+  </ActionBar>
+  <ScrollView>
+    <StackLayout class="p-16">
+      <Label text="Cuéntanos un bug, una idea u otra nota." textWrap="true" class="footnote m-b-12" />
+      <Label text="Mensaje" class="footnote" />
+      <TextView text="{{ messageText }}" hint="Escribe aquí…" class="input m-t-4" minHeight="120" maxLength="8000" />
+      <Label text="Categoría" class="footnote m-t-12" />
+      <ListPicker items="{{ categoryLabels }}" selectedIndex="{{ categoryIndex }}" class="input m-t-4" />
+      <Label text="{{ statusText }}" textWrap="true" class="window-error m-t-8" visibility="{{ statusVisibility }}" />
+      <Button text="{{ sendButtonText }}" tap="{{ onSend }}" isEnabled="{{ sendEnabled }}" class="-primary m-t-12 reward-touch" />
+    </StackLayout>
+  </ScrollView>
+</Page>
