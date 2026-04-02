@@ -21,7 +21,7 @@
 
 **Purpose**: Wire feature artifacts into the repo’s entrypoints so maintainers can find the mapping and task list.
 
-- [ ] T001 [P] Add a short **Related artifacts** line at the top of `specs/002-tidy-arch-alignment/spec.md` (after **Status** or **Input**) linking to [`plan.md`](./plan.md), [`tasks.md`](./tasks.md), and [`contracts/architecture-checklist.md`](./contracts/architecture-checklist.md)
+- [x] T001 [P] Add a short **Related artifacts** line at the top of `specs/002-tidy-arch-alignment/spec.md` (after **Status** or **Input**) linking to [`plan.md`](./plan.md), [`tasks.md`](./tasks.md), and [`contracts/architecture-checklist.md`](./contracts/architecture-checklist.md)
 
 ---
 
@@ -31,7 +31,7 @@
 
 **⚠️ CRITICAL**: Complete **before T005** (first `ApiEnv` / domain test code). **Phase 3 (US1)** docs may run after **Phase 1** without waiting on T002.
 
-- [ ] T002 Audit `specs/002-tidy-arch-alignment/contracts/architecture-checklist.md` rows C1–C5 against FR-002–FR-005 and SC-003 in `specs/002-tidy-arch-alignment/spec.md`; edit `specs/002-tidy-arch-alignment/contracts/architecture-checklist.md` only if requirement IDs or pass criteria drift. Spot-check **FR-005**: confirm task/tag/auth routes under `apps/api/src/routes/` still parse bodies with `@dayparty/validation` schemas at the edge (no new raw-body domain logic).
+- [x] T002 Audit `specs/002-tidy-arch-alignment/contracts/architecture-checklist.md` rows C1–C5 against FR-002–FR-005 and SC-003 in `specs/002-tidy-arch-alignment/spec.md`; edit `specs/002-tidy-arch-alignment/contracts/architecture-checklist.md` only if requirement IDs or pass criteria drift. Spot-check **FR-005**: confirm task/tag/auth routes under `apps/api/src/routes/` still parse bodies with `@dayparty/validation` schemas at the edge (no new raw-body domain logic).
 
 **Checkpoint**: Checklist trusted for SC-002 reviews — **US2** implementation (T005+) may begin.
 
@@ -45,8 +45,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Add a Monorepo Notes bullet in `AGENTS.md` linking `specs/002-tidy-arch-alignment/plan.md` as the canonical **Tidy ↔ monorepo** mapping table (FR-001 discoverability; keep `CLAUDE.md` symlink unchanged)
-- [ ] T004 [US1] Add a **Peer review (SC-001)** subsection to `specs/002-tidy-arch-alignment/quickstart.md` stating that a second maintainer must approve the `plan.md` mapping table as accurate before the feature is considered closed
+- [x] T003 [US1] Add a Monorepo Notes bullet in `AGENTS.md` linking `specs/002-tidy-arch-alignment/plan.md` as the canonical **Tidy ↔ monorepo** mapping table (FR-001 discoverability; keep `CLAUDE.md` symlink unchanged)
+- [x] T004 [US1] Add a **Peer review (SC-001)** subsection to `specs/002-tidy-arch-alignment/quickstart.md` stating that a second maintainer must approve the `plan.md` mapping table as accurate before the feature is considered closed
 
 **Checkpoint**: Mapping is linked from canonical agent docs and SC-001 process is written — US1 documentation MVP met (peer sign-off is human gate).
 
@@ -60,10 +60,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T005 [US2] Retype `ApiEnv` in `apps/api/src/types.ts` so `userRepo`, `sessionRepo`, `tagRepo`, and `taskRepo` use `UserRepository`, `SessionRepository`, `TagRepository`, and `TaskRepository` from `@dayparty/domain` (remove `Mongo*` type imports from this file)
-- [ ] T006 [P] [US2] Add Vitest to `packages/domain/package.json` (`vitest` devDependency, `"test": "vitest run"` script) and create `packages/domain/vitest.config.ts` with `include: ['src/**/*.test.ts']` and `environment: 'node'` so `vitest.workspace.ts` at repository root picks up the package
-- [ ] T007 [US2] Add `packages/domain/src/actions/create-task.test.ts` calling `makeCreateTaskAction` with in-memory fake `TaskRepository` and `TagRepository` — cover at least one success path and one domain failure (e.g. missing tag), with **no** imports from `hono`, `@dayparty/db`, or `mongodb` (SC-003 — task create path)
-- [ ] T008 [US2] Add `packages/domain/src/actions/get-rundown.test.ts` calling `makeGetRundownAction` with a fake `TaskRepository` — assert `capacity` / `completed` match returned tasks (SC-003 — rundown path; **no** Hono/Mongo imports)
+- [x] T005 [US2] Retype `ApiEnv` in `apps/api/src/types.ts` so `userRepo`, `sessionRepo`, `tagRepo`, and `taskRepo` use `UserRepository`, `SessionRepository`, `TagRepository`, and `TaskRepository` from `@dayparty/domain` (remove `Mongo*` type imports from this file)
+- [x] T006 [P] [US2] Add Vitest to `packages/domain/package.json` (`vitest` devDependency, `"test": "vitest run"` script) and create `packages/domain/vitest.config.ts` with `include: ['src/**/*.test.ts']` and `environment: 'node'` so `vitest.workspace.ts` at repository root picks up the package
+- [x] T007 [US2] Add `packages/domain/src/actions/create-task.test.ts` calling `makeCreateTaskAction` with in-memory fake `TaskRepository` and `TagRepository` — cover at least one success path and one domain failure (e.g. missing tag), with **no** imports from `hono`, `@dayparty/db`, or `mongodb` (SC-003 — task create path)
+- [x] T008 [US2] Add `packages/domain/src/actions/get-rundown.test.ts` calling `makeGetRundownAction` with a fake `TaskRepository` — assert `capacity` / `completed` match returned tasks (SC-003 — rundown path; **no** Hono/Mongo imports)
 
 **Checkpoint**: API types honor ports; domain package has **two** core-level tests (create + rundown) — US2 meets v1 SC-003 for the task aggregate slice.
 
@@ -77,8 +77,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T009 [US3] Add a **Composition root (FR-004)** comment block at the top of `apps/api/src/index.ts` stating that new server-side repos/actions must be constructed and passed into `createApp` here (or a future extracted builder per `specs/002-tidy-arch-alignment/research.md`), not via globals
-- [ ] T010 [US3] Add an **Optional HTTP extensions** subsection to `specs/002-tidy-arch-alignment/quickstart.md` describing the agreed pattern: prefer registering extra routes in `apps/api/src/app.ts` (e.g. mounting additional `Hono` sub-apps or extending `createApp` **only when** the surface needs new dependencies); never fork domain logic inside `@dayparty/domain` for one-offs. Document today’s `createApp(env)` shape first; code changes are optional and only if the team adds a real extension hook.
+- [x] T009 [US3] Add a **Composition root (FR-004)** comment block at the top of `apps/api/src/index.ts` stating that new server-side repos/actions must be constructed and passed into `createApp` here (or a future extracted builder per `specs/002-tidy-arch-alignment/research.md`), not via globals
+- [x] T010 [US3] Add an **Optional HTTP extensions** subsection to `specs/002-tidy-arch-alignment/quickstart.md` describing the agreed pattern: prefer registering extra routes in `apps/api/src/app.ts` (e.g. mounting additional `Hono` sub-apps or extending `createApp` **only when** the surface needs new dependencies); never fork domain logic inside `@dayparty/domain` for one-offs. Document today’s `createApp(env)` shape first; code changes are optional and only if the team adds a real extension hook.
 
 **Checkpoint**: US3 documentation + inline traceability complete.
 
@@ -88,9 +88,9 @@
 
 **Purpose**: Validate build graph, commands, and leave no broken references after US2.
 
-- [ ] T011 [P] Run `pnpm build` from repository root and fix any TypeScript errors caused by `ApiEnv` port typing in `apps/api/src/types.ts`
-- [ ] T012 [P] Run `pnpm --filter @dayparty/domain test` from repository root; if `turbo run test` omits `@dayparty/domain`, ensure `packages/domain/package.json` exposes a `test` script and re-run `pnpm test` as needed
-- [ ] T013 [P] Align **Useful commands** in `specs/002-tidy-arch-alignment/quickstart.md` with the actual scripts after T006–T012 (e.g. confirm `pnpm --filter @dayparty/domain test` runs both `*.test.ts` files)
+- [x] T011 [P] Run `pnpm build` from repository root and fix any TypeScript errors caused by `ApiEnv` port typing in `apps/api/src/types.ts`
+- [x] T012 [P] Run `pnpm --filter @dayparty/domain test` from repository root; if `turbo run test` omits `@dayparty/domain`, ensure `packages/domain/package.json` exposes a `test` script and re-run `pnpm test` as needed
+- [x] T013 [P] Align **Useful commands** in `specs/002-tidy-arch-alignment/quickstart.md` with the actual scripts after T006–T012 (e.g. confirm `pnpm --filter @dayparty/domain test` runs both `*.test.ts` files)
 
 ---
 

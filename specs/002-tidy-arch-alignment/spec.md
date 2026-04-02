@@ -2,7 +2,10 @@
 
 **Feature Branch**: `002-tidy-arch-alignment`  
 **Created**: 2026-04-02  
-**Status**: Draft  
+**Status**: Approved (SC-001 mapping review complete, 2026-04-02)
+
+**Related artifacts**: [`plan.md`](./plan.md) (Tidy ↔ monorepo mapping), [`tasks.md`](./tasks.md) (implementation checklist), [`contracts/architecture-checklist.md`](./contracts/architecture-checklist.md) (per-slice SC-002 checklist).
+
 **Input**: User description: "we want to align the current, new architecture more with the proposed tidy architecture (see docs/broader_context/004-tidy-architecture-reference.md)"
 
 ## User Scenarios & Testing _(mandatory)_

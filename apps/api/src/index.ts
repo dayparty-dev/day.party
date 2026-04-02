@@ -1,3 +1,11 @@
+/**
+ * Composition root (FR-004)
+ *
+ * Construct repositories and domain actions here and pass the resulting `env`
+ * into `createApp`. New server-side repos or actions belong in this wiring
+ * (or a small extracted builder per `specs/002-tidy-arch-alignment/research.md`),
+ * not in hidden globals.
+ */
 import './load-env';
 import { serve } from '@hono/node-server';
 import {

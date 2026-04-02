@@ -61,6 +61,7 @@ Human onboarding: `specs/001-monorepo-restructure/quickstart.md` (install, build
 
 ## Monorepo Notes
 
+- **Tidy ↔ monorepo mapping** (feature 002): canonical table and structure notes live in [`specs/002-tidy-arch-alignment/plan.md`](specs/002-tidy-arch-alignment/plan.md) — use it when placing core vs adapter vs infrastructure code.
 - Prefer `pnpm` commands at repo root over `npm`
 - Shared libraries currently live under `packages/`, including `core`, `validation`, `domain`, `db`, `api-client`, `typescript-config`, and `eslint-config`
 - The existing reference app in this workspace is `apps/web-legacy`
