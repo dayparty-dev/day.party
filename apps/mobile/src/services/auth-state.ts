@@ -4,6 +4,7 @@ import { SecureStorage } from '@nativescript/secure-storage';
 import { Frame } from '@nativescript/core';
 
 import { API_BASE_URL } from '../config';
+import { resetVisualPresetCache } from './visual-preset';
 
 const TOKEN_KEY = 'bearer_token';
 const SERVICE = 'org.dayparty.mobile';
@@ -100,6 +101,7 @@ class AuthStateService {
       /* ignore */
     }
     this.client.clearToken();
+    resetVisualPresetCache();
     this.navigateToLogin(true);
     return result;
   }
@@ -112,6 +114,7 @@ class AuthStateService {
       /* ignore */
     }
     this.client.clearToken();
+    resetVisualPresetCache();
     this.navigateToLogin(true);
   }
 

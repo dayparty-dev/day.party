@@ -3,6 +3,7 @@ import { Frame, Observable } from '@nativescript/core';
 
 import { parseTokenFromUrl } from '../utils/parse-token-from-url';
 import { authState } from '../services/auth-state';
+import { refreshVisualPresetFromApi } from '../services/visual-preset';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 
 class LoginViewModel extends Observable {
@@ -80,6 +81,9 @@ class LoginViewModel extends Observable {
       );
       return;
     }
+    await refreshVisualPresetFromApi(authState.getClient(), () => {
+      authState.clearSessionAndGoToLogin();
+    });
     Frame.topmost()?.navigate({
       moduleName: 'views/rundown-view',
       clearHistory: true,

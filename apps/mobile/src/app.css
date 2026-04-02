@@ -212,3 +212,214 @@ Button.-primary {
   color: #b91c1c;
   margin-left: 8;
 }
+
+/* US5 / T046: visualPreset from API — tokens aligned with apps/web/src/styles/presets.css */
+
+.page.preset-calm {
+  background-color: #e8eef5;
+}
+
+.page.preset-calm ActionBar {
+  background-color: #e8eef5;
+  color: #1a2332;
+}
+
+.page.preset-calm .label,
+.page.preset-calm .task-title,
+.page.preset-calm .h3 {
+  color: #1a2332;
+}
+
+.page.preset-calm .footnote,
+.page.preset-calm .task-meta,
+.page.preset-calm .plan-footnote,
+.page.preset-calm .triage-intro,
+.page.preset-calm .triage-hint {
+  color: #5c6b7f;
+}
+
+.page.preset-calm .input {
+  border-color: #c5d0e0;
+  background-color: #fbfcfe;
+  color: #1a2332;
+}
+
+.page.preset-calm .window-editor {
+  background-color: #fbfcfe;
+  border-color: #c5d0e0;
+}
+
+.page.preset-calm .list {
+  separator-color: #c5d0e0;
+}
+
+.page.preset-calm .task-item-wrap {
+  border-bottom-color: #c5d0e0;
+}
+
+.page.preset-calm .triage-block {
+  background-color: #dfe8f2;
+}
+
+.page.preset-calm .reward-card {
+  background-color: #fbfcfe;
+  border-color: #c5d0e0;
+}
+
+.page.preset-calm .error-banner {
+  background-color: #fdecef;
+  border-color: #f1b8c4;
+}
+
+.page.preset-calm .error-text {
+  color: #7a1f33;
+}
+
+.page.preset-calm Button.-primary {
+  background-color: #3d6b8f;
+  color: #ffffff;
+}
+
+.page.preset-playful {
+  background-color: #fff5eb;
+}
+
+.page.preset-playful ActionBar {
+  background-color: #fff5eb;
+  color: #2d1f14;
+}
+
+.page.preset-playful .label,
+.page.preset-playful .task-title,
+.page.preset-playful .h3 {
+  color: #2d1f14;
+}
+
+.page.preset-playful .footnote,
+.page.preset-playful .task-meta,
+.page.preset-playful .plan-footnote,
+.page.preset-playful .triage-intro,
+.page.preset-playful .triage-hint {
+  color: #7a5c45;
+}
+
+.page.preset-playful .input {
+  border-color: #f0d4b8;
+  background-color: #fffaf3;
+  color: #2d1f14;
+}
+
+.page.preset-playful .window-editor {
+  background-color: #fffaf3;
+  border-color: #f0d4b8;
+}
+
+.page.preset-playful .list {
+  separator-color: #f0d4b8;
+}
+
+.page.preset-playful .task-item-wrap {
+  border-bottom-color: #f0d4b8;
+}
+
+.page.preset-playful .triage-block {
+  background-color: #ffe8cc;
+}
+
+.page.preset-playful .reward-card {
+  background-color: #fffaf3;
+  border-color: #f0d4b8;
+}
+
+.page.preset-playful .error-banner {
+  background-color: #ffe8e6;
+  border-color: #ffb3a8;
+}
+
+.page.preset-playful .error-text {
+  color: #8b2500;
+}
+
+.page.preset-playful Button.-primary {
+  background-color: #e85d04;
+  color: #ffffff;
+}
+
+.page.preset-highContrast {
+  background-color: #0a0a0a;
+}
+
+.page.preset-highContrast ActionBar {
+  background-color: #0a0a0a;
+  color: #fafafa;
+}
+
+.page.preset-highContrast .label,
+.page.preset-highContrast .task-title,
+.page.preset-highContrast .h3 {
+  color: #fafafa;
+}
+
+.page.preset-highContrast .footnote,
+.page.preset-highContrast .task-meta,
+.page.preset-highContrast .plan-footnote,
+.page.preset-highContrast .triage-intro,
+.page.preset-highContrast .triage-hint,
+.page.preset-highContrast .notes-preview {
+  color: #b8b8b8;
+}
+
+.page.preset-highContrast .input {
+  border-color: #f5f5f5;
+  background-color: #161616;
+  color: #fafafa;
+}
+
+.page.preset-highContrast .window-editor {
+  background-color: #161616;
+  border-color: #f5f5f5;
+}
+
+.page.preset-highContrast .list {
+  separator-color: #2a2a2a;
+}
+
+.page.preset-highContrast .task-item-wrap {
+  border-bottom-color: #2a2a2a;
+}
+
+.page.preset-highContrast .triage-block {
+  background-color: #161616;
+}
+
+.page.preset-highContrast .reward-card {
+  background-color: #161616;
+  border-color: #f5f5f5;
+}
+
+.page.preset-highContrast .error-banner {
+  background-color: #3b0a0a;
+  border-color: #ff6b6b;
+}
+
+.page.preset-highContrast .error-text {
+  color: #ffb4b4;
+}
+
+.page.preset-highContrast .notes-text {
+  color: #fafafa;
+}
+
+.page.preset-highContrast Button.-primary {
+  background-color: #ffea00;
+  color: #0a0a0a;
+}
+
+.page.preset-calm .task-title,
+.page.preset-calm .input,
+.page.preset-playful .task-title,
+.page.preset-playful .input,
+.page.preset-highContrast .task-title,
+.page.preset-highContrast .input {
+  font-size: 16;
+}
