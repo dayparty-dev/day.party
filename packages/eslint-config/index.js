@@ -16,7 +16,9 @@ const base = [
       },
     },
     plugins: {
-      '@typescript-eslint': tseslint,
+      // typescript-eslint's `configs` / rule typings lag ESLint 9's `Plugin` from `@eslint/core`;
+      // runtime shape is correct — narrow at the boundary for `@ts-check`.
+      '@typescript-eslint': /** @type {import('eslint').ESLint.Plugin} */ (/** @type {unknown} */ (tseslint)),
     },
     rules: {
       ...tseslint.configs['recommended'].rules,
