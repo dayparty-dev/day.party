@@ -5,6 +5,9 @@ Last updated: 2026-04-02
 
 ## Active Technologies
 
+- TypeScript 5.x (strict incremental goal), Node for API + Turborepo, pnpm, Hono (`apps/api`), React 19 + Vite (`apps/web`), NativeScript 9 (`apps/mobile`), Zod (`@dayparty/validation`), MongoDB driver (`@dayparty/db`), `DayPartyClient` (`@dayparty/api-client`) (004-legacy-parity-basics)
+- MongoDB 6 — new collections `feedback_submissions`, `admin_audit_events`; extended `user_preferences` documents (004-legacy-parity-basics)
+
 - TypeScript 5.x (strict mode incremental) + Turborepo, pnpm 10, Hono (`apps/api`), React 19 + Vite (`apps/web`), NativeScript 9 (`apps/mobile`), Zod (`@dayparty/validation`), MongoDB driver (`@dayparty/db`), `DayPartyClient` (`@dayparty/api-client`) (003-vision-aligned-rebuild)
 - MongoDB 6 (existing); new/extended documents and collections per `data-model.md`; access via **repository ports** in `@dayparty/domain`, implementations in `@dayparty/db` (003-vision-aligned-rebuild)
 
@@ -85,7 +88,10 @@ Human onboarding: `specs/001-monorepo-restructure/quickstart.md` (install, build
 
 ## Recent Changes
 
+- Constitution 2.2.0: **i18n** — web and mobile MAY support **multiple user-selectable locales** when a feature spec requires it (see `.specify/memory/constitution.md` Architecture Constraints).
+
+- 004-legacy-parity-basics: Added TypeScript 5.x (strict incremental goal), Node for API + Turborepo, pnpm, Hono (`apps/api`), React 19 + Vite (`apps/web`), NativeScript 9 (`apps/mobile`), Zod (`@dayparty/validation`), MongoDB driver (`@dayparty/db`), `DayPartyClient` (`@dayparty/api-client`)
+
 - 003-vision-aligned-rebuild: Added TypeScript 5.x (strict mode incremental) + Turborepo, pnpm 10, Hono (`apps/api`), React 19 + Vite (`apps/web`), NativeScript 9 (`apps/mobile`), Zod (`@dayparty/validation`), MongoDB driver (`@dayparty/db`), `DayPartyClient` (`@dayparty/api-client`)
 
 - 002-tidy-arch-alignment: Documented stack paths and Mongo access via domain ports + `@dayparty/db` in agent context (plan-driven update).
-- 001-monorepo-restructure: Added TypeScript 5.x (strict mode goal, incremental migration) + Turborepo, pnpm 10, Hono, NativeScript 9 + Vite, React 19, Zod, mongodb driver

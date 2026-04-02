@@ -1,5 +1,9 @@
 <!--
 Sync Impact Report
+- Version change: 2.1.0 → 2.2.0 (MINOR: i18n — mobile may ship multiple locales)
+- Modified: Architecture Constraints **i18n** — removed “Spanish only” mobile MVP;
+  web and mobile both MAY support multiple user-selectable locales per feature specs
+  (e.g. 004 FR-009). Prefer small JSON catalogs per platform; no shared UI i18n package required.
 - Version change: 2.0.1 → 2.1.0 (MINOR: new Spec-Driven Implementation
   constraint + strengthened legacy-as-reference language)
 - Added: "Spec-Driven Implementation" section in Architecture Constraints
@@ -160,7 +164,7 @@ The NativeScript mobile app MUST feel native on each platform.
   is planned as a future step once the monorepo structure is stable.
 - **No Zustand in mobile**. NativeScript with TypeScript puro uses singleton
   services for state management — more natural in that context.
-- **i18n**: Spanish only in mobile MVP. Web i18n approach TBD with final web stack.
+- **i18n**: **Web and mobile** MAY support **multiple user-selectable locales** when a feature spec requires it (e.g. English + Spanish). Use **platform-appropriate** catalogs (JSON + `react-i18next` or similar on web; NativeScript resources / JSON loader on mobile). Shared packages stay **string-free** for UI copy unless a future shared message catalog is explicitly introduced. Start with the smallest set of strings the spec calls “core screens.”
 - The legacy web app MAY break during restructuring. Structure correctness is the priority.
 
 ## Development Workflow
@@ -179,4 +183,4 @@ The NativeScript mobile app MUST feel native on each platform.
 - When a principle conflicts with shipping working software, the principle
   yields — but the conflict MUST be noted for future resolution.
 
-**Version**: 2.1.0 | **Ratified**: 2026-03-31 | **Last Amended**: 2026-03-31
+**Version**: 2.2.0 | **Ratified**: 2026-03-31 | **Last Amended**: 2026-04-02
