@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Quickstart (Phase 9 T042/T048)**: `specs/003-vision-aligned-rebuild/quickstart.md` documents API env vars (`MONGODB_*`, `PORT`, `API_PUBLIC_URL`, `WEB_PUBLIC_URL`, `CORS_ORIGIN`, `MAGIC_LINK_SECRET`), auth → JWT flow, curl samples for tasks/prefs/triage/suggestions/rewards/ledger/marketplace/history, **FR-011** cross-session checklist, and **Session / offline (v1)** scope (server-authoritative; retry + refresh; no offline queue / merge UI in 003 v1).
 - **Mobile triage (T043)**: `rundown-view` ListView rows include a collapsible triage block (`triageVisibility`) when `showTriageForTask` matches web (`skipped` | `overflowUnresolved` | `outsideRunwayTaskIds`). Uses `DayPartyClient.triageTask` + `getDaySuggestions` (7-day window); `TaskRow` holds `moveDateInput` / `moveHint`; `textChange` on `TextField` + `ObservableArray.setItem` updates hint and `moveEnabled`; `refreshTriageBusy` disables actions on the in-flight row only. Spanish copy; triage buttons `min-height: 44` in `app.css`.
 - **Plan history (US6 T034–T039)**: `PlanHistoryEvent` in `@dayparty/core`; `PlanHistoryRepository.append` / `listByUserId` in `@dayparty/domain`; Mongo `plan_history_events` with base64url cursor embedding `order` + `timestamp` + `_id` (matches asc/desc). Domain actions take `historyRepo`: create/update/reorder/delete/triage, `patchUserPreferences`, `createRewardDefinition`, `purchaseReward`. **Idempotency**: `append` optional `correlation` + pre-insert `findOne` by `{ userId, correlation }` for bounty credit (`history-bounty:task-bounty:<taskId>`) and purchase (`history-purchase:<ledger correlation>`). API `GET /api/history?limit=&cursor=&order=` omits `userId` on events; client `getHistory` + `PlanHistoryPanel` (collapsible on `RundownPage`).
 - **US5 visual presets (T031–T033)**: `DEFAULT_VISUAL_PRESET` in `@dayparty/core`; domain prefs actions already synthesize full `UserPreferences` on GET when no doc; Mongo `docToPrefs` fills missing `visualPreset` / `dayWindow` for legacy rows. Web: `apps/web/src/styles/presets.css` defines `:root.preset-{calm,playful,highContrast}` token maps (default = no class, base vars in `index.css`); `VisualPresetProvider` (`context/visual-preset-context.tsx`) wraps protected routes, applies classes from `getUserPreferences` / `patchUserPreferences`; rundown **Day window** `<details>` includes **Look & feel** `<select>`. Shared `--dp-on-accent` for text on accent-filled buttons (high-contrast preset uses yellow accent + dark label).
@@ -606,5 +607,31 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - ListView item `TextField` `textChange` must update the row via `ObservableArray.setItem` so `moveHint` / `moveEnabled` refresh; `runTriageFor` uses `try/finally` + `refreshTriageBusy` so buttons re-enable after errors.
+
+---
+
+## Iteration 19 - 2026-04-02
+
+**User Story**: Phase 9 — Polish & cross-cutting (**T040**–**T042**, **T048**)
+
+**Tasks Completed**:
+
+- [x] T040 [P]: `pnpm build` at repo root — green (no TS fixes required)
+- [x] T041 [P]: `pnpm test` at repo root — green (domain Vitest; `@dayparty/api` has no `test` script)
+- [x] T042 [P]: Refreshed `quickstart.md` — env vars, auth/JWT, curl for shipped routes, **FR-011** checklist
+- [x] T048 [P]: **Session / offline (v1)** subsection in `quickstart.md` per `spec.md` assumptions
+
+**Tasks Remaining in Story**: None — Phase 9 complete; Phase 10 (**T044**–**T047**) remains
+
+**Commit**: bb17086f0f64422bbdd4d29a58edaee7fb8f2f07
+
+**Files Changed**:
+
+- `specs/003-vision-aligned-rebuild/quickstart.md`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Pre-commit Prettier may reformat `quickstart.md` on commit; root `pnpm test` does not run API package tests until a `test` script exists there.
 
 ---
