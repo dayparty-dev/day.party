@@ -5,6 +5,9 @@ Last updated: 2026-04-02
 
 ## Active Technologies
 
+- TypeScript 5.x (strict mode incremental) + Turborepo, pnpm 10, Hono (`apps/api`), React 19 + Vite (`apps/web`), NativeScript 9 (`apps/mobile`), Zod (`@dayparty/validation`), MongoDB driver (`@dayparty/db`), `DayPartyClient` (`@dayparty/api-client`) (003-vision-aligned-rebuild)
+- MongoDB 6 (existing); new/extended documents and collections per `data-model.md`; access via **repository ports** in `@dayparty/domain`, implementations in `@dayparty/db` (003-vision-aligned-rebuild)
+
 - TypeScript 5.x (strict mode goal, incremental migration) + Turborepo, pnpm 10, Hono (`apps/api`), NativeScript 9 + Vite (`apps/mobile`), React 19 + Vite (`apps/web`), Zod (`@dayparty/validation`), MongoDB driver (`@dayparty/db`) (001-monorepo-restructure, 002-tidy-arch-alignment)
 - MongoDB 6 (existing instance, no migration); persistence via repository ports in `@dayparty/domain` with implementations in `@dayparty/db` (002-tidy-arch-alignment)
 
@@ -81,6 +84,8 @@ Human onboarding: `specs/001-monorepo-restructure/quickstart.md` (install, build
 <!-- MANUAL ADDITIONS END -->
 
 ## Recent Changes
+
+- 003-vision-aligned-rebuild: Added TypeScript 5.x (strict mode incremental) + Turborepo, pnpm 10, Hono (`apps/api`), React 19 + Vite (`apps/web`), NativeScript 9 (`apps/mobile`), Zod (`@dayparty/validation`), MongoDB driver (`@dayparty/db`), `DayPartyClient` (`@dayparty/api-client`)
 
 - 002-tidy-arch-alignment: Documented stack paths and Mongo access via domain ports + `@dayparty/db` in agent context (plan-driven update).
 - 001-monorepo-restructure: Added TypeScript 5.x (strict mode goal, incremental migration) + Turborepo, pnpm 10, Hono, NativeScript 9 + Vite, React 19, Zod, mongodb driver
