@@ -1,7 +1,15 @@
 import type { Task } from '@dayparty/core';
 import type { TaskRepository } from '../interfaces/task-repository';
+import type { UpdateTaskInput } from './update-task';
 
-export function makeToggleTaskCompletionAction(taskRepo: TaskRepository) {
+/**
+ * Toggles completion by delegating to `updateTask` so lifecycle rules (status sync,
+ * tag validation, **bounty → ledger** on first complete, etc.) stay in one place.
+ */
+export function makeToggleTaskCompletionAction(
+  taskRepo: TaskRepository,
+  updateTask: (id: string, input: UpdateTaskInput) => Promise<Task>,
+) {
   return async (id: string): Promise<Task> => {
     const task = await taskRepo.findById(id);
     if (!task) {
@@ -9,15 +17,10 @@ export function makeToggleTaskCompletionAction(taskRepo: TaskRepository) {
     }
 
     const nextComplete = !task.isComplete;
-    const updated = await taskRepo.update(id, {
+    return updateTask(id, {
       isComplete: nextComplete,
       status: nextComplete ? 'done' : 'planned',
       deferredToDate: undefined,
     });
-    if (!updated) {
-      throw new Error(`Task "${id}" not found after update`);
-    }
-
-    return updated;
   };
 }
