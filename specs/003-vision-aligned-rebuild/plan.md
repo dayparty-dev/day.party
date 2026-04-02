@@ -18,7 +18,7 @@ Re-implement **flexible day planning** in the current monorepo stack so it match
 **Testing**: Vitest (packages/apps as configured); domain logic for fit/triage/rewards with **in-memory fakes**; API routes with **integration** tests where routes are added or changed  
 **Target Platform**: Node for API; browsers for `apps/web`; iOS/Android for `apps/mobile`  
 **Project Type**: Turborepo monorepo — shared packages + API + web + mobile  
-**Performance Goals**: Responsive planning UI and rundown loads for “typical personal use” (spec edge cases: hundreds of actionables, thousands of history events); no hard numeric SLA in this plan  
+**Performance Goals**: Responsive planning UI and rundown loads for “typical personal use” (spec edge cases: hundreds of actionables, thousands of history events); no hard numeric SLA in this plan. _Non-binding example only:_ a rundown for a typical personal list (on the order of tens of tasks) should feel snappy end-to-end—e.g. API response well under ~500 ms on a warm connection is a comfortable bar, not a commitment.  
 **Constraints**: Tidy Architecture + Pod-style packages; **no UI in `packages/`**; validation at HTTP boundary; spec-driven (legacy reference only); **YAGNI** on gamification chrome (lootboxes, parody skins) until P1–P3 foundations exist  
 **Scale/Scope**: Six prioritized user stories; multiple Mongo collections and REST surface evolution; **incremental** delivery by story, not a single big-bang
 
@@ -76,8 +76,8 @@ specs/003-vision-aligned-rebuild/
 ├── packages/
 │   ├── core/src/models/           # Task (actionable) shapes, DayRundown evolution, prefs types
 │   ├── domain/src/
-│   │   ├── actions/               # getRundown, create/update/reorder, triage, ledger hooks
-│   │   └── interfaces/             # repository ports (tasks, prefs, history, rewards, …)
+│   │   ├── actions/                    # getRundown, create/update/reorder, triage, ledger hooks
+│   │   └── interfaces/                 # repository ports (tasks, prefs, history, rewards, …)
 │   ├── db/src/                    # Mongo implementations of new/updated ports
 │   ├── validation/src/schemas/    # Zod for new fields and endpoints
 │   └── api-client/src/            # DayPartyClient parity with REST

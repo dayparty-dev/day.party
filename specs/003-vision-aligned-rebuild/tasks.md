@@ -201,6 +201,8 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 **Purpose**: Build health, docs, and constitution checks across slices.
 
+**Scheduling note**: **T040** and **T041** may run **incrementally** during the milestone (fix build/test regressions as slices land). **T042** and **T048** should align with **release or sign-off** documentation so quickstart and session/offline notes match shipped behavior—avoid reading “after all stories” as “never start T040/T041 early,” or treating doc tasks as interchangeable with build/test health checks.
+
 - [ ] T040 [P] Run `pnpm build` from repository root and fix TypeScript errors from 003 changes
 - [ ] T041 [P] Run `pnpm test` from repository root (or scoped filters per package) and fix regressions introduced by 003 tasks
 - [ ] T042 [P] Refresh `specs/003-vision-aligned-rebuild/quickstart.md` with final routes, env vars, and curl examples matching shipped code. Include **FR-011** cross-session checks: same authenticated user after logout/login (or new browser session) sees consistent plan, notes, ledger balance, and history as applicable.
@@ -219,7 +221,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 - [ ] T043 [P] [US2] Implement triage / defer / move-day flows on mobile in `apps/mobile/src/views/rundown-view.ts` and `apps/mobile/src/views/rundown-view.xml` (or add `apps/mobile/src/views/triage-view.ts` + `triage-view.xml` and register in `apps/mobile/src/app.ts`)
 - [ ] T044 [P] [US3] Add actionable **notes** UX (view/edit markdown or plain text detail) in new `apps/mobile/src/views/task-detail-view.ts` + `task-detail-view.xml`, navigable from rundown — **see US3 “T044 vs T054”**; prefer one combined detail route when **T054** runs
 - [ ] T045 [P] [US4] Add rewards balance + marketplace minimal flow in new `apps/mobile/src/views/rewards-view.ts` + `rewards-view.xml` and wire navigation in `apps/mobile/src/app.ts`
-- [ ] T046 [P] [US5] Apply `visualPreset` from preferences API to mobile chrome (theme classes or `App_Resources` colors) in `apps/mobile/src/app.ts` with at least two presets matching web intent. Respect **constitution** platform fidelity: **iOS** ~44pt / **Android** ~48dp minimum touch targets per **`spec.md` US5 AS2**.
+- [ ] T046 [P] [US5] Apply `visualPreset` from preferences API to mobile chrome (theme classes or `App_Resources` colors) in `apps/mobile/src/app.ts` with at least two presets matching web intent. Respect **constitution** platform fidelity: **iOS** ~44pt / **Android** ~48dp minimum touch targets per **`spec.md` US5 AS2`. **Depends on**: **T031** (prefs API round-trip for `visualPreset`) and **T032** (web preset CSS variable / root-class intent so mobile can mirror tokens). **T033** (web preset selector UI) is **not\*\* a hard blocker—mobile can read and apply `visualPreset` from the API without it.
 - [ ] T047 [P] [US6] Add read-only plan history list in new `apps/mobile/src/views/history-view.ts` + `history-view.xml` and entry from `apps/mobile/src/app.ts`
 
 ---
@@ -231,8 +233,8 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 - **Phase 1** → **Phase 2** → **US1 (Phase 3)** → later stories in priority order **or** parallelize **after US1** where stories do not depend on each other’s UI (server-side US4 can proceed before US3 if task shapes already support bounty fields).
 - **Gap closure T049–T050**: SHOULD finish **before** treating US1 as fully shippable on `apps/web` / `apps/mobile`; **T049** and **T050** may run **in parallel** and may overlap with early **Phase 6** if staffed.
 - **Gap closure T051–T056**: SHOULD finish **before** treating **US1** / **US4** as **product-complete** per **`spec.md`** definition of done; **T051** depends on **T022**/`getTask`; **T053**/**T056** extend **T049**/**T050**; **T054**–**T055** can parallelize after **T051** patterns exist.
-- **Polish (Phase 9)**: After all target user stories for the milestone are complete.
-- **Phase 10 (mobile parity)**: Run **after** each story’s API is available — **T043** after US2 routes, **T044** after T022–T023 patterns, **T045** after T028, **T046** after T031–T032, **T047** after T037. Can parallelize with web polish if staffed.
+- **Polish (Phase 9)**: **T040** / **T041** may run incrementally during the milestone; **T042** / **T048** should align with release/sign-off documentation (see Phase 9 **Scheduling note**).
+- **Phase 10 (mobile parity)**: Run **after** each story’s API is available — **T043** after US2 routes, **T044** after T022–T023 patterns, **T045** after T028, **T046** after **T031** + **T032** (not blocked on **T033**), **T047** after T037. Can parallelize with web polish if staffed.
 
 ### User Story Dependencies
 
