@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Mobile triage (T043)**: `rundown-view` ListView rows include a collapsible triage block (`triageVisibility`) when `showTriageForTask` matches web (`skipped` | `overflowUnresolved` | `outsideRunwayTaskIds`). Uses `DayPartyClient.triageTask` + `getDaySuggestions` (7-day window); `TaskRow` holds `moveDateInput` / `moveHint`; `textChange` on `TextField` + `ObservableArray.setItem` updates hint and `moveEnabled`; `refreshTriageBusy` disables actions on the in-flight row only. Spanish copy; triage buttons `min-height: 44` in `app.css`.
 - **Plan history (US6 T034–T039)**: `PlanHistoryEvent` in `@dayparty/core`; `PlanHistoryRepository.append` / `listByUserId` in `@dayparty/domain`; Mongo `plan_history_events` with base64url cursor embedding `order` + `timestamp` + `_id` (matches asc/desc). Domain actions take `historyRepo`: create/update/reorder/delete/triage, `patchUserPreferences`, `createRewardDefinition`, `purchaseReward`. **Idempotency**: `append` optional `correlation` + pre-insert `findOne` by `{ userId, correlation }` for bounty credit (`history-bounty:task-bounty:<taskId>`) and purchase (`history-purchase:<ledger correlation>`). API `GET /api/history?limit=&cursor=&order=` omits `userId` on events; client `getHistory` + `PlanHistoryPanel` (collapsible on `RundownPage`).
 - **US5 visual presets (T031–T033)**: `DEFAULT_VISUAL_PRESET` in `@dayparty/core`; domain prefs actions already synthesize full `UserPreferences` on GET when no doc; Mongo `docToPrefs` fills missing `visualPreset` / `dayWindow` for legacy rows. Web: `apps/web/src/styles/presets.css` defines `:root.preset-{calm,playful,highContrast}` token maps (default = no class, base vars in `index.css`); `VisualPresetProvider` (`context/visual-preset-context.tsx`) wraps protected routes, applies classes from `getUserPreferences` / `patchUserPreferences`; rundown **Day window** `<details>` includes **Look & feel** `<select>`. Shared `--dp-on-accent` for text on accent-filled buttons (high-contrast preset uses yellow accent + dark label).
 - **Mobile bounty on create (T056)**: `rundown-view` optional recompensa block mirrors web `CreateTaskPanel`: integer amount 1–1M, comma-separated scope tags, **Alta resistencia**; omitted from `createTask` when amount empty. `task-detail-view` `onSave`: `clearBounty` → `bounty: null` (aligned with `TaskEditPanel`, not gated on `hadBounty`).
@@ -580,5 +581,30 @@ Started: 2026-04-02 15:10:01
 
 - Vitest domain tests need an in-memory `PlanHistoryRepository` when actions gain a history dependency.
 - `task.updated` is skipped when a PATCH produces no diff in the summarized fields (avoids empty noise).
+
+---
+
+## Iteration 18 - 2026-04-02
+
+**User Story**: User Story 2 — NativeScript triage parity (**T043**)
+
+**Tasks Completed**:
+
+- [x] T043 [P] [US2]: Triage / defer / move-day on mobile `rundown-view` + `rundown-view.xml` (`triageTask`, suggestions hints, Spanish UI)
+
+**Tasks Remaining in Story**: None — **T043** complete; Phase 9 polish (**T040**–**T042**, **T048**) and Phase 10 **T044**–**T047** remain
+
+**Commit**: 9438ccd3a8457ac3e684780b76e363da59c7adf5
+
+**Files Changed**:
+
+- `apps/mobile/src/views/rundown-view.ts`
+- `apps/mobile/src/views/rundown-view.xml`
+- `apps/mobile/src/app.css`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- ListView item `TextField` `textChange` must update the row via `ObservableArray.setItem` so `moveHint` / `moveEnabled` refresh; `runTriageFor` uses `try/finally` + `refreshTriageBusy` so buttons re-enable after errors.
 
 ---
