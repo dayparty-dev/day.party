@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **US5 visual presets (T031–T033)**: `DEFAULT_VISUAL_PRESET` in `@dayparty/core`; domain prefs actions already synthesize full `UserPreferences` on GET when no doc; Mongo `docToPrefs` fills missing `visualPreset` / `dayWindow` for legacy rows. Web: `apps/web/src/styles/presets.css` defines `:root.preset-{calm,playful,highContrast}` token maps (default = no class, base vars in `index.css`); `VisualPresetProvider` (`context/visual-preset-context.tsx`) wraps protected routes, applies classes from `getUserPreferences` / `patchUserPreferences`; rundown **Day window** `<details>` includes **Look & feel** `<select>`. Shared `--dp-on-accent` for text on accent-filled buttons (high-contrast preset uses yellow accent + dark label).
 - **Mobile bounty on create (T056)**: `rundown-view` optional recompensa block mirrors web `CreateTaskPanel`: integer amount 1–1M, comma-separated scope tags, **Alta resistencia**; omitted from `createTask` when amount empty. `task-detail-view` `onSave`: `clearBounty` → `bounty: null` (aligned with `TaskEditPanel`, not gated on `hadBounty`).
 - **Create task bounty (T053)**: Web `CreateTaskPanel` optional bounty block: amount (points), comma-separated scope tags, **High resistance** checkbox; omitted from POST when amount empty; same bounds as `taskBountySchema` / `TaskEditPanel`.
 - **Focus `planned` ↔ `in_progress` (T052 / T055)**: Web `TaskCard` exposes optional `onToggleFocus` + `focusBusy`; `RundownPage` calls `updateTask` with flipped `status`; `OngoingPage` prefers the first incomplete task with `status === 'in_progress'`, then offers **Start** / **Pause** (`updateTask`). Mobile rundown rows use **Enfoque** / **Pausa** (`toggleFocusFor`); `ongoing-view` mirrors pick + toggle. **In progress** badge on web `TaskCard` (`focusTag`).
@@ -511,5 +512,37 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - NativeScript `Switch` for `newTaskBountyHighResistance` uses two-way `checked="{{ ... }}"` like window crosses; no `checkedChange` handler needed for create flow.
+
+---
+
+## Iteration 16 - 2026-04-02
+
+**User Story**: User Story 5 — Visual presets (T031–T033)
+
+**Tasks Completed**:
+
+- [x] T031 [US5]: Verified prefs pipeline; exported `DEFAULT_VISUAL_PRESET`; Mongo `docToPrefs` normalizes missing `visualPreset` / `dayWindow`; API route comment for GET defaults / PATCH merge
+- [x] T032 [P] [US5]: `presets.css` calm / playful / highContrast maps; `body` 16px baseline; `--dp-on-accent`; primary shell touch targets (rundown header + save window)
+- [x] T033 [US5]: `VisualPresetProvider` + rundown **Look & feel** selector bound to preferences API
+
+**Tasks Remaining in Story**: None — US5 web slice complete (**T046** mobile still open in Phase 10)
+
+**Commit**: 6acb388b3bfcd0bb12e74ae35d6ee47547e260f9
+
+**Files Changed**:
+
+- `packages/core/src/models/user-preferences.ts`, `packages/core/src/index.ts`
+- `packages/domain/src/actions/user-preferences-actions.ts`
+- `packages/db/src/repositories/user-preferences-repository.ts`
+- `apps/api/src/routes/preferences.ts`
+- `apps/web/src/styles/presets.css`, `apps/web/src/context/visual-preset-context.tsx`, `apps/web/src/App.tsx`, `apps/web/src/main.tsx`, `apps/web/src/index.css`
+- `apps/web/src/pages/RundownPage.tsx`, `RundownPage.module.css`
+- `apps/web/src/components/*.module.css`, `LoginPage.module.css`, `OngoingPage.module.css`, `RewardsPage.module.css`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- `:root.preset-*` shares the same element as `:root`; non-default presets add a single class; `default` clears preset classes so base `index.css` tokens apply.
+- High-contrast yellow accent needs `--dp-on-accent` (dark text) on filled primary buttons site-wide.
 
 ---
