@@ -13,6 +13,9 @@ Started: 2026-04-02 15:10:01
 - **Prefs HTTP**: `GET` / `PATCH /api/me/preferences` (session auth). Response body omits `userId`. `GET` synthesizes defaults from `@dayparty/core` when no Mongo doc exists (not persisted until `PATCH`). `PATCH` merges `sizeToMinutes` shallowly over any stored overrides.
 - **Web rundown**: `RundownPage` holds full `DayRundownResponse`; plan bar uses `plannedMinutes` / `availableMinutes`; day window uses `<input type="time" step={300}>` + `minutesToTimeInput` / `timeInputToMinutes` helpers; `TaskCard` takes explicit `runwayPlacement` from `dayFit` task id lists.
 - **Mobile rundown**: Spanish copy for plan footnote and runway labels (`En ventana` / `Extra`); `metaLine` shows estimate, size, essentiality.
+- **Task lifecycle (US2)**: `Task.status` is required on the core type; Mongo normalizes legacy rows (`isComplete` → `done`, else stored `status` or `planned`). `skipped` tasks do not consume runway minutes in `computeDayFit` (`taskCountsTowardRunwayMinutes`).
+- **Triage API**: `POST /api/tasks/:id/triage` body discriminated by `action`: `defer_to_date` (moves `scheduledDate`, appends `position` on target day), `demote`, `mark_skipped`, `clear_skipped`. `PATCH /api/tasks/:id` also accepts `status` / `deferredToDate` with Zod refiners. Suggestions: `GET /api/tasks/suggestions?fromDate=&toDate=` (max 14-day span) returns `hints` where `remainingMinutes >= 30`.
+- **Web triage**: `TaskTriageBar` under tasks that are outside the runway, when `overflowUnresolved`, or when status is `skipped`; loads suggestions for list date +7 days for the date picker hint.
 
 ---
 
@@ -203,5 +206,43 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - Full US1 checklist in Phase 3 is done; US2+ tasks remain elsewhere in `tasks.md` — Ralph `COMPLETE` only when **all** feature tasks are checked.
+
+---
+
+## Iteration 7 - 2026-04-02
+
+**User Story**: User Story 2 — Triage overflow and move work (T016–T020)
+
+**Tasks Completed**:
+
+- [x] T016: `TaskStatus`, `status`, `deferredToDate` on `Task`; Mongo normalization; Zod `taskStatusSchema` on update
+- [x] T017: `makeApplyTaskTriageAction`, extended `makeUpdateTaskAction` lifecycle merge; `skipped` excluded from runway load in `computeDayFit`; toggle completion syncs `status`
+- [x] T018: `POST /api/tasks/:id/triage`, extended `PATCH /api/tasks/:id` validation
+- [x] T019: `makeSuggestDayCapacitiesAction`, `GET /api/tasks/suggestions`
+- [x] T020: `TaskTriageBar`, rundown integration, `DayPartyClient.triageTask` / `getDaySuggestions`
+
+**Tasks Remaining in Story**: None — US2 slice in `tasks.md` complete (Phase 10 T043 still open for mobile parity)
+
+**Commit**: 582d6521702c6f47fc5d14e51312ec79731d761b
+
+**Files Changed**:
+
+- `packages/core/src/models/task.ts`, `packages/core/src/index.ts`
+- `packages/domain/src/day-fit.ts`, `packages/domain/src/day-suggestions.ts`, `packages/domain/src/index.ts`
+- `packages/domain/src/actions/update-task.ts`, `packages/domain/src/actions/toggle-task-completion.ts`, `packages/domain/src/actions/create-task.ts`, `packages/domain/src/actions/triage-task.ts`
+- `packages/domain/src/actions/*.test.ts`, `packages/domain/src/day-fit.test.ts`
+- `packages/validation/src/schemas/task.ts`
+- `packages/db/src/repositories/task-repository.ts`
+- `packages/api-client/src/client.ts`, `packages/api-client/src/index.ts`
+- `apps/api/src/types.ts`, `apps/api/src/index.ts`, `apps/api/src/routes/tasks.ts`, `apps/api/src/seed.ts`
+- `apps/web/src/pages/RundownPage.tsx`, `apps/web/src/components/TaskCard.tsx`, `apps/web/src/components/TaskCard.module.css`
+- `apps/web/src/components/TaskTriageBar.tsx`, `apps/web/src/components/TaskTriageBar.module.css`, `apps/web/src/utils/today-local.ts`
+- `apps/mobile/src/views/rundown-view.ts`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Register `GET /suggestions` before any future `GET /:id` on the tasks router; static paths first.
+- NativeScript `EventData.object` needs `as unknown as { checked: boolean }` for strict `tsc` on the window checkbox handler.
 
 ---
