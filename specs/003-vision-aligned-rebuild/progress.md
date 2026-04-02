@@ -10,6 +10,7 @@ Started: 2026-04-02 15:10:01
 - **`computeDayFit`**: Greedy pack in task order; `plannedMinutes` sums effective minutes for **incomplete** tasks only; completed tasks are always `inRunwayTaskIds` and use no runway minutes; `overflowUnresolved` when any incomplete **essential** task is outside the runway. Default size→minutes: 15/25/40/55/75 for sizes 1–5; overridden by prefs `sizeToMinutes`.
 - **`DEFAULT_SIZE_TO_MINUTES`**: Single export from `@dayparty/core` for domain fit + Mongo read-path legacy fill; keep aligned.
 - **Prefs Zod**: `patchUserPreferencesSchema` / `dayWindowSchema` enforce midnight-crossing vs same-day window rules; `sizeToMinutes` patch uses strict keys `1`–`5` only.
+- **Prefs HTTP**: `GET` / `PATCH /api/me/preferences` (session auth). Response body omits `userId`. `GET` synthesizes defaults from `@dayparty/core` when no Mongo doc exists (not persisted until `PATCH`). `PATCH` merges `sizeToMinutes` shallowly over any stored overrides.
 
 ---
 
@@ -136,5 +137,38 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - T011 is still needed for explicit route/docs copy even though create/update already use extended Zod inference against existing handlers.
+
+---
+
+## Iteration 5 - 2026-04-02
+
+**User Story**: Partial progress on US1 — API + client for prefs and documented task rundown (T011–T013)
+
+**Tasks Completed**:
+
+- [x] T011: Module comment on `apps/api/src/routes/tasks.ts` for P1 rundown/task fields; create/update already validated and wired.
+- [x] T012: `apps/api/src/routes/preferences.ts`, mount `/api/me/preferences` in `app.ts`, `getUserPreferences` / `patchUserPreferences` on `ApiEnv` and composition root.
+- [x] T013: `DayPartyClient.getUserPreferences`, `patchUserPreferences`, `parseUserPreferences`; export `UserPreferencesResponse` / `PatchUserPreferencesInput`.
+
+**Tasks Remaining in Story**: 2 (T014–T015)
+
+**Commit**: 520ce51fef64d9eac16f4c6f5db31d06588d7f8a
+
+**Files Changed**:
+
+- `packages/domain/src/actions/user-preferences-actions.ts`
+- `packages/domain/src/index.ts`
+- `apps/api/src/types.ts`
+- `apps/api/src/app.ts`
+- `apps/api/src/index.ts`
+- `apps/api/src/routes/preferences.ts`
+- `apps/api/src/routes/tasks.ts`
+- `packages/api-client/src/client.ts`
+- `packages/api-client/src/index.ts`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Empty `PATCH` body `{}` passes Zod but is rejected at the handler with 422 so clients get a clear error; client mirrors the same check before `request`.
 
 ---
