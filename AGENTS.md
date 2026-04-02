@@ -1,12 +1,12 @@
 # day.party Development Guidelines
 
 Canonical instructions for AI coding agents in this repository.
-Last updated: 2026-03-31
+Last updated: 2026-04-02
 
 ## Active Technologies
 
-- TypeScript 5.x (strict mode goal, incremental migration) + Turborepo, pnpm 10, Hono, NativeScript 9 + Vite, React 19, Zod, mongodb driver (001-monorepo-restructure)
-- MongoDB 6 (existing instance, no migration) (001-monorepo-restructure)
+- TypeScript 5.x (strict mode goal, incremental migration) + Turborepo, pnpm 10, Hono (`apps/api`), NativeScript 9 + Vite (`apps/mobile`), React 19 + Vite (`apps/web`), Zod (`@dayparty/validation`), MongoDB driver (`@dayparty/db`) (001-monorepo-restructure, 002-tidy-arch-alignment)
+- MongoDB 6 (existing instance, no migration); persistence via repository ports in `@dayparty/domain` with implementations in `@dayparty/db` (002-tidy-arch-alignment)
 
 ## Project Structure
 
@@ -81,4 +81,5 @@ Human onboarding: `specs/001-monorepo-restructure/quickstart.md` (install, build
 
 ## Recent Changes
 
+- 002-tidy-arch-alignment: Documented stack paths and Mongo access via domain ports + `@dayparty/db` in agent context (plan-driven update).
 - 001-monorepo-restructure: Added TypeScript 5.x (strict mode goal, incremental migration) + Turborepo, pnpm 10, Hono, NativeScript 9 + Vite, React 19, Zod, mongodb driver

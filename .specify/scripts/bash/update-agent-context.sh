@@ -633,7 +633,10 @@ update_specific_agent() {
             update_agent_file "$GEMINI_FILE" "Gemini CLI" || return 1
             ;;
         copilot)
-            update_agent_file "$COPILOT_FILE" "GitHub Copilot" || return 1
+            # `.github/agents/copilot-instructions.md` MUST be a symlink to `AGENTS.md`.
+            # Writing directly to COPILOT_FILE replaces the symlink with a regular file on
+            # most systems; always update the canonical file.
+            update_agent_file "$AGENTS_FILE" "GitHub Copilot" || return 1
             ;;
         cursor-agent)
             update_agent_file "$CURSOR_FILE" "Cursor IDE" || return 1
