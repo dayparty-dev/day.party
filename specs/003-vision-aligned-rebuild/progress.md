@@ -40,5 +40,36 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - MongoDB Node driver types reject `_id` in `replaceOne` replacement documents typed as `WithoutId`; branch insert vs `updateOne` `$set` for `put` semantics.
+- **US1 rundown shape**: `DayRundown` requires `dayFit` and `dayWindow`. Until T007–T008, domain actions return `EMPTY_DAY_FIT` and `DEFAULT_DAY_WINDOW` from `@dayparty/core`.
+
+---
+
+## Iteration 2 - 2026-04-02
+
+**User Story**: Partial progress on US1 — core models for day fit + window echo (T006)
+
+**Tasks Completed**:
+
+- [x] T006: `TaskEssentiality`, optional `estimatedMinutes` / `essentiality` on `Task`; `DayFit`, `DayRundown.dayFit` + `dayWindow`; `DEFAULT_DAY_WINDOW`, `EMPTY_DAY_FIT`; rundown actions + api-client parse alignment
+
+**Tasks Remaining in Story**: 9 (T007–T015)
+
+**Commit**: e4fa70356cc4f5808e83bad569b0ddd0bb857078
+
+**Files Changed**:
+
+- `packages/core/src/models/task.ts`
+- `packages/core/src/models/day-rundown.ts`
+- `packages/core/src/models/user-preferences.ts`
+- `packages/core/src/index.ts`
+- `packages/domain/src/actions/get-rundown.ts`
+- `packages/domain/src/actions/reorder-tasks.ts`
+- `packages/domain/src/actions/get-rundown.test.ts`
+- `packages/api-client/src/client.ts`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Contract uses `priority` / `essentiality`; data model lists `essential` \| `normal` \| `optional` — implemented as `TaskEssentiality` + field `essentiality` on `Task`.
 
 ---
