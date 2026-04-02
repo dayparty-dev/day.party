@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Mobile bounty on create (T056)**: `rundown-view` optional recompensa block mirrors web `CreateTaskPanel`: integer amount 1–1M, comma-separated scope tags, **Alta resistencia**; omitted from `createTask` when amount empty. `task-detail-view` `onSave`: `clearBounty` → `bounty: null` (aligned with `TaskEditPanel`, not gated on `hadBounty`).
 - **Create task bounty (T053)**: Web `CreateTaskPanel` optional bounty block: amount (points), comma-separated scope tags, **High resistance** checkbox; omitted from POST when amount empty; same bounds as `taskBountySchema` / `TaskEditPanel`.
 - **Focus `planned` ↔ `in_progress` (T052 / T055)**: Web `TaskCard` exposes optional `onToggleFocus` + `focusBusy`; `RundownPage` calls `updateTask` with flipped `status`; `OngoingPage` prefers the first incomplete task with `status === 'in_progress'`, then offers **Start** / **Pause** (`updateTask`). Mobile rundown rows use **Enfoque** / **Pausa** (`toggleFocusFor`); `ongoing-view` mirrors pick + toggle. **In progress** badge on web `TaskCard` (`focusTag`).
 - **Mobile task detail (T054)**: `apps/mobile/src/views/task-detail-view.{ts,xml}` — `authState.navigateToTaskDetail(taskId)` passes `Frame` `context`; `onNavigatingTo` reads `args.context` / `page.navigationContext`. Full edit + `notesMarkdown` + bounty (Spanish copy); `ListPicker` for status / essentiality / tag; `Observable.propertyChangeEvent` on `statusIndex` toggles deferred date visibility.
@@ -485,5 +486,30 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - Reuse the same bounty validation rules as `TaskEditPanel` (integer amount range, `parseBountyTagKeys`); omit `bounty` from `createTask` body when amount field is empty.
+
+---
+
+## Iteration 15 - 2026-04-02
+
+**User Story**: Gap closure — US4 mobile bounty on create (**T056**); task-detail bounty clear aligned with web
+
+**Tasks Completed**:
+
+- [x] T056 [P] [US4]: Mobile optional **bounty** on create (`rundown-view` + `createTask`); **edit/clear** already in **T054** `task-detail-view` — aligned clear path with `TaskEditPanel`
+
+**Tasks Remaining in Story**: None — gap-closure **T051–T056** complete; Phase 7+ tasks remain in `tasks.md`
+
+**Commit**: e681f420e6b5b66f9c85e23b9076ccef2ecd706c
+
+**Files Changed**:
+
+- `apps/mobile/src/views/rundown-view.ts`
+- `apps/mobile/src/views/rundown-view.xml`
+- `apps/mobile/src/views/task-detail-view.ts`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- NativeScript `Switch` for `newTaskBountyHighResistance` uses two-way `checked="{{ ... }}"` like window crosses; no `checkedChange` handler needed for create flow.
 
 ---
