@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Mobile notes (T044 / US3)**: Rundown `TaskRow` includes optional `notesPreviewLine` + `notesPreviewVisibility` from `TaskRundownItemResponse.notesPreview`; **Notas** → `authState.navigateToTaskDetail(taskId, { notesFocus: true })`. `task-detail-view` reads `context.notesFocus`, sets `pageTitle` **Notas** vs **Editar tarea**, `notesEditorHeight` 220 vs 150; notes **TextView** after **Título** with `.notes-text` (monospace) and short helper copy.
 - **Quickstart (Phase 9 T042/T048)**: `specs/003-vision-aligned-rebuild/quickstart.md` documents API env vars (`MONGODB_*`, `PORT`, `API_PUBLIC_URL`, `WEB_PUBLIC_URL`, `CORS_ORIGIN`, `MAGIC_LINK_SECRET`), auth → JWT flow, curl samples for tasks/prefs/triage/suggestions/rewards/ledger/marketplace/history, **FR-011** cross-session checklist, and **Session / offline (v1)** scope (server-authoritative; retry + refresh; no offline queue / merge UI in 003 v1).
 - **Mobile triage (T043)**: `rundown-view` ListView rows include a collapsible triage block (`triageVisibility`) when `showTriageForTask` matches web (`skipped` | `overflowUnresolved` | `outsideRunwayTaskIds`). Uses `DayPartyClient.triageTask` + `getDaySuggestions` (7-day window); `TaskRow` holds `moveDateInput` / `moveHint`; `textChange` on `TextField` + `ObservableArray.setItem` updates hint and `moveEnabled`; `refreshTriageBusy` disables actions on the in-flight row only. Spanish copy; triage buttons `min-height: 44` in `app.css`.
 - **Plan history (US6 T034–T039)**: `PlanHistoryEvent` in `@dayparty/core`; `PlanHistoryRepository.append` / `listByUserId` in `@dayparty/domain`; Mongo `plan_history_events` with base64url cursor embedding `order` + `timestamp` + `_id` (matches asc/desc). Domain actions take `historyRepo`: create/update/reorder/delete/triage, `patchUserPreferences`, `createRewardDefinition`, `purchaseReward`. **Idempotency**: `append` optional `correlation` + pre-insert `findOne` by `{ userId, correlation }` for bounty credit (`history-bounty:task-bounty:<taskId>`) and purchase (`history-purchase:<ledger correlation>`). API `GET /api/history?limit=&cursor=&order=` omits `userId` on events; client `getHistory` + `PlanHistoryPanel` (collapsible on `RundownPage`).
@@ -12,7 +13,7 @@ Started: 2026-04-02 15:10:01
 - **Mobile bounty on create (T056)**: `rundown-view` optional recompensa block mirrors web `CreateTaskPanel`: integer amount 1–1M, comma-separated scope tags, **Alta resistencia**; omitted from `createTask` when amount empty. `task-detail-view` `onSave`: `clearBounty` → `bounty: null` (aligned with `TaskEditPanel`, not gated on `hadBounty`).
 - **Create task bounty (T053)**: Web `CreateTaskPanel` optional bounty block: amount (points), comma-separated scope tags, **High resistance** checkbox; omitted from POST when amount empty; same bounds as `taskBountySchema` / `TaskEditPanel`.
 - **Focus `planned` ↔ `in_progress` (T052 / T055)**: Web `TaskCard` exposes optional `onToggleFocus` + `focusBusy`; `RundownPage` calls `updateTask` with flipped `status`; `OngoingPage` prefers the first incomplete task with `status === 'in_progress'`, then offers **Start** / **Pause** (`updateTask`). Mobile rundown rows use **Enfoque** / **Pausa** (`toggleFocusFor`); `ongoing-view` mirrors pick + toggle. **In progress** badge on web `TaskCard` (`focusTag`).
-- **Mobile task detail (T054)**: `apps/mobile/src/views/task-detail-view.{ts,xml}` — `authState.navigateToTaskDetail(taskId)` passes `Frame` `context`; `onNavigatingTo` reads `args.context` / `page.navigationContext`. Full edit + `notesMarkdown` + bounty (Spanish copy); `ListPicker` for status / essentiality / tag; `Observable.propertyChangeEvent` on `statusIndex` toggles deferred date visibility.
+- **Mobile task detail (T054)**: `apps/mobile/src/views/task-detail-view.{ts,xml}` — `authState.navigateToTaskDetail(taskId, { notesFocus? })` passes `Frame` `context`; `onNavigatingTo` reads `args.context` / `page.navigationContext`. Full edit + `notesMarkdown` + bounty (Spanish copy); `ListPicker` for status / essentiality / tag; `Observable.propertyChangeEvent` on `statusIndex` toggles deferred date visibility.
 - **Rewards / ledger (US4 T024–T030)**: `RewardDefinition` / `RewardDefinitionType` in `@dayparty/core` (`models/reward.ts`); `LedgerEntry` / `LedgerEntryReason` in `models/ledger.ts`. `Task.bounty?: TaskBounty` (`amount`, optional `tagKeys`, `highResistance`). Domain ports: `RewardDefinitionRepository` (`listByUserId`, `findById`, `create`), `LedgerRepository` (`insert` append-only omitting `id`/`createdAt`, `listByUserId` with `limit` + optional cursor, `findByCorrelation`, `sumAmountByUserId`). Mongo: `reward_definitions`, `ledger_entries`. Re-export document types from interface modules via `@dayparty/core` (avoid duplicate domain copies).
 - **US4 API**: `GET`/`POST /api/rewards`, `GET /api/ledger?limit=&cursor=`, `POST /api/marketplace/purchase` with `{ rewardDefinitionId }`. Responses omit `userId` on rewards and ledger rows. **Bounty**: `makeUpdateTaskAction` takes `LedgerRepository`; on first transition to complete for a task with `bounty.amount > 0`, inserts `task_completion` line with correlation `task-bounty:<taskId>` if none exists.
 - **US4 client**: `DayPartyClient.getRewards`, `createRewardDefinition`, `getLedger`, `purchaseReward`; `parseTask` accepts optional `bounty`. Types: `ApiRewardDefinition`, `ApiLedgerEntry`, `LedgerPageResponse`.
@@ -633,5 +634,33 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - Pre-commit Prettier may reformat `quickstart.md` on commit; root `pnpm test` does not run API package tests until a `test` script exists there.
+
+---
+
+## Iteration 20 - 2026-04-02
+
+**User Story**: Phase 10 — US3 mobile notes (**T044**)
+
+**Tasks Completed**:
+
+- [x] T044 [P] [US3]: Rundown **Notas** + `notesPreview` line; `navigateToTaskDetail` `notesFocus`; task-detail notes block promoted under title with monospace editor and contextual title/height
+
+**Tasks Remaining in Story**: None — story complete
+
+**Commit**: a3f40bde646304dc8f57b3d41985e2f2b87ea367
+
+**Files Changed**:
+
+- `apps/mobile/src/services/auth-state.ts`
+- `apps/mobile/src/views/rundown-view.ts`
+- `apps/mobile/src/views/rundown-view.xml`
+- `apps/mobile/src/views/task-detail-view.ts`
+- `apps/mobile/src/views/task-detail-view.xml`
+- `apps/mobile/src/app.css`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Kept a single **task-detail** route per T044 vs T054 guidance; **Notas** is an entry point + `notesFocus` UX, not a second screen.
 
 ---
