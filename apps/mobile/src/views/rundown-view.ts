@@ -12,6 +12,8 @@ type TaskRow = {
   tagColor: string;
   completeIcon: string;
   isComplete: boolean;
+  metaLine: string;
+  runwayLabel: string;
 };
 
 function todayIso(): string {
@@ -22,9 +24,17 @@ function todayIso(): string {
   return `${y}-${mo}-${da}`;
 }
 
+function formatMinuteOfDay(m: number): string {
+  const clamped = Math.max(0, Math.min(1439, Math.round(m)));
+  const h = Math.floor(clamped / 60);
+  const min = clamped % 60;
+  return `${h}:${String(min).padStart(2, '0')}`;
+}
+
 class RundownViewModel extends Observable {
   taskRows = new ObservableArray<TaskRow>();
   summaryText = '';
+  planFootnote = '';
   errorMessage = '';
   errorBannerVisibility = 'collapse';
 
@@ -63,14 +73,38 @@ class RundownViewModel extends Observable {
       }
     }
 
-    const { capacity, completed, tasks } = rundownResult.data;
+    const { capacity, completed, tasks, dayFit, dayWindow } = rundownResult.data;
     this.set('summaryText', `${completed}/${capacity} completadas · ${date}`);
+
+    const start = formatMinuteOfDay(dayWindow.startMinuteOfDay);
+    const end = formatMinuteOfDay(dayWindow.endMinuteOfDay);
+    const cross = dayWindow.crossesMidnight ? ' · cruza medianoche' : '';
+    const over = dayFit.overflowUnresolved ? ' · Esencial fuera de ventana' : '';
+    this.set(
+      'planFootnote',
+      `Ventana ${start}–${end}${cross} · ${dayFit.plannedMinutes}/${dayFit.availableMinutes} min previstos${over}`,
+    );
 
     while (this.taskRows.length > 0) {
       this.taskRows.pop();
     }
     const sorted = [...tasks].sort((a, b) => a.position - b.position);
     for (const t of sorted) {
+      const parts: string[] = [];
+      if (t.estimatedMinutes != null) {
+        parts.push(`${t.estimatedMinutes} min`);
+      }
+      parts.push(`tam. ${t.size}`);
+      if (t.essentiality === 'essential') {
+        parts.push('Esencial');
+      }
+      if (t.essentiality === 'optional') {
+        parts.push('Opcional');
+      }
+      let runwayLabel = '';
+      if (!t.isComplete) {
+        runwayLabel = dayFit.outsideRunwayTaskIds.includes(t.id) ? 'Extra' : 'En ventana';
+      }
       this.taskRows.push({
         id: t.id,
         title: t.title,
@@ -78,6 +112,8 @@ class RundownViewModel extends Observable {
         tagColor: t.tagKey ? (tagColors.get(t.tagKey) ?? '#6b7280') : '#9ca3af',
         completeIcon: t.isComplete ? '✓' : '○',
         isComplete: t.isComplete,
+        metaLine: parts.join(' · '),
+        runwayLabel,
       });
     }
   }

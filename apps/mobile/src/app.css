@@ -46,6 +46,30 @@ Button.-primary {
   font-size: 16;
 }
 
+.task-meta {
+  font-size: 13;
+  color: #6b7280;
+  margin-top: 4;
+  font-weight: 400;
+}
+
+.plan-footnote {
+  font-size: 13;
+  color: #4b5563;
+  padding: 0 12 8 12;
+  font-weight: 500;
+}
+
+.runway-badge {
+  font-size: 12;
+  font-weight: 700;
+  margin-left: 8;
+  color: #5d4037;
+  vertical-align: center;
+  text-align: right;
+  max-width: 72;
+}
+
 .size-badge {
   font-size: 14;
   margin-left: 8;

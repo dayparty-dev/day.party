@@ -1,25 +1,35 @@
 import { ERROR_CODES } from '@dayparty/core';
-import type { TagResponse, TaskResponse } from '@dayparty/api-client';
+import type { DayRundownResponse, TagResponse, TaskResponse } from '@dayparty/api-client';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
-import { TaskCard } from '../components/TaskCard';
+import { TaskCard, type TaskRunwayPlacement } from '../components/TaskCard';
 import { useAuth } from '../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../utils/network-error';
+import { minutesToTimeInput, timeInputToMinutes } from '../utils/time-of-day';
 import { todayLocalDateString } from '../utils/today-local';
 import styles from './RundownPage.module.css';
+
+function runwayPlacementForTask(task: TaskResponse, dayFit: DayRundownResponse['dayFit']): TaskRunwayPlacement {
+  if (task.isComplete) {
+    return 'complete';
+  }
+  return dayFit.outsideRunwayTaskIds.includes(task.id) ? 'outside-runway' : 'in-runway';
+}
 
 export function RundownPage(): ReactElement {
   const { client, onUnauthorized } = useAuth();
   const date = useMemo(() => todayLocalDateString(), []);
-  const [rundown, setRundown] = useState<{
-    tasks: TaskResponse[];
-    capacity: number;
-    completed: number;
-  } | null>(null);
+  const [rundown, setRundown] = useState<DayRundownResponse | null>(null);
   const [tags, setTags] = useState<TagResponse[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [networkBanner, setNetworkBanner] = useState<string | null>(null);
+  const [windowError, setWindowError] = useState<string | null>(null);
+  const [savingWindow, setSavingWindow] = useState(false);
+
+  const [winStart, setWinStart] = useState('09:00');
+  const [winEnd, setWinEnd] = useState('17:00');
+  const [winCrosses, setWinCrosses] = useState(false);
 
   const tagColorByKey = useMemo(() => {
     const m = new Map<string, string>();
@@ -62,17 +72,23 @@ export function RundownPage(): ReactElement {
       setLoadError(tRes.error.message);
       return;
     }
-    setRundown({
-      tasks: rRes.data.tasks,
-      capacity: rRes.data.capacity,
-      completed: rRes.data.completed,
-    });
+    setRundown(rRes.data);
     setTags(tRes.data);
   }, [client, date, onUnauthorized]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!rundown) {
+      return;
+    }
+    const { dayWindow } = rundown;
+    setWinStart(minutesToTimeInput(dayWindow.startMinuteOfDay));
+    setWinEnd(minutesToTimeInput(dayWindow.endMinuteOfDay));
+    setWinCrosses(dayWindow.crossesMidnight);
+  }, [rundown]);
 
   async function toggleTask(task: TaskResponse): Promise<void> {
     const result = await client.updateTask(task.id, { isComplete: !task.isComplete });
@@ -91,11 +107,54 @@ export function RundownPage(): ReactElement {
     await load();
   }
 
+  async function saveDayWindow(): Promise<void> {
+    setWindowError(null);
+    const startMin = timeInputToMinutes(winStart);
+    const endMin = timeInputToMinutes(winEnd);
+    if (!winCrosses && startMin >= endMin) {
+      setWindowError('When the window does not cross midnight, start must be before end.');
+      return;
+    }
+    if (winCrosses && startMin <= endMin) {
+      setWindowError('When crossing midnight, start (evening) must be after end (morning).');
+      return;
+    }
+    setSavingWindow(true);
+    const res = await client.patchUserPreferences({
+      dayWindow: {
+        startMinuteOfDay: startMin,
+        endMinuteOfDay: endMin,
+        crossesMidnight: winCrosses,
+      },
+    });
+    setSavingWindow(false);
+    if (!res.ok) {
+      if (res.error.code === ERROR_CODES.UNAUTHORIZED) {
+        onUnauthorized();
+        return;
+      }
+      if (isLikelyNetworkFailure(res.error)) {
+        setNetworkBanner(res.error.message);
+        return;
+      }
+      setWindowError(res.error.message);
+      return;
+    }
+    await load();
+  }
+
   const sortedTasks = useMemo(() => {
     if (!rundown) {
       return [];
     }
     return [...rundown.tasks].sort((a, b) => a.position - b.position);
+  }, [rundown]);
+
+  const planLoadPercent = useMemo(() => {
+    if (!rundown || rundown.dayFit.availableMinutes <= 0) {
+      return 0;
+    }
+    return Math.min(100, (rundown.dayFit.plannedMinutes / rundown.dayFit.availableMinutes) * 100);
   }, [rundown]);
 
   return (
@@ -129,12 +188,76 @@ export function RundownPage(): ReactElement {
 
       {loadError ? <p className={styles.err}>{loadError}</p> : null}
 
+      {rundown ? (
+        <section className={styles.planPanel} aria-label="Day plan and window">
+          <div className={styles.planStats}>
+            <span>
+              <strong>{rundown.dayFit.plannedMinutes}</strong> min planned
+            </span>
+            <span className={styles.planSep}>·</span>
+            <span>
+              <strong>{rundown.dayFit.availableMinutes}</strong> min in window
+            </span>
+            {rundown.dayFit.overflowUnresolved ? (
+              <span className={styles.planWarn}>Essential work does not fit — triage in the next slice.</span>
+            ) : null}
+          </div>
+          <div className={styles.planBar} role="presentation">
+            <div className={styles.planBarFill} style={{ width: `${planLoadPercent}%` }} />
+          </div>
+          <details className={styles.windowDetails}>
+            <summary className={styles.windowSummary}>Day window</summary>
+            <div className={styles.windowForm}>
+              <p className={styles.windowHint}>
+                Adjust when your planning day runs. Times use a 24-hour clock in your local timezone.
+              </p>
+              <div className={styles.windowRow}>
+                <label className={styles.windowLabel}>
+                  Start
+                  <input
+                    type="time"
+                    className={styles.timeInput}
+                    value={winStart}
+                    step={300}
+                    onChange={(e) => setWinStart(e.target.value)}
+                  />
+                </label>
+                <label className={styles.windowLabel}>
+                  End
+                  <input
+                    type="time"
+                    className={styles.timeInput}
+                    value={winEnd}
+                    step={300}
+                    onChange={(e) => setWinEnd(e.target.value)}
+                  />
+                </label>
+              </div>
+              <label className={styles.crossesLabel}>
+                <input type="checkbox" checked={winCrosses} onChange={(e) => setWinCrosses(e.target.checked)} />
+                Window crosses midnight (night shift)
+              </label>
+              {windowError ? <p className={styles.windowErr}>{windowError}</p> : null}
+              <button
+                type="button"
+                className={styles.saveWindowBtn}
+                disabled={savingWindow}
+                onClick={() => void saveDayWindow()}
+              >
+                {savingWindow ? 'Saving…' : 'Save window'}
+              </button>
+            </div>
+          </details>
+        </section>
+      ) : null}
+
       <ul className={styles.list}>
         {sortedTasks.map((task) => (
           <li key={task.id} className={styles.li}>
             <TaskCard
               task={task}
               tagColor={task.tagKey ? tagColorByKey.get(task.tagKey) : undefined}
+              runwayPlacement={rundown ? runwayPlacementForTask(task, rundown.dayFit) : 'in-runway'}
               onToggleComplete={toggleTask}
             />
           </li>

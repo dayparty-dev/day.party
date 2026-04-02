@@ -94,3 +94,145 @@
   color: var(--dp-muted);
   font-size: 0.95rem;
 }
+
+.planPanel {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--dp-surface);
+  border: 1px solid var(--dp-border);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+}
+
+.planStats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 0.88rem;
+  color: var(--dp-muted);
+}
+
+.planStats strong {
+  color: var(--dp-text);
+  font-weight: 700;
+}
+
+.planSep {
+  color: var(--dp-border);
+  user-select: none;
+}
+
+.planWarn {
+  flex-basis: 100%;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--dp-danger-text);
+}
+
+.planBar {
+  margin-top: 10px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--dp-pill-bg);
+  overflow: hidden;
+}
+
+.planBarFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--dp-accent-hover), var(--dp-accent));
+  transition: width 0.25s ease;
+}
+
+.windowDetails {
+  margin-top: 14px;
+  border-top: 1px solid var(--dp-border);
+  padding-top: 12px;
+}
+
+.windowSummary {
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--dp-text);
+}
+
+.windowForm {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.windowHint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--dp-muted);
+  line-height: 1.4;
+}
+
+.windowRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.windowLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dp-muted);
+}
+
+.timeInput {
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--dp-border);
+  background: var(--dp-bg);
+  color: var(--dp-text);
+}
+
+.crossesLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--dp-text);
+  cursor: pointer;
+}
+
+.windowErr {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--dp-danger-text);
+}
+
+.saveWindowBtn {
+  align-self: flex-start;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: var(--dp-accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.saveWindowBtn:hover:not(:disabled) {
+  background: var(--dp-accent-hover);
+}
+
+.saveWindowBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

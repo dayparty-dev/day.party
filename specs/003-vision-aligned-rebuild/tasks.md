@@ -58,8 +58,8 @@
 - [x] T011 [US1] Update `apps/api/src/routes/tasks.ts` to return extended rundown and accept new fields on create/update; keep existing auth and error patterns
 - [x] T012 [US1] Add preferences routes (e.g. `GET`/`PATCH` user prefs) in `apps/api/src/routes/preferences.ts` and mount them from `apps/api/src/app.ts` with Zod validation at the edge
 - [x] T013 [US1] Extend `DayPartyClient` in `packages/api-client/src/client.ts` for rundown shape and preferences methods; align shared types from `@dayparty/core`
-- [ ] T014 [US1] Implement day window controls, fit/overflow, and **runway vs outside-runway labeling** (and priority badges) in `apps/web/src/pages/RundownPage.tsx` and `apps/web/src/components/TaskCard.tsx` — **no triage actions** here (defer/demote → US2 / `TriagePanel.tsx`)
-- [ ] T015 [P] [US1] Surface extended rundown and day-window feedback in `apps/mobile/src/views/rundown-view.ts` (and `apps/mobile/src/views/rundown-view.xml` as needed)
+- [x] T014 [US1] Implement day window controls, fit/overflow, and **runway vs outside-runway labeling** (and priority badges) in `apps/web/src/pages/RundownPage.tsx` and `apps/web/src/components/TaskCard.tsx` — **no triage actions** here (defer/demote → US2 / `TriagePanel.tsx`)
+- [x] T015 [P] [US1] Surface extended rundown and day-window feedback in `apps/mobile/src/views/rundown-view.ts` (and `apps/mobile/src/views/rundown-view.xml` as needed)
 
 **Checkpoint**: MVP day planning + fit feedback works on web and mobile consumes API — **stop here** for demo if desired.
 

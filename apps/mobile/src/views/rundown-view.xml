@@ -3,7 +3,7 @@
     <ActionItem text="Salir" ios.position="right" android.position="actionBar" tap="{{ onLogout }}" />
   </ActionBar>
 
-  <GridLayout rows="auto, auto, *">
+  <GridLayout rows="auto, auto, auto, *">
     <StackLayout row="0" visibility="{{ errorBannerVisibility }}" class="error-banner">
       <Label text="{{ errorMessage }}" textWrap="true" class="error-text" />
       <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8" />
@@ -14,12 +14,17 @@
       <Button col="1" text="En curso" tap="{{ onOngoing }}" class="-primary" />
     </GridLayout>
 
-    <ListView row="2" items="{{ taskRows }}" itemTap="{{ onTaskTap }}" class="list">
+    <Label row="2" text="{{ planFootnote }}" textWrap="true" class="plan-footnote" />
+
+    <ListView row="3" items="{{ taskRows }}" itemTap="{{ onTaskTap }}" class="list">
       <ListView.itemTemplate>
         <GridLayout columns="5, *, auto, auto" class="p-12 task-row">
-          <StackLayout col="0" width="5" backgroundColor="{{ tagColor }}" />
-          <Label col="1" text="{{ title }}" textWrap="true" class="task-title" />
-          <Label col="2" text="{{ size }}" class="size-badge" />
+          <StackLayout col="0" width="5" backgroundColor="{{ tagColor }}" verticalAlignment="stretch" />
+          <StackLayout col="1">
+            <Label text="{{ title }}" textWrap="true" class="task-title" />
+            <Label text="{{ metaLine }}" textWrap="true" class="task-meta" />
+          </StackLayout>
+          <Label col="2" text="{{ runwayLabel }}" class="runway-badge" textWrap="true" />
           <Label col="3" text="{{ completeIcon }}" class="complete-icon" />
         </GridLayout>
       </ListView.itemTemplate>
