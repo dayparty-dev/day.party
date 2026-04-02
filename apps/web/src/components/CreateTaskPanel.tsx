@@ -1,4 +1,4 @@
-import type { DayPartyClient } from '@dayparty/api-client';
+import type { CreateTaskInput, DayPartyClient } from '@dayparty/api-client';
 import { ERROR_CODES, type TaskEssentiality } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
@@ -6,6 +6,13 @@ import { isLikelyNetworkFailure } from '../utils/network-error';
 import styles from './CreateTaskPanel.module.css';
 
 const SIZES = [1, 2, 3, 4, 5] as const;
+
+function parseBountyTagKeys(raw: string): string[] {
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 type CreateTaskPanelProps = {
   client: DayPartyClient;
@@ -28,6 +35,9 @@ export function CreateTaskPanel({
   const [size, setSize] = useState<(typeof SIZES)[number]>(2);
   const [minutesRaw, setMinutesRaw] = useState('');
   const [essentiality, setEssentiality] = useState<TaskEssentiality>('normal');
+  const [bountyAmountRaw, setBountyAmountRaw] = useState('');
+  const [bountyTagKeysRaw, setBountyTagKeysRaw] = useState('');
+  const [bountyHighResistance, setBountyHighResistance] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -50,12 +60,29 @@ export function CreateTaskPanel({
       estimatedMinutes = n;
     }
 
-    const body = {
+    let bounty: CreateTaskInput['bounty'];
+    const bRaw = bountyAmountRaw.trim();
+    if (bRaw !== '') {
+      const amt = Number(bRaw);
+      if (!Number.isInteger(amt) || amt < 1 || amt > 1_000_000) {
+        setLocalError('Bounty amount must be a whole number from 1 to 1,000,000.');
+        return;
+      }
+      const tagKeys = parseBountyTagKeys(bountyTagKeysRaw);
+      bounty = {
+        amount: amt,
+        ...(tagKeys.length > 0 ? { tagKeys } : {}),
+        ...(bountyHighResistance ? { highResistance: true } : {}),
+      };
+    }
+
+    const body: CreateTaskInput = {
       title: trimmed,
       size,
       scheduledDate,
       ...(estimatedMinutes !== undefined ? { estimatedMinutes } : {}),
       ...(essentiality !== 'normal' ? { essentiality } : {}),
+      ...(bounty !== undefined ? { bounty } : {}),
     };
 
     setSubmitting(true);
@@ -77,6 +104,9 @@ export function CreateTaskPanel({
 
     setTitle('');
     setMinutesRaw('');
+    setBountyAmountRaw('');
+    setBountyTagKeysRaw('');
+    setBountyHighResistance(false);
     await onSuccess();
   }
 
@@ -134,6 +164,36 @@ export function CreateTaskPanel({
               <option value="essential">Essential</option>
               <option value="optional">Optional</option>
             </select>
+          </label>
+        </div>
+        <div className={styles.bountyBlock}>
+          <span className={styles.label}>Bounty (optional)</span>
+          <label className={styles.field}>
+            <span className={styles.label}>Amount (points)</span>
+            <input
+              className={styles.numberInput}
+              inputMode="numeric"
+              value={bountyAmountRaw}
+              onChange={(e) => setBountyAmountRaw(e.target.value)}
+              placeholder="None"
+            />
+          </label>
+          <label className={styles.field}>
+            <span className={styles.label}>Scope tags (comma-separated)</span>
+            <input
+              className={styles.textInput}
+              value={bountyTagKeysRaw}
+              onChange={(e) => setBountyTagKeysRaw(e.target.value)}
+              placeholder="e.g. work, deep-focus"
+            />
+          </label>
+          <label className={styles.inlineChecks}>
+            <input
+              type="checkbox"
+              checked={bountyHighResistance}
+              onChange={(e) => setBountyHighResistance(e.target.checked)}
+            />
+            High resistance
           </label>
         </div>
         {localError ? <p className={styles.err}>{localError}</p> : null}
