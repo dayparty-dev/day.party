@@ -68,7 +68,7 @@
   font-size: 0.88rem;
   font-weight: 600;
   background: var(--dp-accent);
-  color: #fff;
+  color: var(--dp-on-accent);
   cursor: pointer;
 }
 

@@ -1,13 +1,12 @@
 import {
   DEFAULT_DAY_WINDOW,
+  DEFAULT_VISUAL_PRESET,
   type DayWindow,
   type TaskSize,
   type UserPreferences,
   type VisualPreset,
 } from '@dayparty/core';
 import type { UserPreferencesRepository } from '../interfaces/user-preferences-repository';
-
-const DEFAULT_VISUAL_PRESET: VisualPreset = 'default';
 
 function defaultPreferences(userId: string): UserPreferences {
   return {

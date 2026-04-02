@@ -18,6 +18,7 @@ export function createPreferenceRoutes(env: ApiEnv) {
   const requireAuth = createAuthMiddleware(env);
   prefs.use('/*', requireAuth);
 
+  // GET merges domain defaults (dayWindow, visualPreset) when no Mongo doc exists; PATCH shallow-merges validated fields.
   prefs.get('/', async (c) => {
     const user = c.get('user');
     const doc = await env.getUserPreferences(user.id);

@@ -5,7 +5,7 @@ import type {
   TaskRundownItemResponse,
   TaskTriageInput,
 } from '@dayparty/api-client';
-import { ERROR_CODES } from '@dayparty/core';
+import { ERROR_CODES, type VisualPreset } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
@@ -14,6 +14,7 @@ import { TaskCard, type TaskRunwayPlacement } from '../components/TaskCard';
 import { TaskEditPanel } from '../components/TaskEditPanel';
 import { TaskNotesPanel } from '../components/TaskNotesPanel';
 import { TaskTriageBar } from '../components/TaskTriageBar';
+import { useVisualPreset } from '../context/visual-preset-context';
 import { useAuth } from '../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import { minutesToTimeInput, timeInputToMinutes } from '../utils/time-of-day';
@@ -40,8 +41,16 @@ function showTriageForTask(task: TaskRundownItemResponse, dayFit: DayRundownResp
   return dayFit.overflowUnresolved || dayFit.outsideRunwayTaskIds.includes(task.id);
 }
 
+const PRESET_OPTIONS: { value: VisualPreset; label: string }[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'calm', label: 'Calm' },
+  { value: 'playful', label: 'Playful' },
+  { value: 'highContrast', label: 'High contrast' },
+];
+
 export function RundownPage(): ReactElement {
   const { client, onUnauthorized } = useAuth();
+  const { visualPreset, presetError, savingPreset, saveVisualPreset } = useVisualPreset();
   const date = useMemo(() => todayLocalDateString(), []);
   const [rundown, setRundown] = useState<DayRundownResponse | null>(null);
   const [tags, setTags] = useState<TagResponse[] | null>(null);
@@ -332,6 +341,29 @@ export function RundownPage(): ReactElement {
               >
                 {savingWindow ? 'Saving…' : 'Save window'}
               </button>
+              <div className={styles.presetRow}>
+                <label className={styles.presetLabel} htmlFor="visual-preset">
+                  Look &amp; feel
+                  <select
+                    id="visual-preset"
+                    className={styles.presetSelect}
+                    value={visualPreset ?? 'default'}
+                    disabled={visualPreset === null || savingPreset}
+                    onChange={(e) => {
+                      const next = e.target.value as VisualPreset;
+                      void saveVisualPreset(next);
+                    }}
+                  >
+                    {PRESET_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <p className={styles.presetHint}>Applies across Today, Ongoing, and Rewards while signed in.</p>
+                {presetError ? <p className={styles.presetErr}>{presetError}</p> : null}
+              </div>
             </div>
           </details>
         </section>

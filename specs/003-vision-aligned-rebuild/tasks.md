@@ -174,9 +174,9 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 ### Implementation for User Story 5
 
-- [ ] T031 [US5] **Verify prefs pipeline for `visualPreset` (no new modeling)**: `UserPreferences` in `packages/core`, Zod in `packages/validation/src/schemas/user-preferences.ts`, and Mongo `put`/`findByUserId` in `packages/db/src/repositories/user-preferences-repository.ts` already include `visualPreset` from Phase 2. Confirm **`GET`/`PATCH /api/me/preferences`** in `apps/api/src/routes/preferences.ts` round-trips `visualPreset` per `contracts/day-planning-rest.md` and `data-model.md`, including sensible **default** when a user has no prefs doc yet.
-- [ ] T032 [P] [US5] Add preset CSS variable maps (e.g. calm vs playful) in `apps/web/src/styles/presets.css` and apply root class switching in `apps/web/src/App.tsx` or `apps/web/src/main.tsx`. Preset styles MUST respect **`spec.md` US5 AS2** (body copy ≥16px, primary controls ≥44×44 CSS px).
-- [ ] T033 [US5] Add preset selector UI bound to preferences API in `apps/web/src/pages/RundownPage.tsx` or new `apps/web/src/pages/SettingsPage.tsx`
+- [x] T031 [US5] **Verify prefs pipeline for `visualPreset` (no new modeling)**: `UserPreferences` in `packages/core`, Zod in `packages/validation/src/schemas/user-preferences.ts`, and Mongo `put`/`findByUserId` in `packages/db/src/repositories/user-preferences-repository.ts` already include `visualPreset` from Phase 2. Confirm **`GET`/`PATCH /api/me/preferences`** in `apps/api/src/routes/preferences.ts` round-trips `visualPreset` per `contracts/day-planning-rest.md` and `data-model.md`, including sensible **default** when a user has no prefs doc yet.
+- [x] T032 [P] [US5] Add preset CSS variable maps (e.g. calm vs playful) in `apps/web/src/styles/presets.css` and apply root class switching in `apps/web/src/App.tsx` or `apps/web/src/main.tsx`. Preset styles MUST respect **`spec.md` US5 AS2** (body copy ≥16px, primary controls ≥44×44 CSS px).
+- [x] T033 [US5] Add preset selector UI bound to preferences API in `apps/web/src/pages/RundownPage.tsx` or new `apps/web/src/pages/SettingsPage.tsx`
 
 ---
 

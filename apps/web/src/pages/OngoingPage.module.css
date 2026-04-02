@@ -184,7 +184,7 @@
   border: none;
   border-radius: 12px;
   background: var(--dp-accent);
-  color: #fff;
+  color: var(--dp-on-accent);
   cursor: pointer;
 }
 

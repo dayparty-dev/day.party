@@ -34,10 +34,14 @@
 }
 
 .headerLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
   font-size: 0.88rem;
   font-weight: 600;
   text-decoration: none;
-  padding: 8px 14px;
   border-radius: 999px;
   background: var(--dp-surface);
   color: var(--dp-accent);
@@ -49,14 +53,18 @@
 }
 
 .ongoingBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 16px;
   font-size: 0.88rem;
   font-weight: 600;
   text-decoration: none;
-  padding: 8px 14px;
   border-radius: 999px;
   background: var(--dp-accent);
-  color: #fff;
+  color: var(--dp-on-accent);
 }
 
 .ongoingBtn:hover {
@@ -242,11 +250,12 @@
   align-self: flex-start;
   border: none;
   border-radius: 8px;
-  padding: 8px 16px;
+  min-height: 44px;
+  padding: 0 18px;
   font-size: 0.88rem;
   font-weight: 600;
   background: var(--dp-accent);
-  color: #fff;
+  color: var(--dp-on-accent);
   cursor: pointer;
 }
 
@@ -257,4 +266,44 @@
 .saveWindowBtn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+}
+
+.presetRow {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--dp-border);
+}
+
+.presetLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--dp-text);
+}
+
+.presetSelect {
+  max-width: 280px;
+  min-height: 44px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--dp-border);
+  background: var(--dp-surface);
+  color: var(--dp-text);
+}
+
+.presetHint {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--dp-muted);
+}
+
+.presetErr {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--dp-danger-text);
 }

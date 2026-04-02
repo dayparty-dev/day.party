@@ -1,0 +1,87 @@
+/**
+ * Visual presets (US5 / FR-009). Non-`default` presets use classes on `:root` (see `visual-preset-context.tsx`).
+ * US5 AS2: body copy ≥16px; primary controls ≥44×44 CSS px (shell buttons use module CSS min-heights).
+ */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+body {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Calm: cooler, quieter contrast */
+:root.preset-calm {
+  color-scheme: light;
+  --dp-bg: #e8eef5;
+  --dp-surface: #fbfcfe;
+  --dp-text: #1a2332;
+  --dp-muted: #5c6b7f;
+  --dp-border: #c5d0e0;
+  --dp-accent: #3d6b8f;
+  --dp-accent-hover: #2f5572;
+  --dp-danger-bg: #fdecef;
+  --dp-danger-border: #f1b8c4;
+  --dp-danger-text: #7a1f33;
+  --dp-pill-bg: #dfe8f2;
+  --dp-pill-fg: #2c3a4d;
+  --dp-tag-unknown: #c8d2de;
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+}
+
+:root.preset-calm h1,
+:root.preset-calm h2,
+:root.preset-calm h3 {
+  font-family: Fraunces, 'Source Sans 3', serif;
+  font-weight: 600;
+}
+
+/* Playful: warmer, rounder type */
+:root.preset-playful {
+  color-scheme: light;
+  --dp-bg: #fff5eb;
+  --dp-surface: #fffaf3;
+  --dp-text: #2d1f14;
+  --dp-muted: #7a5c45;
+  --dp-border: #f0d4b8;
+  --dp-accent: #e85d04;
+  --dp-accent-hover: #c44e03;
+  --dp-danger-bg: #ffe8e6;
+  --dp-danger-border: #ffb3a8;
+  --dp-danger-text: #8b2500;
+  --dp-pill-bg: #ffe8cc;
+  --dp-pill-fg: #5c3d1e;
+  --dp-tag-unknown: #e8d4c4;
+  font-family: Nunito, system-ui, sans-serif;
+}
+
+:root.preset-playful h1,
+:root.preset-playful h2,
+:root.preset-playful h3 {
+  font-family: Nunito, system-ui, sans-serif;
+  font-weight: 700;
+}
+
+/* High contrast: light-on-dark + strong accent */
+:root.preset-highContrast {
+  color-scheme: dark;
+  --dp-bg: #0a0a0a;
+  --dp-surface: #161616;
+  --dp-text: #fafafa;
+  --dp-muted: #b8b8b8;
+  --dp-border: #f5f5f5;
+  --dp-accent: #ffea00;
+  --dp-accent-hover: #fff176;
+  --dp-on-accent: #0a0a0a;
+  --dp-danger-bg: #3b0a0a;
+  --dp-danger-border: #ff6b6b;
+  --dp-danger-text: #ffb4b4;
+  --dp-pill-bg: #2a2a2a;
+  --dp-pill-fg: #fafafa;
+  --dp-tag-unknown: #555;
+  font-family: system-ui, sans-serif;
+}
+
+:root.preset-highContrast a {
+  text-decoration-thickness: 2px;
+}

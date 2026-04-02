@@ -1,12 +1,16 @@
 import { ObjectId, type Collection, type Db } from 'mongodb';
-import type { UserPreferences } from '@dayparty/core';
+import { DEFAULT_DAY_WINDOW, DEFAULT_VISUAL_PRESET, type UserPreferences } from '@dayparty/core';
 import type { UserPreferencesRepository } from '@dayparty/domain';
 
 type UserPrefsDoc = UserPreferences & { _id: ObjectId };
 
 function docToPrefs({ _id, ...rest }: UserPrefsDoc): UserPreferences {
   void _id;
-  return rest;
+  return {
+    ...rest,
+    dayWindow: rest.dayWindow ?? DEFAULT_DAY_WINDOW,
+    visualPreset: rest.visualPreset ?? DEFAULT_VISUAL_PRESET,
+  };
 }
 
 export class MongoUserPreferencesRepository implements UserPreferencesRepository {

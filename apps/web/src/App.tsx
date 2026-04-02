@@ -6,6 +6,7 @@ import { LogoutPage } from './pages/LogoutPage';
 import { OngoingPage } from './pages/OngoingPage';
 import { RewardsPage } from './pages/RewardsPage';
 import { RundownPage } from './pages/RundownPage';
+import { VisualPresetProvider } from './context/visual-preset-context';
 
 function AuthBootSpinner(): ReactElement {
   return (
@@ -23,7 +24,11 @@ function ProtectedLayout(): ReactElement {
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  return <Outlet />;
+  return (
+    <VisualPresetProvider>
+      <Outlet />
+    </VisualPresetProvider>
+  );
 }
 
 function RootRedirect(): ReactElement {

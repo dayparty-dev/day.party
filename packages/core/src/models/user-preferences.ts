@@ -3,6 +3,9 @@ import type { TaskSize } from '../constants/index';
 /** UI theme preset (FR-009). */
 export type VisualPreset = 'default' | 'calm' | 'playful' | 'highContrast';
 
+/** Default preset when no preference is stored (API GET synthesis + PATCH merge base). */
+export const DEFAULT_VISUAL_PRESET: VisualPreset = 'default';
+
 /** User-defined daily planning window (FR-002). */
 export type DayWindow = {
   startMinuteOfDay: number;

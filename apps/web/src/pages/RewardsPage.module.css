@@ -116,7 +116,7 @@
   border: none;
   border-radius: 8px;
   background: var(--dp-accent);
-  color: #fff;
+  color: var(--dp-on-accent);
   cursor: pointer;
 }
 
@@ -159,7 +159,7 @@
   border: none;
   border-radius: 8px;
   background: var(--dp-accent);
-  color: #fff;
+  color: var(--dp-on-accent);
   cursor: pointer;
   align-self: flex-start;
 }

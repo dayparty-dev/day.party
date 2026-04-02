@@ -145,7 +145,7 @@
   font-size: 0.85rem;
   cursor: pointer;
   background: var(--dp-accent);
-  color: #fff;
+  color: var(--dp-on-accent);
 }
 
 .saveBtn:disabled {
