@@ -28,7 +28,7 @@ function extractMagicToken(search: string): string | null {
 }
 
 export function LoginPage(): ReactElement {
-  const { login, verifyFromToken, isAuthenticated, onUnauthorized } = useAuth();
+  const { login, verifyFromToken, isAuthenticated, authReady, onUnauthorized } = useAuth();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,10 +44,10 @@ export function LoginPage(): ReactElement {
   }, [searchParams, setSearchParams]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (authReady && isAuthenticated) {
       navigate('/rundown', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [authReady, isAuthenticated, navigate]);
 
   useEffect(() => {
     const token = extractMagicToken(window.location.search);
@@ -91,6 +91,14 @@ export function LoginPage(): ReactElement {
       return;
     }
     setStatus(result.data.message);
+  }
+
+  if (!authReady) {
+    return (
+      <div className={styles.boot} aria-busy="true" aria-live="polite">
+        Loading…
+      </div>
+    );
   }
 
   return (

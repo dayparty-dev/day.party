@@ -5,8 +5,19 @@ import { LoginPage } from './pages/LoginPage';
 import { OngoingPage } from './pages/OngoingPage';
 import { RundownPage } from './pages/RundownPage';
 
+function AuthBootSpinner(): ReactElement {
+  return (
+    <div className="auth-loading" aria-busy="true" aria-live="polite">
+      Loading…
+    </div>
+  );
+}
+
 function ProtectedLayout(): ReactElement {
-  const { isAuthenticated } = useAuth();
+  const { authReady, isAuthenticated } = useAuth();
+  if (!authReady) {
+    return <AuthBootSpinner />;
+  }
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -14,7 +25,10 @@ function ProtectedLayout(): ReactElement {
 }
 
 function RootRedirect(): ReactElement {
-  const { isAuthenticated } = useAuth();
+  const { authReady, isAuthenticated } = useAuth();
+  if (!authReady) {
+    return <AuthBootSpinner />;
+  }
   return <Navigate to={isAuthenticated ? '/rundown' : '/login'} replace />;
 }
 

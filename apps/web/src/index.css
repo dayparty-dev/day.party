@@ -34,3 +34,12 @@ body {
 #root {
   min-height: 100vh;
 }
+
+.auth-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dp-muted);
+  font-size: 0.95rem;
+}

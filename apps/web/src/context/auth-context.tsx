@@ -1,8 +1,9 @@
 import { DayPartyClient } from '@dayparty/api-client';
 import { ERROR_CODES } from '@dayparty/core';
-import { createContext, useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { API_BASE_URL } from '../config';
+import { clearSessionToken, readSessionToken, writeSessionToken } from '../utils/session-token-storage';
 
 export type AuthUser = {
   id: string;
@@ -14,6 +15,8 @@ export type AuthUser = {
 type AuthContextValue = {
   client: DayPartyClient;
   user: AuthUser | null;
+  /** True after we finish reading `localStorage` and optional `/auth/me` hydration. */
+  authReady: boolean;
   isAuthenticated: boolean;
   login: (email: string) => ReturnType<DayPartyClient['login']>;
   verifyFromToken: (magicToken: string) => Promise<boolean>;
@@ -25,26 +28,45 @@ export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }): React.ReactElement {
   const navigate = useNavigate();
-  const tokenRef = useRef<string | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [epoch, setEpoch] = useState(0);
+  const [authReady, setAuthReady] = useState(false);
 
   const client = useMemo(() => new DayPartyClient({ baseUrl: API_BASE_URL }), []);
 
-  const bump = useCallback(() => {
-    setEpoch((e) => e + 1);
-  }, []);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const stored = readSessionToken();
+      if (stored) {
+        client.setToken(stored);
+        const meRes = await client.me();
+        if (cancelled) {
+          return;
+        }
+        if (meRes.ok) {
+          setUser(meRes.data);
+        } else {
+          clearSessionToken();
+          client.clearToken();
+        }
+      }
+      if (!cancelled) {
+        setAuthReady(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [client]);
 
-  void epoch;
-  const isAuthenticated = tokenRef.current !== null;
+  const isAuthenticated = user !== null;
 
   const onUnauthorized = useCallback(() => {
-    tokenRef.current = null;
+    clearSessionToken();
     client.clearToken();
     setUser(null);
-    bump();
     navigate('/login', { replace: true });
-  }, [bump, client, navigate]);
+  }, [client, navigate]);
 
   const login = useCallback(
     async (email: string) => {
@@ -59,12 +81,14 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
       if (!result.ok) {
         return false;
       }
-      tokenRef.current = client.getToken();
+      const session = client.getToken();
+      if (session) {
+        writeSessionToken(session);
+      }
       setUser(result.data.user);
-      bump();
       return true;
     },
-    [bump, client],
+    [client],
   );
 
   const logout = useCallback(async () => {
@@ -73,23 +97,24 @@ export function AuthProvider({ children }: { children: ReactNode }): React.React
       onUnauthorized();
       return;
     }
-    tokenRef.current = null;
+    clearSessionToken();
+    client.clearToken();
     setUser(null);
-    bump();
     navigate('/login', { replace: true });
-  }, [bump, client, navigate, onUnauthorized]);
+  }, [client, navigate, onUnauthorized]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       client,
       user,
+      authReady,
       isAuthenticated,
       login,
       verifyFromToken,
       logout,
       onUnauthorized,
     }),
-    [client, user, isAuthenticated, login, verifyFromToken, logout, onUnauthorized],
+    [client, user, authReady, isAuthenticated, login, verifyFromToken, logout, onUnauthorized],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
