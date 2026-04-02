@@ -19,6 +19,63 @@
   letter-spacing: -0.02em;
 }
 
+.dateNav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dateStep {
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--dp-border);
+  background: var(--dp-surface);
+  color: var(--dp-text);
+  cursor: pointer;
+}
+
+.dateStep:hover {
+  background: var(--dp-pill-bg);
+}
+
+.dateInput {
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--dp-border);
+  background: var(--dp-surface);
+  color: var(--dp-text);
+}
+
+.dateInput:focus {
+  outline: 2px solid var(--dp-accent);
+  outline-offset: 1px;
+}
+
+.dateToday {
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--dp-accent);
+  background: transparent;
+  color: var(--dp-accent);
+  cursor: pointer;
+}
+
+.dateToday:hover {
+  background: var(--dp-pill-bg);
+}
+
 .meta {
   margin: 6px 0 0;
   font-size: 0.88rem;

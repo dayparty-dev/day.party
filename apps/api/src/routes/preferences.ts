@@ -1,14 +1,16 @@
 import type { UserPreferences } from '@dayparty/core';
-import { ERROR_CODES } from '@dayparty/core';
+import { DEFAULT_COLOR_SCHEME, DEFAULT_LOCALE, ERROR_CODES } from '@dayparty/core';
 import { createApiError, fromZodError, patchUserPreferencesSchema } from '@dayparty/validation';
 import { Hono } from 'hono';
 import { createAuthMiddleware } from '../middleware/auth-middleware';
 import type { ApiEnv, ApiVariables } from '../types';
 
 function prefsPublic(p: UserPreferences): Omit<UserPreferences, 'userId'> {
-  const { userId: _u, sizeToMinutes, ...rest } = p;
+  const { userId: _u, sizeToMinutes, locale, colorScheme, ...rest } = p;
   return {
     ...rest,
+    locale: locale ?? DEFAULT_LOCALE,
+    colorScheme: colorScheme ?? DEFAULT_COLOR_SCHEME,
     ...(sizeToMinutes != null && Object.keys(sizeToMinutes).length > 0 ? { sizeToMinutes } : {}),
   };
 }
@@ -39,7 +41,7 @@ export function createPreferenceRoutes(env: ApiEnv) {
     if (Object.keys(parsed.data).length === 0) {
       return c.json(
         createApiError(ERROR_CODES.VALIDATION_ERROR, 'At least one preference field is required', {
-          body: ['Provide dayWindow, visualPreset, and/or sizeToMinutes'],
+          body: ['Provide dayWindow, visualPreset, sizeToMinutes, locale, and/or colorScheme'],
         }),
         422,
       );

@@ -7,6 +7,8 @@
 
 **Scope note**: This specification inventories **user-visible and operator-visible capabilities** that existed in the reference legacy web application and are **not yet represented** in the new first-party web and mobile experiences (or are only partially represented). It intentionally does **not** prescribe copying legacy source code. It complements the vision-aligned rebuild (**003**): **003** defines the target product; **004** closes **baseline gaps** so day-to-day use and operations do not regress versus what users could already do in the reference experience.
 
+**Related artifacts** (004 implementation): [`plan.md`](./plan.md) · [`tasks.md`](./tasks.md) · [`data-model.md`](./data-model.md) · [`contracts/legacy-parity-rest.md`](./contracts/legacy-parity-rest.md) · [`quickstart.md`](./quickstart.md)
+
 **Related context**: [`specs/003-vision-aligned-rebuild/spec.md`](../003-vision-aligned-rebuild/spec.md) (core planner, triage, notes, rewards, presets, history).
 
 ## Clarifications

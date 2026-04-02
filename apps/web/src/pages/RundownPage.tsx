@@ -8,7 +8,7 @@ import type {
 import { ERROR_CODES, type VisualPreset } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { CreateTaskPanel } from '../components/CreateTaskPanel';
 import { PlanHistoryPanel } from '../components/PlanHistoryPanel';
 import { TaskCard, type TaskRunwayPlacement } from '../components/TaskCard';
@@ -19,7 +19,7 @@ import { useVisualPreset } from '../context/visual-preset-context';
 import { useAuth } from '../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import { minutesToTimeInput, timeInputToMinutes } from '../utils/time-of-day';
-import { addLocalCalendarDays, todayLocalDateString } from '../utils/today-local';
+import { addLocalCalendarDays, isValidLocalIsoDate, todayLocalDateString } from '../utils/today-local';
 import styles from './RundownPage.module.css';
 
 function runwayPlacementForTask(
@@ -49,10 +49,53 @@ const PRESET_OPTIONS: { value: VisualPreset; label: string }[] = [
   { value: 'highContrast', label: 'High contrast' },
 ];
 
+function planningDayLabel(iso: string, todayIso: string): string {
+  if (iso === todayIso) {
+    return 'Today';
+  }
+  const [y, m, d] = iso.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  return dt.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
 export function RundownPage(): ReactElement {
   const { client, onUnauthorized } = useAuth();
   const { visualPreset, presetError, savingPreset, saveVisualPreset } = useVisualPreset();
-  const date = useMemo(() => todayLocalDateString(), []);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const todayIso = useMemo(() => todayLocalDateString(), []);
+
+  useEffect(() => {
+    const q = searchParams.get('date');
+    if (q && isValidLocalIsoDate(q)) {
+      return;
+    }
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('date', todayIso);
+        return next;
+      },
+      { replace: true },
+    );
+  }, [searchParams, setSearchParams, todayIso]);
+
+  const dateParam = searchParams.get('date');
+  const date = dateParam && isValidLocalIsoDate(dateParam) ? dateParam : todayIso;
+  const dayTitle = useMemo(() => planningDayLabel(date, todayIso), [date, todayIso]);
+
+  const setPlanningDate = useCallback(
+    (nextIso: string) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set('date', nextIso);
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
   const [rundown, setRundown] = useState<DayRundownResponse | null>(null);
   const [tags, setTags] = useState<TagResponse[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -252,7 +295,42 @@ export function RundownPage(): ReactElement {
     <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <h1 className={styles.title}>Today</h1>
+          <h1 className={styles.title}>{dayTitle}</h1>
+          <nav className={styles.dateNav} aria-label="Planning date">
+            <button
+              type="button"
+              className={styles.dateStep}
+              aria-label="Previous day"
+              onClick={() => setPlanningDate(addLocalCalendarDays(date, -1))}
+            >
+              ←
+            </button>
+            <input
+              className={styles.dateInput}
+              type="date"
+              value={date}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v && isValidLocalIsoDate(v)) {
+                  setPlanningDate(v);
+                }
+              }}
+              aria-label="Select planning date"
+            />
+            <button
+              type="button"
+              className={styles.dateStep}
+              aria-label="Next day"
+              onClick={() => setPlanningDate(addLocalCalendarDays(date, 1))}
+            >
+              →
+            </button>
+            {date !== todayIso ? (
+              <button type="button" className={styles.dateToday} onClick={() => setPlanningDate(todayIso)}>
+                Today
+              </button>
+            ) : null}
+          </nav>
           <p className={styles.meta}>
             {date}
             {rundown ? (

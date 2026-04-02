@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router';
 import { useAuth } from './hooks/useAuth';
+import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { LogoutPage } from './pages/LogoutPage';
 import { OngoingPage } from './pages/OngoingPage';
@@ -31,12 +32,27 @@ function ProtectedLayout(): ReactElement {
   );
 }
 
-function RootRedirect(): ReactElement {
+/** Logged-out `/` shows marketing; authed users go straight to the planner. */
+function HomeRoute(): ReactElement {
   const { authReady, isAuthenticated } = useAuth();
   if (!authReady) {
     return <AuthBootSpinner />;
   }
-  return <Navigate to={isAuthenticated ? '/rundown' : '/login'} replace />;
+  if (isAuthenticated) {
+    return <Navigate to="/rundown" replace />;
+  }
+  return <LandingPage />;
+}
+
+function WildcardRoute(): ReactElement {
+  const { authReady, isAuthenticated } = useAuth();
+  if (!authReady) {
+    return <AuthBootSpinner />;
+  }
+  if (isAuthenticated) {
+    return <Navigate to="/rundown" replace />;
+  }
+  return <Navigate to="/" replace />;
 }
 
 export function App(): ReactElement {
@@ -49,8 +65,8 @@ export function App(): ReactElement {
         <Route path="/rewards" element={<RewardsPage />} />
         <Route path="/ongoing" element={<OngoingPage />} />
       </Route>
-      <Route path="/" element={<RootRedirect />} />
-      <Route path="*" element={<RootRedirect />} />
+      <Route path="/" element={<HomeRoute />} />
+      <Route path="*" element={<WildcardRoute />} />
     </Routes>
   );
 }

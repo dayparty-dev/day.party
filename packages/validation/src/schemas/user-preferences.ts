@@ -27,6 +27,10 @@ export const dayWindowSchema = z
 
 export const visualPresetSchema = z.enum(['default', 'calm', 'playful', 'highContrast']);
 
+export const userLocaleSchema = z.enum(['en', 'es']);
+
+export const colorSchemeSchema = z.enum(['system', 'light', 'dark']);
+
 const minuteOverride = z.number().int().min(1).max(2880);
 
 /** Partial overrides for size → minutes (keys 1–5 only). */
@@ -46,6 +50,8 @@ export const patchUserPreferencesSchema = z
     dayWindow: dayWindowSchema.optional(),
     visualPreset: visualPresetSchema.optional(),
     sizeToMinutes: sizeToMinutesPartialSchema.optional(),
+    locale: userLocaleSchema.optional(),
+    colorScheme: colorSchemeSchema.optional(),
   })
   .strict();
 

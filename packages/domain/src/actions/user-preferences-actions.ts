@@ -1,8 +1,10 @@
 import {
   DEFAULT_DAY_WINDOW,
   DEFAULT_VISUAL_PRESET,
+  type ColorScheme,
   type DayWindow,
   type TaskSize,
+  type UserLocale,
   type UserPreferences,
   type VisualPreset,
 } from '@dayparty/core';
@@ -23,6 +25,8 @@ export type UserPreferencesPatch = {
   dayWindow?: DayWindow;
   visualPreset?: VisualPreset;
   sizeToMinutes?: Partial<Record<TaskSize, number>>;
+  locale?: UserLocale;
+  colorScheme?: ColorScheme;
 };
 
 export function makeGetUserPreferencesAction(userPrefsRepo: UserPreferencesRepository) {
@@ -45,6 +49,8 @@ export function makePatchUserPreferencesAction(
       visualPreset: patch.visualPreset ?? base.visualPreset,
       sizeToMinutes:
         patch.sizeToMinutes !== undefined ? { ...base.sizeToMinutes, ...patch.sizeToMinutes } : base.sizeToMinutes,
+      locale: patch.locale !== undefined ? patch.locale : base.locale,
+      colorScheme: patch.colorScheme !== undefined ? patch.colorScheme : base.colorScheme,
       updatedAt: new Date().toISOString(),
     };
     const saved = await userPrefsRepo.put(next);

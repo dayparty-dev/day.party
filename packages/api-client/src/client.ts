@@ -1,5 +1,6 @@
 import type {
   ApiError,
+  ColorScheme,
   DayFit,
   DayWindow,
   LedgerEntry,
@@ -11,10 +12,11 @@ import type {
   TaskBounty,
   TaskSize,
   User,
+  UserLocale,
   UserPreferences,
   VisualPreset,
 } from '@dayparty/core';
-import { ERROR_CODES } from '@dayparty/core';
+import { DEFAULT_COLOR_SCHEME, DEFAULT_LOCALE, ERROR_CODES } from '@dayparty/core';
 import {
   createRewardDefinitionSchema,
   createTagSchema,
@@ -951,6 +953,14 @@ function isVisualPreset(value: unknown): value is VisualPreset {
   return value === 'default' || value === 'calm' || value === 'playful' || value === 'highContrast';
 }
 
+function parseUserLocale(value: unknown): UserLocale | null {
+  return value === 'en' || value === 'es' ? value : null;
+}
+
+function parseColorScheme(value: unknown): ColorScheme | null {
+  return value === 'system' || value === 'light' || value === 'dark' ? value : null;
+}
+
 function parseSizeToMinutesOverrides(input: unknown): Partial<Record<TaskSize, number>> | undefined | null {
   /** API / Mongo may serialize absent overrides as JSON `null`. */
   if (input === undefined || input === null) {
@@ -984,6 +994,11 @@ function parseUserPreferences(input: unknown): ApiUserPreferences | null {
   if (!isVisualPreset(input.visualPreset) || typeof input.updatedAt !== 'string') {
     return null;
   }
+  const locale = input.locale === undefined ? DEFAULT_LOCALE : parseUserLocale(input.locale);
+  const colorScheme = input.colorScheme === undefined ? DEFAULT_COLOR_SCHEME : parseColorScheme(input.colorScheme);
+  if (locale === null || colorScheme === null) {
+    return null;
+  }
   const sizeToMinutes = parseSizeToMinutesOverrides(input.sizeToMinutes);
   if (input.sizeToMinutes != null && sizeToMinutes === null) {
     return null;
@@ -991,6 +1006,8 @@ function parseUserPreferences(input: unknown): ApiUserPreferences | null {
   return {
     dayWindow,
     visualPreset: input.visualPreset,
+    locale,
+    colorScheme,
     updatedAt: input.updatedAt,
     ...(sizeToMinutes && Object.keys(sizeToMinutes).length > 0 ? { sizeToMinutes } : {}),
   };

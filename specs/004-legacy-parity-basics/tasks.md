@@ -27,7 +27,7 @@
 
 **Purpose**: Traceability and repo readiness for 004.
 
-- [ ] T001 [P] Add a **Related artifacts** subsection near the top of `specs/004-legacy-parity-basics/spec.md` linking [`plan.md`](./plan.md), [`tasks.md`](./tasks.md), [`data-model.md`](./data-model.md), [`contracts/legacy-parity-rest.md`](./contracts/legacy-parity-rest.md), and [`quickstart.md`](./quickstart.md)
+- [x] T001 [P] Add a **Related artifacts** subsection near the top of `specs/004-legacy-parity-basics/spec.md` linking [`plan.md`](./plan.md), [`tasks.md`](./tasks.md), [`data-model.md`](./data-model.md), [`contracts/legacy-parity-rest.md`](./contracts/legacy-parity-rest.md), and [`quickstart.md`](./quickstart.md)
 
 ---
 
@@ -37,14 +37,14 @@
 
 **⚠️ CRITICAL**: Complete before stories that PATCH preferences (US8) or call admin APIs (US7, US9 triage).
 
-- [ ] T002 [P] Extend `UserPreferences` with `locale` (`en`|`es`) and `colorScheme` (`system`|`light`|`dark`) plus defaults in `packages/core/src/models/user-preferences.ts`; export from `packages/core/src/index.ts` per `specs/004-legacy-parity-basics/data-model.md`
-- [ ] T003 [P] Extend `patchUserPreferencesSchema` and related types in `packages/validation/src/schemas/user-preferences.ts` per `specs/004-legacy-parity-basics/contracts/legacy-parity-rest.md`
-- [ ] T004 Update merge/default logic in `packages/domain/src/actions/user-preferences-actions.ts` for `locale` and `colorScheme`
-- [ ] T005 Update document read/write mapping in `packages/db/src/repositories/user-preferences-repository.ts` (omit new fields until patched — backward compatible)
-- [ ] T006 Ensure `GET`/`PATCH` user preferences routes in `apps/api/src/routes/preferences.ts` accept and return new fields with existing auth patterns
-- [ ] T007 Extend `DayPartyClient` preference types and JSON parsers in `packages/api-client/src/client.ts` for `locale` and `colorScheme`
-- [ ] T008 [P] Add `requireAdmin` middleware (403 when `user.role !== 'admin'`) in `apps/api/src/middleware/admin-middleware.ts`
-- [ ] T009 Export helper from `apps/api/src/middleware/admin-middleware.ts` and document usage beside `createAuthMiddleware` in `apps/api/src/types.ts` / route modules
+- [x] T002 [P] Extend `UserPreferences` with `locale` (`en`|`es`) and `colorScheme` (`system`|`light`|`dark`) plus defaults in `packages/core/src/models/user-preferences.ts`; export from `packages/core/src/index.ts` per `specs/004-legacy-parity-basics/data-model.md`
+- [x] T003 [P] Extend `patchUserPreferencesSchema` and related types in `packages/validation/src/schemas/user-preferences.ts` per `specs/004-legacy-parity-basics/contracts/legacy-parity-rest.md`
+- [x] T004 Update merge/default logic in `packages/domain/src/actions/user-preferences-actions.ts` for `locale` and `colorScheme`
+- [x] T005 Update document read/write mapping in `packages/db/src/repositories/user-preferences-repository.ts` (omit new fields until patched — backward compatible)
+- [x] T006 Ensure `GET`/`PATCH` user preferences routes in `apps/api/src/routes/preferences.ts` accept and return new fields with existing auth patterns
+- [x] T007 Extend `DayPartyClient` preference types and JSON parsers in `packages/api-client/src/client.ts` for `locale` and `colorScheme`
+- [x] T008 [P] Add `requireAdmin` middleware (403 when `user.role !== 'admin'`) in `apps/api/src/middleware/admin-middleware.ts`
+- [x] T009 Export helper from `apps/api/src/middleware/admin-middleware.ts` and document usage beside `createAuthMiddleware` in `apps/api/src/types.ts` / route modules
 
 **Checkpoint**: Preferences and admin gate are ready — **US1** can start in parallel with **US2–US4** (they do not block landing); **US8** should wait for Phase 2.
 
@@ -58,8 +58,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Create `apps/web/src/pages/LandingPage.tsx` with concise value proposition and primary CTA linking to `/login`
-- [ ] T011 [US1] Update `apps/web/src/App.tsx` routes: unauthenticated `/` renders `LandingPage`; authenticated `/` redirects to `/rundown` (preserve existing protected routes)
+- [x] T010 [P] [US1] Create `apps/web/src/pages/LandingPage.tsx` with concise value proposition and primary CTA linking to `/login`
+- [x] T011 [US1] Update `apps/web/src/App.tsx` routes: unauthenticated `/` renders `LandingPage`; authenticated `/` redirects to `/rundown` (preserve existing protected routes)
 
 **Checkpoint**: MVP marketing entry on web — **no mobile requirement** for US1.
 
@@ -73,8 +73,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 [P] [US2] Add selected-date state synced to URL query (e.g. `?date=`) and day-navigation UI in `apps/web/src/pages/RundownPage.tsx`
-- [ ] T013 [US2] Thread selected date into `client.getRundown`, capacity hints, create-task default `scheduledDate`, and triage targets in `apps/web/src/pages/RundownPage.tsx`, `apps/web/src/components/CreateTaskPanel.tsx`, and `apps/web/src/components/TaskEditPanel.tsx` as needed
+- [x] T012 [P] [US2] Add selected-date state synced to URL query (e.g. `?date=`) and day-navigation UI in `apps/web/src/pages/RundownPage.tsx`
+- [x] T013 [US2] Thread selected date into `client.getRundown`, capacity hints, create-task default `scheduledDate`, and triage targets in `apps/web/src/pages/RundownPage.tsx`, `apps/web/src/components/CreateTaskPanel.tsx`, and `apps/web/src/components/TaskEditPanel.tsx` as needed
 - [ ] T014 [P] [US2] Add date picker / stepper and load `getRundown(selectedDate)` in `apps/mobile/src/views/rundown-view.ts` and `apps/mobile/src/views/rundown-view.xml`
 
 **Checkpoint**: Multi-day planning works on both clients.

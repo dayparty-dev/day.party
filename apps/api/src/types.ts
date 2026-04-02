@@ -16,6 +16,10 @@ import type {
   UserRepository,
 } from '@dayparty/domain';
 
+/**
+ * Shared API context. Auth: use `createAuthMiddleware` from `middleware/auth-middleware.ts` on routes that need a session;
+ * for `/api/admin/*`, chain `createRequireAdmin` from `middleware/admin-middleware.ts` **after** auth.
+ */
 export type ApiEnv = {
   userRepo: UserRepository;
   sessionRepo: SessionRepository;
