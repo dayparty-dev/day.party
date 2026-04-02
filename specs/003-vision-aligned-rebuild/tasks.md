@@ -15,6 +15,10 @@
 - **[Story]**: User story label ([US1]…[US6]) on user-story phase tasks only
 - Include exact file paths in descriptions
 
+### Product story-done vs web-only slice
+
+Per `spec.md` (**Mobile / web parity**), a user story is **product-done** only when **both** `apps/web` and `apps/mobile` ship that story’s UX. For **US2** and **US3**, phases below mark **web + API** work complete (**T016–T023**, **T020**, **T023**); **mobile parity** is **T043** / **T044** (Phase 10). Until those are `[x]`, treat US2/US3 as **web slice complete**, not fully story-closed on the product.
+
 ---
 
 ## Phase 1: Setup (Shared Infrastructure)
@@ -44,9 +48,9 @@
 
 **Goal**: Ordered actionables per date with **estimates**, **user-defined day window**, **fit/overflow** and **in-runway vs outside-runway** (FR-001–FR-003, FR-012, SC-001, SC-002).
 
-**Independent Test**: Create ≥5 tasks for a date, set window in prefs, reorder, observe `dayFit` / runway split in API and UI — without notes, rewards, or history features.
+**Independent Test**: From **first-party `apps/web` and `apps/mobile`** (not `apps/web-legacy` and not ad hoc `curl` alone), create ≥5 actionables for the selected date, set the day window in prefs, reorder, and observe `dayFit` / runway split in API and UI — without notes, rewards, or history features. (**T049** / **T050** MUST be `[x]` before this test passes end-to-end.)
 
-**FR-004 traceability (partial in US1)**: **Complete** and **reopen** (toggle incomplete) are extended in **T011** with the new task model. **Skip** as a first-class state and **triage-style** transitions land in **US2 (T016–T017)**. **Ledger / bounty consistency** on completion is **US4 (T027)**. Stopping after US1 is an MVP demo, not full FR-004 closure.
+**FR-004 traceability (partial in US1)**: **Complete** and **reopen** (toggle incomplete) are extended in **T011** with the new task model. **`skip`** and other **triage-style** transitions (defer, demote, status changes) are owned by **US2** domain/API (**T016–T018**) and web UI (**T020**); express **`skip`** via the same `Task` status / triage rules as in `data-model.md` (not a separate US1 task). **Ledger / bounty consistency** on completion is **US4 (T027)**. Stopping after US1 is an MVP demo, not full FR-004 closure.
 
 ### Implementation for User Story 1
 
@@ -61,13 +65,15 @@
 - [x] T014 [US1] Implement day window controls, fit/overflow, and **runway vs outside-runway labeling** (and priority badges) in `apps/web/src/pages/RundownPage.tsx` and `apps/web/src/components/TaskCard.tsx` — **no triage actions** here (defer/demote → US2 / `TriagePanel.tsx`)
 - [x] T015 [P] [US1] Surface extended rundown and day-window feedback in `apps/mobile/src/views/rundown-view.ts` (and `apps/mobile/src/views/rundown-view.xml` as needed)
 
-**Checkpoint**: MVP day planning + fit feedback works on web and mobile consumes API — **stop here** for demo if desired.
+**Checkpoint**: MVP day planning + fit feedback on web and mobile **after T049–T050** — **stop here** for demo if desired (US1 product story-done still requires create UX on both clients per `spec.md`).
 
 ---
 
 ## Phase 4: User Story 2 — Triage overflow and move work (Priority: P2)
 
 **Goal**: Defer, demote, or move items; suggested placement; overflow UX paths (FR-005, SC-003).
+
+**Product story-done**: **US2** on the product also requires **T043** (mobile triage). The tasks below are **web + API slice** complete.
 
 **Independent Test**: Mark incomplete or overflowing items for tomorrow / another date / low importance; verify task dates and statuses update via API and appear correctly in rundown.
 
@@ -85,6 +91,8 @@
 
 **Goal**: Persist markdown notes on tasks; scannable list + detail view (FR-006, SC-004).
 
+**Product story-done**: **US3** on the product also requires **T044** (mobile notes). The tasks below are **web + API slice** complete.
+
 **Independent Test**: Add long markdown to a task, reload, confirm formatting preserved and list rows stay compact.
 
 ### Implementation for User Story 3
@@ -92,6 +100,15 @@
 - [x] T021 [P] [US3] Add `notesMarkdown` to `Task` in `packages/core/src/models/task.ts`, validation in `packages/validation/src/schemas/task.ts`, and BSON mapping in `packages/db/src/repositories/task-repository.ts`; ensure rundown serialization **omits** `notesMarkdown` (see `contracts/day-planning-rest.md` P3)
 - [x] T022 [US3] Add `GET /api/tasks/:id` in `apps/api/src/routes/tasks.ts` returning **full** task including `notesMarkdown`; ensure **route order** registers `GET /`, `PATCH /reorder`, etc. **before** `GET /:id` per `contracts/day-planning-rest.md`. Rundown **`GET /api/tasks?date=`** MUST omit `notesMarkdown` (optional `notesPreview` only per contract)
 - [x] T023 [US3] Add notes editor/detail UI in new `apps/web/src/components/TaskNotesPanel.tsx` (or similar) and integrate from `apps/web/src/pages/RundownPage.tsx` with lightweight markdown rendering
+
+---
+
+## Gap closure: Create actionable (web + mobile)
+
+**Purpose**: US1 is incomplete on greenfield clients until users can add tasks without `apps/web-legacy` or raw HTTP. **Depends on**: T011/T013 (API + `DayPartyClient.createTask` already shipped).
+
+- [ ] T049 [P] [US1] Implement create-task UX in `apps/web` (new component under `apps/web/src/components/` and/or `apps/web/src/pages/RundownPage.tsx`), calling `DayPartyClient.createTask` with **`scheduledDate`** aligned to the current rundown date and fields allowed by `createTaskSchema` (`estimatedMinutes` and/or legacy `size`, title, etc.); on success, **refetch rundown** or merge the created task per existing data-loading patterns
+- [ ] T050 [P] [US1] Implement create-task UX in `apps/mobile` (`apps/mobile/src/views/rundown-view.ts` + `rundown-view.xml`, or a small dedicated view + `app.ts` registration), same API contract as T049; register navigation if split into a separate view
 
 ---
 
@@ -157,7 +174,7 @@
 
 ## Phase 10: NativeScript parity (US2–US6)
 
-**Purpose**: Satisfy constitution **mobile-native fidelity** and `spec.md` **mobile / web parity** for stories after US1 — each surface owns its UI; consume the same REST/`api-client` contracts.
+**Purpose**: Satisfy constitution **mobile-native fidelity** and `spec.md` **mobile / web parity** for **US2–US6** — each surface owns its UI; consume the same REST/`api-client` contracts. (**US1** mobile/web create parity is **T049–T050** in the gap-closure section above, not Phase 10.)
 
 **⚠️ Depends on**: Corresponding API + web slices existing or in progress so contracts are stable.
 
@@ -174,6 +191,7 @@
 ### Phase Dependencies
 
 - **Phase 1** → **Phase 2** → **US1 (Phase 3)** → later stories in priority order **or** parallelize **after US1** where stories do not depend on each other’s UI (server-side US4 can proceed before US3 if task shapes already support bounty fields).
+- **Gap closure T049–T050**: SHOULD finish **before** treating US1 as fully shippable on `apps/web` / `apps/mobile`; **T049** and **T050** may run **in parallel** and may overlap with early **Phase 6** if staffed.
 - **Polish (Phase 9)**: After all target user stories for the milestone are complete.
 - **Phase 10 (mobile parity)**: Run **after** each story’s API is available — **T043** after US2 routes, **T044** after T022–T023 patterns, **T045** after T028, **T046** after T031–T032, **T047** after T037. Can parallelize with web polish if staffed.
 
@@ -216,7 +234,7 @@ Task: "T015 [P] [US1] … apps/mobile/src/views/rundown-view.ts …"
 ### MVP First (User Story 1 only)
 
 1. Complete Phase 1–2.
-2. Complete Phase 3 (US1) through **T014** minimum; add **T015** if mobile MVP is in scope.
+2. Complete Phase 3 (US1) through **T014** minimum; add **T015** if mobile MVP is in scope; add **T049** and **T050** so first-party web/mobile can create actionables (US1 independent test).
 3. **STOP and VALIDATE** against US1 **Independent Test** in `specs/003-vision-aligned-rebuild/spec.md`.
 4. **Scope honesty**: MVP US1 does **not** yet satisfy **FR-004** fully (skip + reward-ledger coupling) nor **FR-009** on mobile until **Phase 10** tasks for later stories are done.
 

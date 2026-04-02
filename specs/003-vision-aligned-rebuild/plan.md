@@ -8,7 +8,7 @@
 
 ## Summary
 
-Re-implement **flexible day planning** in the current monorepo stack so it matches the product vision in `docs/idea.md` and legacy next-steps in `docs/next-steps.md`, **without** treating `apps/web-legacy` as a blueprint (constitution: spec-driven). The codebase already has a minimal **Task** model (ordered items per calendar date, abstract `size` 1–5, rundown with summed `capacity`) and Hono REST routes. This feature **evolves** that core into spec **actionables** and **day plans**: real **fit/overflow** against a user-defined **daily window**, **priority / essentiality**, **triage and deferral**, **expanded notes**, **rewards and marketplace**, **visual presets**, and **audit history**—delivered in **priority slices** (P1→P6 in the spec) so each slice stays shippable and constitution-simple.
+Re-implement **flexible day planning** in the current monorepo stack so it matches the product vision in `docs/idea.md` and legacy next-steps in `docs/next-steps.md`, **without** treating `apps/web-legacy` as a blueprint (constitution: spec-driven). The codebase already has a minimal **Task** model (ordered items per calendar date, abstract `size` 1–5, rundown with summed `capacity`) and Hono REST routes. This feature **evolves** that core into spec **actionables** and **day plans**: real **fit/overflow** against a user-defined **daily window**, **priority / essentiality**, **triage and deferral**, **expanded notes**, **rewards and marketplace**, **visual presets**, and **audit history**—delivered in **priority slices** (P1→P6 in the spec) so each slice stays shippable and constitution-simple. **Task creation** is already supported server-side (`POST /api/tasks`) and in `DayPartyClient`; **first-party web and mobile** still need in-app create UX so US1 is demoable without legacy (`tasks.md` **T049–T050**).
 
 ## Technical Context
 
@@ -22,11 +22,12 @@ Re-implement **flexible day planning** in the current monorepo stack so it match
 **Constraints**: Tidy Architecture + Pod-style packages; **no UI in `packages/`**; validation at HTTP boundary; spec-driven (legacy reference only); **YAGNI** on gamification chrome (lootboxes, parody skins) until P1–P3 foundations exist  
 **Scale/Scope**: Six prioritized user stories; multiple Mongo collections and REST surface evolution; **incremental** delivery by story, not a single big-bang
 
-### Current baseline (verified)
+### Implementation state (003 — update as slices land)
 
-- **Core model**: `Task` in `@dayparty/core` — `title`, `size` (1–5), `scheduledDate`, `position`, `isComplete`, optional `tagKey` ([`packages/core/src/models/task.ts`](../../packages/core/src/models/task.ts)).
-- **Rundown**: `getRundown` sums `size` into `capacity` — **not** yet a time window or overflow split ([`packages/domain/src/actions/get-rundown.ts`](../../packages/domain/src/actions/get-rundown.ts)).
-- **API**: `/api/tasks` CRUD + reorder ([`apps/api/src/routes/tasks.ts`](../../apps/api/src/routes/tasks.ts)); auth via existing JWT/magic-link stack.
+- **Core `Task`**: Evolved beyond legacy `size`-only: `estimatedMinutes`, priority/essentiality, rundown/fit fields, triage-oriented `status`, optional `notesMarkdown` ([`packages/core/src/models/task.ts`](../../packages/core/src/models/task.ts); see `data-model.md`).
+- **Rundown / day fit**: `makeGetRundownAction` loads user prefs, runs **`computeDayFit`**, returns extended rundown (`dayFit`, in-runway vs outside-runway, echoed `dayWindow`) — not merely summed `capacity` ([`packages/domain/src/actions/get-rundown.ts`](../../packages/domain/src/actions/get-rundown.ts), [`packages/domain/src/day-fit.ts`](../../packages/domain/src/day-fit.ts)).
+- **API**: `/api/tasks` extended (list by date, create, patch, reorder, triage payloads, `GET /:id` for full task); **`GET`/`PATCH /api/me/preferences`** for day window ([`apps/api/src/routes/tasks.ts`](../../apps/api/src/routes/tasks.ts), [`preferences.ts`](../../apps/api/src/routes/preferences.ts)); JWT/magic-link auth unchanged.
+- **US1 client gap**: In-app **create actionable** on `apps/web` / `apps/mobile` tracked as **`tasks.md` T049–T050** (server + `DayPartyClient.createTask` already exist).
 
 ## Constitution Check
 
@@ -83,8 +84,8 @@ specs/003-vision-aligned-rebuild/
 │   │   ├── index.ts               # Composition: wire new repos + actions
 │   │   ├── routes/                # tasks.ts evolution; possible prefs/history/rewards routes
 │   │   └── types.ts               # ApiEnv (prefer domain ports per 002 alignment)
-│   ├── web/src/                   # Planning UI, presets, triage (React)
-│   └── mobile/                    # NativeScript planning UI (separate from web)
+│   ├── web/src/                   # Planning UI, presets, triage, **create-task** control (React → `DayPartyClient.createTask`)
+│   └── mobile/                    # NativeScript planning UI (separate from web); **create-task** flow (same REST contract)
 └── apps/web-legacy/               # Reference only — not implementation blueprint
 ```
 

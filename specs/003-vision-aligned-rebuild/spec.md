@@ -15,11 +15,11 @@ A person plans their day as a sequence of things they want to do (exercise, work
 
 **Why this priority**: This is the core differentiator from classic time-blocking and matches the original “flexible moments” vision; without it, the product is just another list.
 
-**Independent Test**: A user can create several actionables, assign estimates, arrange them for “today,” and see whether the total fits their stated day bounds—without any rewards or notes features enabled.
+**Independent Test**: A user can **from the first-party `apps/web` and `apps/mobile` clients** (without relying on `apps/web-legacy` or ad hoc API calls alone) create several actionables, assign estimates, arrange them for the selected day, and see whether the total fits their stated day bounds—without any rewards or notes features enabled.
 
 **Acceptance Scenarios**:
 
-1. **Given** an empty day plan, **When** the user adds actionables with estimates and orders them, **Then** the plan reflects that order and shows whether the combination fits within the user’s chosen day window.
+1. **Given** the first-party web or mobile app, **When** the user adds actionables with estimates and orders them for the selected day, **Then** the plan reflects that order and shows whether the combination fits within the user’s chosen day window.
 2. **Given** a populated plan, **When** the user changes an estimate or reorders items, **Then** dependent items shift accordingly and fit/overflow feedback updates.
 3. **Given** priorities on actionables (e.g., essential vs optional), **When** the day no longer fits everything, **Then** the system surfaces **which items sit inside vs outside the feasible runway** and their **priority**, so the user can see overflow at a glance; **actions** to shorten, defer, or drop ship in **User Story 2** (triage).
 
@@ -115,7 +115,7 @@ Users review a chronological history of meaningful plan edits (moves, estimate c
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST let users define actionables with a human-readable title, optional priority or essentiality, and an estimated duration or effort unit suitable for flexible scheduling.
+- **FR-001**: The system MUST let users define actionables with a human-readable title, optional priority or essentiality, and an estimated duration or effort unit suitable for flexible scheduling. **First-party `apps/web` and `apps/mobile` MUST expose in-app creation** for the planner’s selected day (**`tasks.md` T049–T050**); not only via `POST /api/tasks` or `apps/web-legacy` (see **User Story 1** independent test).
 - **FR-002**: The system MUST let users compose a day plan as an ordered collection of actionables against a user-defined daily window (start/end or equivalent).
 - **FR-003**: The system MUST recalculate fit/overflow feedback when estimates, order, priorities, or the daily window change.
 - **FR-004**: The system MUST let users complete, skip, or reopen actionables in a way that updates the plan state and any dependent rewards consistently.
@@ -160,3 +160,23 @@ Users review a chronological history of meaningful plan edits (moves, estimate c
 - **Offline or interrupted sessions (v1)**: persistence is **server-authoritative**; clients SHOULD retry failed mutations and refresh after success. A **full offline write queue**, merge/conflict UI, and guarantees beyond “no surprising loss on the primary session” are **out of scope** for this spec unless added in a follow-up.
 - **Mobile / web parity**: both **apps/web** and **apps/mobile** MUST implement each user story’s UX for that story to be **done** on the product (constitution: platform-specific UI, shared API). Work can be **parallelized** after API contracts stabilize; `tasks.md` tracks per-surface tasks.
 - **Regulatory or medical claims** are not made; the product is productivity and wellbeing-oriented software, not a clinical tool.
+
+## Iterations
+
+### Iteration 2026-04-02: Client create-task (web + mobile)
+
+**Change**: Require in-app creation of actionables on first-party web and mobile, backed by existing `POST /api/tasks` / `DayPartyClient.createTask`.
+**Scope**: Feature-wide (client UX gap closure; US1-aligned).
+**Artifacts updated**: `spec.md`, `plan.md`, `tasks.md`, `quickstart.md`
+**Tasks added**: T049, T050
+**Tasks removed**: —
+**Tasks marked complete**: — (spec-only iteration)
+
+### Iteration 2026-04-02: Post-analyze doc alignment
+
+**Change**: Align Phase 3 independent test with US1; document **product story-done** vs **web slice** for US2/US3; expand **FR-004**/`skip` traceability in `tasks.md`; replace stale `plan.md` baseline with current implementation state; tighten **FR-001** wording.
+**Scope**: Spec / plan / tasks consistency (after `/speckit-analyze`).
+**Artifacts updated**: `spec.md`, `plan.md`, `tasks.md`
+**Tasks added**: —
+**Tasks removed**: —
+**Tasks marked complete**: —

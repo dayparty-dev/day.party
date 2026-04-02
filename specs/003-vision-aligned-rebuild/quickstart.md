@@ -29,6 +29,14 @@ pnpm --filter @dayparty/web dev
 4. `PATCH /api/tasks/reorder` — reorder runway.
 5. After prefs route exists: `GET`/`PATCH /api/me/preferences` — set `dayWindow` and `visualPreset`.
 
+## Client validation (greenfield web + mobile)
+
+After **T049** / **T050** land:
+
+1. From **`apps/web`**, create an actionable for the selected day (in-app UI, not `curl`).
+2. From **`apps/mobile`**, create an actionable the same way.
+3. Confirm each appears in `GET /api/tasks?date=YYYY-MM-DD` / rundown after refresh.
+
 ## Tests (when slices exist)
 
 ```bash
