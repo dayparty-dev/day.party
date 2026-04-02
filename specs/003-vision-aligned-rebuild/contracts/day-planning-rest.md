@@ -4,6 +4,8 @@
 
 **Principles**: Additive JSON fields and routes where possible; validate with `@dayparty/validation`; errors use existing `ApiError` shape (`@dayparty/core` error codes + field errors).
 
+**Hono route ordering**: In `apps/api/src/routes/tasks.ts`, register **static paths before param routes** — e.g. `GET /` (list by query), `PATCH /reorder`, then **`GET /:id`** — so `:id` does not capture `reorder` or other literals.
+
 ---
 
 ## Existing endpoints (baseline)
@@ -27,7 +29,7 @@
 **`GET /api/tasks?date=YYYY-MM-DD`**
 
 - Response **adds** (non-breaking):
-  - Per task (when persisted): `estimatedMinutes`, `priority` / `essentiality`, `status` (if introduced), `notesMarkdown` omitted or truncated in list if large (implementation choice: full in detail only).
+  - Per task (when persisted): `estimatedMinutes`, `priority` / `essentiality`, `status` (if introduced). **`notesMarkdown` MUST NOT appear in list items** once P3 ships — use optional `notesPreview` (short string) if needed; full body only on **`GET /api/tasks/:id`**.
   - **Derived** object, e.g. `dayFit`:
     - `availableMinutes: number`
     - `plannedMinutes: number`
@@ -60,12 +62,13 @@ Contract **recommendation**: start with **Option A** for fewer routes; add **Opt
 
 **`GET /api/tasks/suggestions?fromDate=&toDate=`** (optional v1)
 
-- Returns sparse “open capacity” hints for move-to-day flow (see `research.md` §5).
+- Returns sparse “open capacity” hints for move-to-day flow (see `research.md` §5). **Does not** model external calendars or user “busy” blocks in v1; align with `spec.md` US2 acceptance (heuristic only).
 
 ### P3 — Notes
 
 - Task create/update accepts `notesMarkdown` (string, max length).
-- **GET list** may omit notes or return `notesPreview` only; **GET /api/tasks/:id** (new) can return full notes if list truncation is used.
+- **`GET /api/tasks?date=`** rundown: each task omits `notesMarkdown` (optional `notesPreview` only).
+- **`GET /api/tasks/:id`**: returns full task document **including** `notesMarkdown` (authoritative read for detail view).
 
 ### P4 — Rewards and ledger
 

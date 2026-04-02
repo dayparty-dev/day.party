@@ -5,6 +5,8 @@
 **Status**: Draft  
 **Input**: User description: "Re-implement legacy day planning in the current product architecture, aligned with the original gamified flexible-day vision (docs/idea.md) and documented next-steps (docs/next-steps.md). Context: original vision emphasizes flexible time pockets (not rigid time-blocking), stimulating presentation, reorderable day “runway,” rewards and optional currency, deferral of non-essential items, and future playful interfaces; next-steps list UI themes, expanded notes, change history, reliable persistence across sessions, reward marketplace, physical integrations (later), and a portable task core for multiple products."
 
+**Related artifacts**: [`plan.md`](./plan.md) · [`tasks.md`](./tasks.md) · [`data-model.md`](./data-model.md) · [`contracts/day-planning-rest.md`](./contracts/day-planning-rest.md)
+
 ## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Shape a flexible day from actionables (Priority: P1)
@@ -19,7 +21,7 @@ A person plans their day as a sequence of things they want to do (exercise, work
 
 1. **Given** an empty day plan, **When** the user adds actionables with estimates and orders them, **Then** the plan reflects that order and shows whether the combination fits within the user’s chosen day window.
 2. **Given** a populated plan, **When** the user changes an estimate or reorders items, **Then** dependent items shift accordingly and fit/overflow feedback updates.
-3. **Given** priorities on actionables (e.g., essential vs optional), **When** the day no longer fits everything, **Then** the system can surface which items are candidates to shorten, defer, or drop while respecting priority.
+3. **Given** priorities on actionables (e.g., essential vs optional), **When** the day no longer fits everything, **Then** the system surfaces **which items sit inside vs outside the feasible runway** and their **priority**, so the user can see overflow at a glance; **actions** to shorten, defer, or drop ship in **User Story 2** (triage).
 
 ---
 
@@ -34,7 +36,7 @@ When not everything planned gets done or fits, the user quickly decides what to 
 **Acceptance Scenarios**:
 
 1. **Given** items that did not run today, **When** the user opens a triage flow, **Then** they can mark an item for tomorrow, another specific day, or “not important right now” with clear outcomes for the plan.
-2. **Given** an item to move, **When** the user chooses another day, **Then** they see proposed slots or a simple way to place it on a date without conflicting with stated unavailable periods.
+2. **Given** an item to move, **When** the user chooses another day, **Then** they see **proposed target dates or simple capacity hints** from a v1 heuristic (remaining minutes vs planned load per day). **Explicit unavailable / busy periods** blocking suggestions are **out of scope for v1** unless user preferences later model them.
 3. **Given** a full day plan, **When** the user adds one more essential item, **Then** they receive understandable feedback about overflow and at least one actionable path (shorten, defer low-priority, or extend the day window if allowed).
 
 ---
@@ -107,7 +109,7 @@ Users review a chronological history of meaningful plan edits (moves, estimate c
 - All items are “essential” but the day cannot fit them: the product avoids silent failure—user must confirm what gives (time box, split task, or defer).
 - Zero or negative currency: marketplace and bounty rules define clear behavior (cannot purchase; optional debt is out of scope unless explicitly added later).
 - Very long notes or huge history: performance stays acceptable for typical personal use (hundreds of items, thousands of events) without requiring the user to manually purge.
-- Offline or interrupted sessions: the user does not lose completed work or last-known plan state beyond a clearly communicated recovery boundary (exact sync model is an implementation concern; the outcome is no surprising data loss for the primary device session).
+- Offline or interrupted sessions: the user does not lose completed work or last-known plan state beyond a clearly communicated recovery boundary (exact sync model is an implementation concern; the outcome is no surprising data loss for the primary device session). **v1 interpretation**: see Assumptions (**Offline or interrupted sessions (v1)**) and `quickstart.md` once **T048** is done.
 
 ## Requirements _(mandatory)_
 
@@ -155,4 +157,6 @@ Users review a chronological history of meaningful plan edits (moves, estimate c
 - **Parody social feeds or daily-changing app “skins”** imitating third-party products are aspirational; this spec does not require them for acceptance—only the preset-based personalization in FR-009.
 - **Portable task core / multi-brand reuse** (e.g., personal vs professional flavors) is a strategic direction from next-steps; this spec defines the behavioral contract of the personal day-planning experience so a shared core can emerge in planning work, without prescribing package names or code layout here.
 - **Sync across multiple devices** is desirable; FR-011 requires session-to-session persistence. Full conflict resolution policies are left to planning unless product owners later tighten them.
+- **Offline or interrupted sessions (v1)**: persistence is **server-authoritative**; clients SHOULD retry failed mutations and refresh after success. A **full offline write queue**, merge/conflict UI, and guarantees beyond “no surprising loss on the primary session” are **out of scope** for this spec unless added in a follow-up.
+- **Mobile / web parity**: both **apps/web** and **apps/mobile** MUST implement each user story’s UX for that story to be **done** on the product (constitution: platform-specific UI, shared API). Work can be **parallelized** after API contracts stabilize; `tasks.md` tracks per-surface tasks.
 - **Regulatory or medical claims** are not made; the product is productivity and wellbeing-oriented software, not a clinical tool.

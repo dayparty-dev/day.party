@@ -90,6 +90,8 @@ specs/003-vision-aligned-rebuild/
 
 **Structure Decision**: Single monorepo with **shared domain + validation + api-client** and **per-platform UI**, matching existing day.party layout and constitution. Feature work **extends** the task/day-plan slice first (P1–P3), then adds rewards/history routes and collections (P4–P6) as separate vertical slices.
 
+**Mobile + web**: Each user story closes when **both** `apps/web` and `apps/mobile` implement that story’s flows (constitution §IV–V). API contracts stabilize first; UIs can proceed in parallel (`tasks.md` Phase 10).
+
 ## Complexity Tracking
 
 > No constitution violations required for this feature. Large surface area is **time-sliced** by spec priorities (P1–P6) and scoped assumptions (single user per workspace, no physical/social epics in this spec).
