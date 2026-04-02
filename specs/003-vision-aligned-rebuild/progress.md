@@ -8,6 +8,8 @@ Started: 2026-04-02 15:10:01
 - **User preferences Mongo**: Collection `user_preferences`; documents are `UserPreferences` fields plus internal `_id`; query and upsert by `userId`. `put` uses `updateOne` when a row exists, else `insertOne` (avoids `replaceOne` typing issues with `WithoutId`).
 - **Core models**: Prefer `Partial<Record<TaskSize, number>>` for optional size→minutes maps aligned with `TaskSize` in `SIZE_SCALE`.
 - **`computeDayFit`**: Greedy pack in task order; `plannedMinutes` sums effective minutes for **incomplete** tasks only; completed tasks are always `inRunwayTaskIds` and use no runway minutes; `overflowUnresolved` when any incomplete **essential** task is outside the runway. Default size→minutes: 15/25/40/55/75 for sizes 1–5; overridden by prefs `sizeToMinutes`.
+- **`DEFAULT_SIZE_TO_MINUTES`**: Single export from `@dayparty/core` for domain fit + Mongo read-path legacy fill; keep aligned.
+- **Prefs Zod**: `patchUserPreferencesSchema` / `dayWindowSchema` enforce midnight-crossing vs same-day window rules; `sizeToMinutes` patch uses strict keys `1`–`5` only.
 
 ---
 
@@ -102,5 +104,37 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - `makeReorderTasksAction` also needs prefs + `computeDayFit` so reorder responses match rundown (not spelled out in T008 but required for consistent API).
+
+---
+
+## Iteration 4 - 2026-04-02
+
+**User Story**: Partial progress on US1 — validation + persistence for estimates and essentiality (T009–T010)
+
+**Tasks Completed**:
+
+- [x] T009: Extended task Zod schemas; added `user-preferences.ts` (`patchUserPreferencesSchema`, `dayWindowSchema`, `visualPresetSchema`, `sizeToMinutesPartialSchema`); wired `create`/`update` domain actions for new task fields so API spreads match types.
+- [x] T010: `MongoTaskRepository.docToTask` fills `estimatedMinutes` from `DEFAULT_SIZE_TO_MINUTES` when BSON omits it; `DEFAULT_SIZE_TO_MINUTES` moved to `@dayparty/core`.
+
+**Tasks Remaining in Story**: 5 (T011–T015)
+
+**Commit**: e3783eef202b96ee419c58f880afaa31f1746790
+
+**Files Changed**:
+
+- `packages/core/src/constants/index.ts`
+- `packages/core/src/index.ts`
+- `packages/domain/src/day-fit.ts`
+- `packages/domain/src/actions/create-task.ts`
+- `packages/domain/src/actions/update-task.ts`
+- `packages/validation/src/schemas/task.ts`
+- `packages/validation/src/schemas/user-preferences.ts`
+- `packages/validation/src/index.ts`
+- `packages/db/src/repositories/task-repository.ts`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- T011 is still needed for explicit route/docs copy even though create/update already use extended Zod inference against existing handlers.
 
 ---
