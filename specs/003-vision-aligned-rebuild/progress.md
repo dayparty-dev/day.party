@@ -5,7 +5,9 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
-- **Rewards / ledger (US4 T024–T025)**: `RewardDefinition` / `RewardDefinitionType` in `@dayparty/core` (`models/reward.ts`); `LedgerEntry` / `LedgerEntryReason` in `models/ledger.ts`. `Task.bounty?: TaskBounty` (`amount`, optional `tagKeys`, `highResistance`). Domain ports: `RewardDefinitionRepository` (`listByUserId`, `findById`, `create`), `LedgerRepository` (`insert` append-only omitting `id`/`createdAt`, `listByUserId` with `limit` + optional cursor). Re-export document types from interface modules via `@dayparty/core` (avoid duplicate domain copies).
+- **Rewards / ledger (US4 T024–T030)**: `RewardDefinition` / `RewardDefinitionType` in `@dayparty/core` (`models/reward.ts`); `LedgerEntry` / `LedgerEntryReason` in `models/ledger.ts`. `Task.bounty?: TaskBounty` (`amount`, optional `tagKeys`, `highResistance`). Domain ports: `RewardDefinitionRepository` (`listByUserId`, `findById`, `create`), `LedgerRepository` (`insert` append-only omitting `id`/`createdAt`, `listByUserId` with `limit` + optional cursor, `findByCorrelation`, `sumAmountByUserId`). Mongo: `reward_definitions`, `ledger_entries`. Re-export document types from interface modules via `@dayparty/core` (avoid duplicate domain copies).
+- **US4 API**: `GET`/`POST /api/rewards`, `GET /api/ledger?limit=&cursor=`, `POST /api/marketplace/purchase` with `{ rewardDefinitionId }`. Responses omit `userId` on rewards and ledger rows. **Bounty**: `makeUpdateTaskAction` takes `LedgerRepository`; on first transition to complete for a task with `bounty.amount > 0`, inserts `task_completion` line with correlation `task-bounty:<taskId>` if none exists.
+- **US4 client**: `DayPartyClient.getRewards`, `createRewardDefinition`, `getLedger`, `purchaseReward`; `parseTask` accepts optional `bounty`. Types: `ApiRewardDefinition`, `ApiLedgerEntry`, `LedgerPageResponse`.
 - **Create task (US1 gap T049–T050)**: Web `CreateTaskPanel` posts via `DayPartyClient.createTask` with `scheduledDate` = rundown date (`todayLocalDateString` / same as `getRundown`), required `title` + `size` (1–5), optional `estimatedMinutes` and `essentiality`; on success clear title/minutes and call shared `load()`. Mobile mirrors the contract in `rundown-view` (Spanish labels), mutual-exclusive Esencial/Opcional switches, then `loadRundown()`.
 - **Task notes (US3)**: `Task.notesMarkdown` optional; rundown rows are `TaskRundownItem` from `taskToRundownItem` (drops full notes, adds `notesPreview` from first line, max 120 chars + `…`). `GET /api/tasks/:id` returns full task including `notesMarkdown` (route after `/reorder`, still before `PATCH /:id`). Mongo `update` uses `$unset` for `notesMarkdown` when clearing (`''` in domain update). API client: `TaskRundownItemResponse` for rundown rows, `TaskResponse` / `getTask` for detail; `parseRundownTaskRow` strips any stray `notesMarkdown` in list JSON. Web: collapsible `TaskNotesPanel` with `react-markdown` preview.
 - **User preferences Mongo**: Collection `user_preferences`; documents are `UserPreferences` fields plus internal `_id`; query and upsert by `userId`. `put` uses `updateOne` when a row exists, else `insertOne` (avoids `replaceOne` typing issues with `WithoutId`).
@@ -338,5 +340,59 @@ Started: 2026-04-02 15:10:01
 
 - **T024** and **T025** were implemented by two parallel subagents; the domain agent used temporary duplicate types when core was not visible yet — reconciled to `import type` + `export type { … } from '@dayparty/core'` so `LedgerEntryReason` is the single reason enum name (replacing a stub `LedgerReason`).
 - Next US4 slice: **T026** Mongo repos (`reward_definitions`, `ledger_entries` collections per data-model) before domain actions and routes.
+
+---
+
+## Iteration 11 - 2026-04-02
+
+**User Story**: User Story 4 — Rewards, bounties, marketplace (T026–T030)
+
+**Tasks Completed**:
+
+- [x] T026: `MongoRewardDefinitionRepository`, `MongoLedgerRepository`; export from `@dayparty/db`
+- [x] T027: Bounty grant in `makeUpdateTaskAction` + `purchase-reward.ts`, `get-ledger-page.ts`, reward catalog actions
+- [x] T028: `rewards.ts`, `ledger.ts`, `marketplace.ts` routes; `ApiEnv` wiring in `apps/api`
+- [x] T029: `DayPartyClient` rewards/ledger/purchase + bounty in `parseTask`; package exports
+- [x] T030: `RewardsPage` + `/rewards` route; rundown header link
+
+**Tasks Remaining in Story**: None — US4 web + API slice complete (mobile parity remains T045)
+
+**Commit**: 7b628b71472172fe236a491e94a9f97c866f3188
+
+**Files Changed**:
+
+- `packages/db/src/repositories/reward-definition-repository.ts`
+- `packages/db/src/repositories/ledger-repository.ts`
+- `packages/db/src/repositories/task-repository.ts`
+- `packages/db/src/index.ts`
+- `packages/domain/src/interfaces/ledger-repository.ts`
+- `packages/domain/src/actions/update-task.ts`
+- `packages/domain/src/actions/create-task.ts`
+- `packages/domain/src/actions/reward-definition-actions.ts`
+- `packages/domain/src/actions/get-ledger-page.ts`
+- `packages/domain/src/actions/purchase-reward.ts`
+- `packages/domain/src/index.ts`
+- `packages/validation/src/schemas/task.ts`
+- `packages/validation/src/schemas/rewards.ts`
+- `packages/validation/src/index.ts`
+- `packages/api-client/src/client.ts`
+- `packages/api-client/src/index.ts`
+- `apps/api/src/types.ts`
+- `apps/api/src/index.ts`
+- `apps/api/src/app.ts`
+- `apps/api/src/routes/rewards.ts`
+- `apps/api/src/routes/ledger.ts`
+- `apps/api/src/routes/marketplace.ts`
+- `apps/web/src/App.tsx`
+- `apps/web/src/pages/RewardsPage.tsx`
+- `apps/web/src/pages/RewardsPage.module.css`
+- `apps/web/src/pages/RundownPage.tsx`
+- `apps/web/src/pages/RundownPage.module.css`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Ledger pagination cursor: base64url of `createdAt` + unit-separator + hex `_id`; query uses `$or` tie-break for descending `(createdAt, _id)`.
+- `costCurrency` 0 is allowed for free rewards; purchase still inserts a ledger line with `amount: 0` (no-op debit) — acceptable v1 or tighten later.
 
 ---
