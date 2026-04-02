@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Create task (US1 gap T049–T050)**: Web `CreateTaskPanel` posts via `DayPartyClient.createTask` with `scheduledDate` = rundown date (`todayLocalDateString` / same as `getRundown`), required `title` + `size` (1–5), optional `estimatedMinutes` and `essentiality`; on success clear title/minutes and call shared `load()`. Mobile mirrors the contract in `rundown-view` (Spanish labels), mutual-exclusive Esencial/Opcional switches, then `loadRundown()`.
 - **Task notes (US3)**: `Task.notesMarkdown` optional; rundown rows are `TaskRundownItem` from `taskToRundownItem` (drops full notes, adds `notesPreview` from first line, max 120 chars + `…`). `GET /api/tasks/:id` returns full task including `notesMarkdown` (route after `/reorder`, still before `PATCH /:id`). Mongo `update` uses `$unset` for `notesMarkdown` when clearing (`''` in domain update). API client: `TaskRundownItemResponse` for rundown rows, `TaskResponse` / `getTask` for detail; `parseRundownTaskRow` strips any stray `notesMarkdown` in list JSON. Web: collapsible `TaskNotesPanel` with `react-markdown` preview.
 - **User preferences Mongo**: Collection `user_preferences`; documents are `UserPreferences` fields plus internal `_id`; query and upsert by `userId`. `put` uses `updateOne` when a row exists, else `insertOne` (avoids `replaceOne` typing issues with `WithoutId`).
 - **Core models**: Prefer `Partial<Record<TaskSize, number>>` for optional size→minutes maps aligned with `TaskSize` in `SIZE_SCALE`.
@@ -277,5 +278,33 @@ Started: 2026-04-02 15:10:01
 
 - Hono keeps `GET /suggestions` before `GET /:id` so `suggestions` is never parsed as an id.
 - Closing the notes panel resets `loaded` so the next open refetches (stays aligned after rundown reload).
+
+---
+
+## Iteration 9 - 2026-04-02
+
+**User Story**: Gap closure — Create actionable on web + mobile (T049, T050)
+
+**Tasks Completed**:
+
+- [x] T049 [P] [US1]: `CreateTaskPanel` + `RundownPage` integration; `createTask` + refetch `load()`
+- [x] T050 [P] [US1]: Create form in `rundown-view.xml` / `rundown-view.ts`; same payload shape; `loadRundown()` on success
+
+**Tasks Remaining in Story**: None — gap closure complete
+
+**Commit**: 16d8a80693149a9eea4e9429419126ec6e50f956
+
+**Files Changed**:
+
+- `apps/web/src/components/CreateTaskPanel.tsx`
+- `apps/web/src/components/CreateTaskPanel.module.css`
+- `apps/web/src/pages/RundownPage.tsx`
+- `apps/mobile/src/views/rundown-view.ts`
+- `apps/mobile/src/views/rundown-view.xml`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- `createTaskSchema` requires `size` (1–5) and `scheduledDate` even when `estimatedMinutes` is set; omit minutes to let the API infer from size mapping.
 
 ---
