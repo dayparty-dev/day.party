@@ -229,9 +229,8 @@ class TaskDetailViewModel extends Observable {
     }
 
     const clearBounty = Boolean(this.get('clearBounty'));
-    const hadBounty = Boolean(this.get('hadBounty'));
     let bountyPatch: UpdateTaskInput['bounty'];
-    if (clearBounty && hadBounty) {
+    if (clearBounty) {
       bountyPatch = null;
     } else {
       const bRaw = String(this.get('bountyAmountText') ?? '').trim();

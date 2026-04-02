@@ -45,6 +45,15 @@
           <Switch col="0" checked="{{ taskOptional }}" checkedChange="{{ onOptionalChange }}" verticalAlignment="center" />
           <Label col="1" text="Opcional" class="footnote" textWrap="true" verticalAlignment="center" />
         </GridLayout>
+        <Label text="Recompensa (opcional)" class="h3 m-t-16" />
+        <Label text="Cantidad en puntos (vacío = sin recompensa)" class="footnote m-t-8" textWrap="true" />
+        <TextField text="{{ newTaskBountyAmount }}" hint="Opcional" keyboardType="number" class="input m-t-4" />
+        <Label text="Ámbito: etiquetas separadas por coma" class="footnote m-t-8" textWrap="true" />
+        <TextField text="{{ newTaskBountyTagKeys }}" hint="trabajo, foco" class="input m-t-4" />
+        <GridLayout columns="auto, *" class="m-t-8">
+          <Switch col="0" checked="{{ newTaskBountyHighResistance }}" verticalAlignment="center" />
+          <Label col="1" text="Alta resistencia" class="footnote" textWrap="true" verticalAlignment="center" />
+        </GridLayout>
         <Label text="{{ createTaskError }}" textWrap="true" class="window-error m-t-8" />
         <Button text="{{ createTaskButtonText }}" tap="{{ onCreateTask }}" isEnabled="{{ createTaskEnabled }}" class="-primary m-t-12" />
       </StackLayout>

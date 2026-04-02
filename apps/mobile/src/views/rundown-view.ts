@@ -1,3 +1,4 @@
+import type { CreateTaskInput } from '@dayparty/api-client';
 import type { EventData, Page } from '@nativescript/core';
 import { Observable, ObservableArray } from '@nativescript/core';
 
@@ -57,6 +58,13 @@ function parseTimeInput(value: string): number | null {
   return Math.max(0, Math.min(1439, h * 60 + m));
 }
 
+function parseBountyTagKeys(raw: string): string[] {
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 class RundownViewModel extends Observable {
   taskRows = new ObservableArray<TaskRow>();
   summaryText = '';
@@ -79,6 +87,9 @@ class RundownViewModel extends Observable {
     this.set('newTaskMinutes', '');
     this.set('taskEssential', false);
     this.set('taskOptional', false);
+    this.set('newTaskBountyAmount', '');
+    this.set('newTaskBountyTagKeys', '');
+    this.set('newTaskBountyHighResistance', false);
     this.set('createTaskError', '');
     this.set('createTaskSaving', false);
     this.set('createTaskEnabled', true);
@@ -297,14 +308,31 @@ class RundownViewModel extends Observable {
       essentiality = 'optional';
     }
 
+    let bounty: CreateTaskInput['bounty'];
+    const bRaw = String(this.get('newTaskBountyAmount') ?? '').trim();
+    if (bRaw !== '') {
+      const amt = Number(bRaw);
+      if (!Number.isInteger(amt) || amt < 1 || amt > 1_000_000) {
+        this.set('createTaskError', 'La recompensa debe ser un entero entre 1 y 1.000.000.');
+        return;
+      }
+      const tagKeys = parseBountyTagKeys(String(this.get('newTaskBountyTagKeys') ?? ''));
+      bounty = {
+        amount: amt,
+        ...(tagKeys.length > 0 ? { tagKeys } : {}),
+        ...(Boolean(this.get('newTaskBountyHighResistance')) ? { highResistance: true } : {}),
+      };
+    }
+
     const client = authState.getClient();
     const date = todayIso();
-    const body = {
+    const body: CreateTaskInput = {
       title,
       size: sizeNum as 1 | 2 | 3 | 4 | 5,
       scheduledDate: date,
       ...(estimatedMinutes !== undefined ? { estimatedMinutes } : {}),
       ...(essentiality ? { essentiality } : {}),
+      ...(bounty !== undefined ? { bounty } : {}),
     };
 
     this.set('createTaskSaving', true);
@@ -325,6 +353,9 @@ class RundownViewModel extends Observable {
     }
     this.set('newTaskTitle', '');
     this.set('newTaskMinutes', '');
+    this.set('newTaskBountyAmount', '');
+    this.set('newTaskBountyTagKeys', '');
+    this.set('newTaskBountyHighResistance', false);
     await this.loadRundown();
   }
 
