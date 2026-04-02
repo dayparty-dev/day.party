@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Rewards / ledger (US4 T024–T025)**: `RewardDefinition` / `RewardDefinitionType` in `@dayparty/core` (`models/reward.ts`); `LedgerEntry` / `LedgerEntryReason` in `models/ledger.ts`. `Task.bounty?: TaskBounty` (`amount`, optional `tagKeys`, `highResistance`). Domain ports: `RewardDefinitionRepository` (`listByUserId`, `findById`, `create`), `LedgerRepository` (`insert` append-only omitting `id`/`createdAt`, `listByUserId` with `limit` + optional cursor). Re-export document types from interface modules via `@dayparty/core` (avoid duplicate domain copies).
 - **Create task (US1 gap T049–T050)**: Web `CreateTaskPanel` posts via `DayPartyClient.createTask` with `scheduledDate` = rundown date (`todayLocalDateString` / same as `getRundown`), required `title` + `size` (1–5), optional `estimatedMinutes` and `essentiality`; on success clear title/minutes and call shared `load()`. Mobile mirrors the contract in `rundown-view` (Spanish labels), mutual-exclusive Esencial/Opcional switches, then `loadRundown()`.
 - **Task notes (US3)**: `Task.notesMarkdown` optional; rundown rows are `TaskRundownItem` from `taskToRundownItem` (drops full notes, adds `notesPreview` from first line, max 120 chars + `…`). `GET /api/tasks/:id` returns full task including `notesMarkdown` (route after `/reorder`, still before `PATCH /:id`). Mongo `update` uses `$unset` for `notesMarkdown` when clearing (`''` in domain update). API client: `TaskRundownItemResponse` for rundown rows, `TaskResponse` / `getTask` for detail; `parseRundownTaskRow` strips any stray `notesMarkdown` in list JSON. Web: collapsible `TaskNotesPanel` with `react-markdown` preview.
 - **User preferences Mongo**: Collection `user_preferences`; documents are `UserPreferences` fields plus internal `_id`; query and upsert by `userId`. `put` uses `updateOne` when a row exists, else `insertOne` (avoids `replaceOne` typing issues with `WithoutId`).
@@ -306,5 +307,36 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - `createTaskSchema` requires `size` (1–5) and `scheduledDate` even when `estimatedMinutes` is set; omit minutes to let the API infer from size mapping.
+
+---
+
+## Iteration 10 - 2026-04-02
+
+**User Story**: Partial progress on US4 — parallel foundation (T024, T025)
+
+**Tasks Completed**:
+
+- [x] T024 [P] [US4]: `RewardDefinition`, `LedgerEntry` (+ reasons/types), `TaskBounty` / `Task.bounty`; core exports
+- [x] T025 [P] [US4]: `RewardDefinitionRepository`, `LedgerRepository` (+ list params/result); domain index exports
+
+**Tasks Remaining in Story**: 5 (T026–T030)
+
+**Commit**: ec891e6daf500a3a8dd576909f84391c2880a0e0
+
+**Files Changed**:
+
+- `packages/core/src/models/reward.ts`
+- `packages/core/src/models/ledger.ts`
+- `packages/core/src/models/task.ts`
+- `packages/core/src/index.ts`
+- `packages/domain/src/interfaces/reward-definition-repository.ts`
+- `packages/domain/src/interfaces/ledger-repository.ts`
+- `packages/domain/src/index.ts`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- **T024** and **T025** were implemented by two parallel subagents; the domain agent used temporary duplicate types when core was not visible yet — reconciled to `import type` + `export type { … } from '@dayparty/core'` so `LedgerEntryReason` is the single reason enum name (replacing a stub `LedgerReason`).
+- Next US4 slice: **T026** Mongo repos (`reward_definitions`, `ledger_entries` collections per data-model) before domain actions and routes.
 
 ---
