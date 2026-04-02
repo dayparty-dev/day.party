@@ -1,0 +1,158 @@
+# Feature Specification: Vision-aligned day planning rebuild
+
+**Feature Branch**: `003-vision-aligned-rebuild`  
+**Created**: 2026-04-02  
+**Status**: Draft  
+**Input**: User description: "Re-implement legacy day planning in the current product architecture, aligned with the original gamified flexible-day vision (docs/idea.md) and documented next-steps (docs/next-steps.md). Context: original vision emphasizes flexible time pockets (not rigid time-blocking), stimulating presentation, reorderable day “runway,” rewards and optional currency, deferral of non-essential items, and future playful interfaces; next-steps list UI themes, expanded notes, change history, reliable persistence across sessions, reward marketplace, physical integrations (later), and a portable task core for multiple products."
+
+## User Scenarios & Testing _(mandatory)_
+
+### User Story 1 - Shape a flexible day from actionables (Priority: P1)
+
+A person plans their day as a sequence of things they want to do (exercise, work blocks, chores, rest), each with an estimated size, without being locked into rigid calendar slots. They can reorder items quickly and see how the pieces fit against the time they have available.
+
+**Why this priority**: This is the core differentiator from classic time-blocking and matches the original “flexible moments” vision; without it, the product is just another list.
+
+**Independent Test**: A user can create several actionables, assign estimates, arrange them for “today,” and see whether the total fits their stated day bounds—without any rewards or notes features enabled.
+
+**Acceptance Scenarios**:
+
+1. **Given** an empty day plan, **When** the user adds actionables with estimates and orders them, **Then** the plan reflects that order and shows whether the combination fits within the user’s chosen day window.
+2. **Given** a populated plan, **When** the user changes an estimate or reorders items, **Then** dependent items shift accordingly and fit/overflow feedback updates.
+3. **Given** priorities on actionables (e.g., essential vs optional), **When** the day no longer fits everything, **Then** the system can surface which items are candidates to shorten, defer, or drop while respecting priority.
+
+---
+
+### User Story 2 - Triage overflow and move work to another day (Priority: P2)
+
+When not everything planned gets done or fits, the user quickly decides what to postpone, downgrade, or reschedule, including picking another day or time from suggested openings.
+
+**Why this priority**: The vision explicitly calls out deferral, “what stays outside the plan,” and moving items—reducing guilt and preserving momentum for neurodivergent-friendly use.
+
+**Independent Test**: With a plan that overflows or with incomplete items at day end, the user can defer or move items without editing each one manually in a calendar grid.
+
+**Acceptance Scenarios**:
+
+1. **Given** items that did not run today, **When** the user opens a triage flow, **Then** they can mark an item for tomorrow, another specific day, or “not important right now” with clear outcomes for the plan.
+2. **Given** an item to move, **When** the user chooses another day, **Then** they see proposed slots or a simple way to place it on a date without conflicting with stated unavailable periods.
+3. **Given** a full day plan, **When** the user adds one more essential item, **Then** they receive understandable feedback about overflow and at least one actionable path (shorten, defer low-priority, or extend the day window if allowed).
+
+---
+
+### User Story 3 - Capture richer context on actionables (Priority: P3)
+
+Users attach longer notes or checklists to an actionable so “expand task” matches real work (meeting prep, links, sub-steps) while staying readable in the main plan view.
+
+**Why this priority**: Listed in legacy next-steps; supports deeper use without cluttering the primary runway.
+
+**Independent Test**: Create an actionable, add structured long-form content, collapse it in the list, reopen and edit—without rewards or history.
+
+**Acceptance Scenarios**:
+
+1. **Given** an actionable, **When** the user adds expanded content (paragraphs, simple lists), **Then** it persists and appears when they open the detail view.
+2. **Given** expanded content with lightweight formatting (headings, emphasis, lists), **When** the user saves, **Then** formatting is preserved on reload.
+3. **Given** a long note, **When** the user views the day list, **Then** the list stays scannable (summary or truncated preview until expanded).
+
+---
+
+### User Story 4 - Rewards, bounties, and a reward marketplace (Priority: P4)
+
+Completing actionables—especially hard or “high resistance” ones—can grant in-app currency and/or immediate perks. The user spends currency in a marketplace of rewards they care about, and can configure bounties per actionable where supported.
+
+**Why this priority**: Central to the original gamification vision and the legacy next-step “marketplace de recompensas.”
+
+**Independent Test**: Complete a task with a bounty, see balance increase, redeem or “purchase” a configured reward from the marketplace without needing the full flexible planner (can use a minimal list if other stories are stubbed).
+
+**Acceptance Scenarios**:
+
+1. **Given** a completed actionable with an attached bounty, **When** completion is recorded, **Then** the user’s balance or granted perk reflects the rules defined for that bounty.
+2. **Given** currency, **When** the user selects a marketplace reward with a price, **Then** currency deducts (or rules apply) and the reward is recorded as obtained or scheduled per its type.
+3. **Given** different reward types (instant gratification vs saved-for-later), **When** the user configures them, **Then** behavior matches the type (e.g., immediate reveal vs banked choice).
+
+---
+
+### User Story 5 - Personalize how the app feels (Priority: P5)
+
+Users choose a presentation preset (e.g., calm, playful, high-contrast) so the experience can feel like a light game or a more conventional productivity surface, per the vision’s “levels of gamification” for interface.
+
+**Why this priority**: Explicit legacy next-step; supports accessibility and personal preference without changing core mechanics.
+
+**Independent Test**: Switch presets and observe typography, color, and density change consistently across main screens.
+
+**Acceptance Scenarios**:
+
+1. **Given** account or device settings, **When** the user selects a visual preset, **Then** primary planning screens adopt that preset until changed.
+2. **Given** a preset, **When** the user uses core flows (plan, triage, rewards), **Then** readability and touch targets remain usable (no critical text below a minimum comfortable size).
+
+---
+
+### User Story 6 - Understand what changed in the plan (Priority: P6)
+
+Users review a chronological history of meaningful plan edits (moves, estimate changes, completions, deferrals) for accountability and debugging “what happened to my day.”
+
+**Why this priority**: Listed in legacy next-steps; supports trust and reflection aligned with self-growth moments in the vision.
+
+**Independent Test**: Perform a series of edits and open history; entries appear in order with human-readable descriptions.
+
+**Acceptance Scenarios**:
+
+1. **Given** several edits in one session, **When** the user opens history, **Then** they see ordered events with enough context to recognize each change.
+2. **Given** a deferred or moved item, **When** the user inspects history, **Then** the event references the item and the before/after placement or status at a useful level of detail.
+
+---
+
+### Edge Cases
+
+- Day boundaries cross midnight (night owl vs early bird): estimates and “fit” logic remain consistent or the user can define which “day” window applies.
+- All items are “essential” but the day cannot fit them: the product avoids silent failure—user must confirm what gives (time box, split task, or defer).
+- Zero or negative currency: marketplace and bounty rules define clear behavior (cannot purchase; optional debt is out of scope unless explicitly added later).
+- Very long notes or huge history: performance stays acceptable for typical personal use (hundreds of items, thousands of events) without requiring the user to manually purge.
+- Offline or interrupted sessions: the user does not lose completed work or last-known plan state beyond a clearly communicated recovery boundary (exact sync model is an implementation concern; the outcome is no surprising data loss for the primary device session).
+
+## Requirements _(mandatory)_
+
+### Functional Requirements
+
+- **FR-001**: The system MUST let users define actionables with a human-readable title, optional priority or essentiality, and an estimated duration or effort unit suitable for flexible scheduling.
+- **FR-002**: The system MUST let users compose a day plan as an ordered collection of actionables against a user-defined daily window (start/end or equivalent).
+- **FR-003**: The system MUST recalculate fit/overflow feedback when estimates, order, priorities, or the daily window change.
+- **FR-004**: The system MUST let users complete, skip, or reopen actionables in a way that updates the plan state and any dependent rewards consistently.
+- **FR-005**: The system MUST provide a triage path for items not executed or not fitting, including deferral to another day and demotion of importance where the user chooses.
+- **FR-006**: The system MUST let users attach expanded content to an actionable, including lightweight structured formatting, without forcing that content into the main list row.
+- **FR-007**: The system MUST maintain a reward balance (or equivalent ledger) and let users acquire configured rewards through a marketplace or catalog interaction.
+- **FR-008**: The system MUST allow configuration of bounties or rewards associated with specific actionables, including differentiated rewards for “high resistance” work when the user sets them up.
+- **FR-009**: The system MUST offer at least one alternate visual preset affecting colors and density (or clearly scoped style families) across core screens.
+- **FR-010**: The system MUST record a retrievable history of material plan and actionable changes with timestamps and enough identifiers for the user to understand each event.
+- **FR-011**: The system MUST persist user data across sessions so the same user sees a consistent plan, notes, balances, and history after leaving and returning.
+- **FR-012**: The system SHOULD visualize or label actionables that fall outside the current day plan (the “shaded runway” concept—left out of today’s feasible set) when overflow occurs.
+
+### Key Entities _(include if feature involves data)_
+
+- **Actionable**: A unit of intended work or life activity; title; estimate; priority; status (planned, in progress, done, deferred); optional bounty configuration; optional expanded content.
+- **Day plan**: A date (or logical day window); ordered references to actionables; derived fit/overflow state against the user’s window and rules.
+- **User preferences**: Daily window defaults; visual preset; any default bounty or reward behaviors the product exposes.
+- **Reward definition**: Name; cost or grant rules; type (instant, banked, scheduled); availability in marketplace.
+- **Ledger entry**: Changes to currency or perks tied to events (completion, purchase, manual adjustment if allowed).
+- **History event**: User-visible record of a change (what entity, what changed, when).
+
+## Success Criteria _(mandatory)_
+
+### Measurable Outcomes
+
+- **SC-001**: A new user can build a first-day plan with at least five actionables, see fit feedback, and reorder once—all within ten minutes without assistance documentation.
+- **SC-002**: In usability tests, at least 80% of participants correctly identify which items overflow a constrained day on first exposure after adding one oversized item.
+- **SC-003**: After deferring or moving an item, users can find that item’s new placement or status without searching unrelated areas of the product (task-success rate target 90% in moderated tests).
+- **SC-004**: Users with expanded notes report that the main day view remains scannable (qualitative: majority agree in interviews or survey after two weeks of use).
+- **SC-005**: Completing a bounty-bearing actionable updates balance or perks in the same session with no conflicting figures visible in marketplace and profile surfaces.
+- **SC-006**: Switching visual presets applies consistently to planning, triage, and rewards entry points with no more than two screen revisits to see the change (heuristic evaluation).
+- **SC-007**: For a week of simulated edits, history lists events in chronological order with no duplicate phantom entries for single user actions (verified in test scenarios).
+
+## Assumptions
+
+- **Single primary user per workspace** for this specification; household or team sharing is out of scope unless added in a later spec.
+- **Authentication and identity** exist or will exist in the hosting product; this spec does not mandate a specific method.
+- **Physical integrations** (candy machine, NFC bracelets, dedicated handheld devices) and **social/community competition** are out of scope for this feature; they may be separate epics.
+- **Parody social feeds or daily-changing app “skins”** imitating third-party products are aspirational; this spec does not require them for acceptance—only the preset-based personalization in FR-009.
+- **Portable task core / multi-brand reuse** (e.g., personal vs professional flavors) is a strategic direction from next-steps; this spec defines the behavioral contract of the personal day-planning experience so a shared core can emerge in planning work, without prescribing package names or code layout here.
+- **Sync across multiple devices** is desirable; FR-011 requires session-to-session persistence. Full conflict resolution policies are left to planning unless product owners later tighten them.
+- **Regulatory or medical claims** are not made; the product is productivity and wellbeing-oriented software, not a clinical tool.
