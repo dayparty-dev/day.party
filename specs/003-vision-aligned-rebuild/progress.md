@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Mobile plan history (T047 / US6)**: `views/history-view` loads `getHistory({ limit: 25, order: 'desc' })`, **Repeater** + `ObservableArray` rows (timestamp, type, `entityId`, JSON payload preview ≤200 chars); **Cargar más** uses `nextCursor`. Rundown **Historial** `ActionItem` → `authState.navigateToHistory()`. `.history-card` shares preset styling with `.reward-card`; `.history-touch` min-height 48 for retry / load-more buttons.
 - **Mobile visual preset (T046 / US5)**: `services/visual-preset.ts` caches `visualPreset` from `getUserPreferences`, applies `preset-calm` / `preset-playful` / `preset-highContrast` via `Page.className` (strip + append). Root `Frame` listens to `Frame.navigatedToEvent` in `app.ts`; authed cold start + post–magic-link `refreshVisualPresetFromApi`; `resetVisualPresetCache` on logout / `clearSessionAndGoToLogin`. `app.css` mirrors web `presets.css` tokens (page bg, **ActionBar**, inputs, triage/reward cards, **Button.-primary**).
 - **Mobile rewards (T045 / US4)**: `views/rewards-view` loads `getRewards` + `getLedger({ limit: 30 })` in parallel; **Comprar** uses `purchaseReward`; create form uses `createRewardDefinition` (Spanish copy). **Repeater** (not nested **ListView**) inside **ScrollView** for catalog + ledger rows. `authState.navigateToRewards()`; rundown **ActionBar** **Recompensas** `ActionItem`. `.reward-touch` **min-height: 48** for marketplace buttons. Shell route list in `app.ts` file comment.
 - **Mobile notes (T044 / US3)**: Rundown `TaskRow` includes optional `notesPreviewLine` + `notesPreviewVisibility` from `TaskRundownItemResponse.notesPreview`; **Notas** → `authState.navigateToTaskDetail(taskId, { notesFocus: true })`. `task-detail-view` reads `context.notesFocus`, sets `pageTitle` **Notas** vs **Editar tarea**, `notesEditorHeight` 220 vs 150; notes **TextView** after **Título** with `.notes-text` (monospace) and short helper copy.
@@ -722,5 +723,34 @@ Started: 2026-04-02 15:10:01
 
 - NativeScript 9 exposes `Frame.navigatedToEvent` (not `navigatedEvent`); narrow `Result` with `res.ok === false` before reading `error`.
 - Mobile users pick up `visualPreset` from the API (e.g. set on web **Look & feel**); changing preset on-device only would need a future PATCH UI.
+
+---
+
+## Iteration 23 - 2026-04-02
+
+**User Story**: Phase 10 — US6 mobile plan history (**T047**)
+
+**Tasks Completed**:
+
+- [x] T047 [P] [US6]: `history-view.ts` / `history-view.xml` — read-only list + pagination; rundown **Historial** + `navigateToHistory`; `app.ts` shell route comment; preset-aligned `.history-card` / `.history-touch`
+
+**Tasks Remaining in Story**: None — **all `tasks.md` checkboxes complete** for feature 003
+
+**Commit**: e111d405ed5e51d8f0c7713f58f4b245ebc510e8
+
+**Files Changed**:
+
+- `apps/mobile/src/views/history-view.ts`
+- `apps/mobile/src/views/history-view.xml`
+- `apps/mobile/src/services/auth-state.ts`
+- `apps/mobile/src/views/rundown-view.ts`
+- `apps/mobile/src/views/rundown-view.xml`
+- `apps/mobile/src/app.ts`
+- `apps/mobile/src/app.css`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Mirror web `PlanHistoryPanel` field layout (when / type / entity / payload) for consistent audit readability; keep **Observable** visibility strings (no ternary in XML bindings).
 
 ---
