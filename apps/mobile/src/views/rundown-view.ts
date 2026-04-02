@@ -1,5 +1,4 @@
 import type { EventData, Page } from '@nativescript/core';
-import type { ItemEventData } from '@nativescript/core/ui';
 import { Observable, ObservableArray } from '@nativescript/core';
 
 import { authState } from '../services/auth-state';
@@ -14,6 +13,11 @@ type TaskRow = {
   isComplete: boolean;
   metaLine: string;
   runwayLabel: string;
+  focusBtnText: string;
+  focusBtnVisibility: 'visible' | 'collapse';
+  onToggleComplete: () => void;
+  onEditTap: () => void;
+  onFocusTap: () => void;
 };
 
 function todayIso(): string {
@@ -132,7 +136,8 @@ class RundownViewModel extends Observable {
       this.taskRows.pop();
     }
     const sorted = [...tasks].sort((a, b) => a.position - b.position);
-    for (const t of sorted) {
+    for (let i = 0; i < sorted.length; i++) {
+      const t = sorted[i]!;
       const parts: string[] = [];
       if (t.estimatedMinutes != null) {
         parts.push(`${t.estimatedMinutes} min`);
@@ -144,12 +149,18 @@ class RundownViewModel extends Observable {
       if (t.essentiality === 'optional') {
         parts.push('Opcional');
       }
+      if (t.status === 'in_progress') {
+        parts.push('En curso');
+      }
       let runwayLabel = '';
       if (!t.isComplete) {
         runwayLabel = dayFit.outsideRunwayTaskIds.includes(t.id) ? 'Extra' : 'En ventana';
       }
+      const canFocus = !t.isComplete && (t.status === 'planned' || t.status === 'in_progress');
+      const taskId = t.id;
+      const status = t.status;
       this.taskRows.push({
-        id: t.id,
+        id: taskId,
         title: t.title,
         size: String(t.size),
         tagColor: t.tagKey ? (tagColors.get(t.tagKey) ?? '#6b7280') : '#9ca3af',
@@ -157,16 +168,17 @@ class RundownViewModel extends Observable {
         isComplete: t.isComplete,
         metaLine: parts.join(' · '),
         runwayLabel,
+        focusBtnText: t.status === 'in_progress' ? 'Pausa' : 'Enfoque',
+        focusBtnVisibility: canFocus ? 'visible' : 'collapse',
+        onToggleComplete: () => void this.toggleAt(i),
+        onEditTap: () => authState.navigateToTaskDetail(taskId),
+        onFocusTap: () => void this.toggleFocusFor(taskId, status),
       });
     }
   }
 
   onLoaded(): void {
     void this.loadRundown();
-  }
-
-  onTaskTap(args: ItemEventData): void {
-    void this.toggleAt(args.index);
   }
 
   async toggleAt(index: number): Promise<void> {
@@ -176,6 +188,28 @@ class RundownViewModel extends Observable {
     }
     const client = authState.getClient();
     const result = await client.updateTask(row.id, { isComplete: !row.isComplete });
+    if (authState.consumeUnauthorized(result)) {
+      return;
+    }
+    if (result.ok === false) {
+      const net = isLikelyNetworkFailure(result.error);
+      this.set(
+        'errorMessage',
+        net ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.' : result.error.message,
+      );
+      this.set('errorBannerVisibility', 'visible');
+      return;
+    }
+    await this.loadRundown();
+  }
+
+  async toggleFocusFor(taskId: string, status: string): Promise<void> {
+    if (status !== 'planned' && status !== 'in_progress') {
+      return;
+    }
+    const next = status === 'in_progress' ? 'planned' : 'in_progress';
+    const client = authState.getClient();
+    const result = await client.updateTask(taskId, { status: next });
     if (authState.consumeUnauthorized(result)) {
       return;
     }

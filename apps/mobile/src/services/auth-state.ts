@@ -63,6 +63,15 @@ class AuthStateService {
     });
   }
 
+  navigateToTaskDetail(taskId: string): void {
+    Frame.topmost()?.navigate({
+      moduleName: 'views/task-detail-view',
+      context: { taskId },
+      clearHistory: false,
+      animated: true,
+    });
+  }
+
   async login(email: string): Promise<Result<{ message: string }>> {
     return this.client.login(email);
   }

@@ -1,0 +1,67 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" loaded="onLoaded" class="page">
+  <ActionBar title="Editar tarea">
+    <NavigationButton text="Atrás" tap="{{ onBack }}" android.systemIcon="ic_menu_back" />
+  </ActionBar>
+
+  <ScrollView>
+    <StackLayout class="p-16">
+      <StackLayout visibility="{{ errorBannerVisibility }}" class="error-banner m-b-12">
+        <Label text="{{ errorMessage }}" textWrap="true" class="error-text" />
+        <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8" />
+      </StackLayout>
+
+      <StackLayout visibility="{{ loadingVisibility }}">
+        <Label text="Cargando…" class="h3" />
+      </StackLayout>
+
+      <StackLayout visibility="{{ formVisibility }}">
+        <Label text="{{ formError }}" textWrap="true" class="window-error m-b-8" />
+
+        <Label text="Título" class="footnote" />
+        <TextField text="{{ title }}" hint="Título" class="input m-t-4" />
+
+        <Label text="Tamaño (1–5)" class="footnote m-t-12" />
+        <TextField text="{{ sizeText }}" hint="2" keyboardType="number" class="input m-t-4" />
+
+        <Label text="Minutos estimados (opcional)" class="footnote m-t-12" />
+        <TextField text="{{ minutesText }}" hint="Vacío = según tamaño" keyboardType="number" class="input m-t-4" />
+
+        <Label text="Importancia" class="footnote m-t-12" />
+        <ListPicker items="{{ essentialityOptions }}" selectedIndex="{{ essentialityIndex }}" class="input m-t-4" />
+
+        <Label text="Etiqueta" class="footnote m-t-12" />
+        <ListPicker items="{{ tagItems }}" selectedIndex="{{ tagPickerIndex }}" class="input m-t-4" />
+
+        <Label text="Fecha planificada (AAAA-MM-DD)" class="footnote m-t-12" />
+        <TextField text="{{ scheduledDate }}" hint="2026-04-02" class="input m-t-4" />
+
+        <Label text="Estado" class="footnote m-t-12" />
+        <ListPicker items="{{ statusOptions }}" selectedIndex="{{ statusIndex }}" class="input m-t-4" />
+
+        <StackLayout visibility="{{ deferredVisibility }}" class="m-t-12">
+          <Label text="Volver a ver el" class="footnote" />
+          <TextField text="{{ deferredToDate }}" hint="AAAA-MM-DD" class="input m-t-4" />
+        </StackLayout>
+
+        <Label text="Notas (markdown)" class="footnote m-t-12" />
+        <TextView text="{{ notesMarkdown }}" hint="Notas…" class="input m-t-4" height="120" />
+
+        <Label text="Recompensa (puntos)" class="h3 m-t-16" />
+        <Label text="Cantidad (vacío = sin cambio; 0 con quitar = eliminar)" class="footnote" textWrap="true" />
+        <TextField text="{{ bountyAmountText }}" hint="Opcional" keyboardType="number" class="input m-t-4" />
+        <Label text="Ámbito etiquetas (coma)" class="footnote m-t-8" />
+        <TextField text="{{ bountyTagKeysText }}" hint="trabajo, foco" class="input m-t-4" />
+        <GridLayout columns="auto, *" class="m-t-8">
+          <Switch col="0" checked="{{ bountyHighResistance }}" verticalAlignment="center" />
+          <Label col="1" text="Alta resistencia" class="footnote" textWrap="true" verticalAlignment="center" />
+        </GridLayout>
+        <GridLayout columns="auto, *" class="m-t-8" visibility="{{ hadBountyVisibility }}">
+          <Switch col="0" checked="{{ clearBounty }}" verticalAlignment="center" />
+          <Label col="1" text="Quitar recompensa" class="footnote" textWrap="true" verticalAlignment="center" />
+        </GridLayout>
+
+        <Button text="{{ saveButtonText }}" tap="{{ onSave }}" isEnabled="{{ saveEnabled }}" class="-primary m-t-20" />
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+</Page>

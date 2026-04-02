@@ -25,16 +25,16 @@ Per `spec.md` (**Mobile / web parity** and **Definition of done (first-party cli
 
 ### API ↔ client coverage matrix (003)
 
-| Capability (REST / client)                                                                         | Web today                  | Mobile today | Product-complete when      | Task IDs                     |
-| -------------------------------------------------------------------------------------------------- | -------------------------- | ------------ | -------------------------- | ---------------------------- |
-| `PATCH` **title**, **size**, **estimatedMinutes**, **essentiality**, **tagKey**, **scheduledDate** | Not exposed                | Not exposed  | Both clients               | **T051**, **T054**           |
-| `PATCH` **status** `planned` ↔ `in_progress` (“focus / pause”)                                     | Not exposed                | Not exposed  | Both clients               | **T052**, **T055**           |
-| `PATCH` **status** / **deferredToDate** (`deferred`)                                               | Partial (via triage defer) | Not exposed  | Both + editor where needed | **T051**, **T054**, **T043** |
-| **Triage** (`POST …/triage`)                                                                       | Exposed (**T020**)         | Not exposed  | Mobile                     | **T043**                     |
-| **Notes** detail (`GET :id`, `PATCH` notes)                                                        | Exposed (**T023**)         | Not exposed  | Mobile                     | **T044**                     |
-| **Bounty** create (`POST` + `createTaskSchema.bounty`)                                             | Not exposed                | Not exposed  | Both                       | **T053**, **T056**           |
-| **Bounty** edit/clear (`PATCH` bounty)                                                             | Not exposed                | Not exposed  | Both                       | **T051**, **T054**           |
-| Rewards / ledger / purchase                                                                        | Exposed (**T030**)         | Not exposed  | Mobile                     | **T045**                     |
+| Capability (REST / client)                                                                         | Web today                  | Mobile today       | Product-complete when      | Task IDs                     |
+| -------------------------------------------------------------------------------------------------- | -------------------------- | ------------------ | -------------------------- | ---------------------------- |
+| `PATCH` **title**, **size**, **estimatedMinutes**, **essentiality**, **tagKey**, **scheduledDate** | Exposed (**T051**)         | Exposed (**T054**) | Both clients               | —                            |
+| `PATCH` **status** `planned` ↔ `in_progress` (“focus / pause”)                                     | Exposed (**T052**)         | Exposed (**T055**) | Both clients               | —                            |
+| `PATCH` **status** / **deferredToDate** (`deferred`)                                               | Partial (via triage defer) | Not exposed        | Both + editor where needed | **T051**, **T054**, **T043** |
+| **Triage** (`POST …/triage`)                                                                       | Exposed (**T020**)         | Not exposed        | Mobile                     | **T043**                     |
+| **Notes** detail (`GET :id`, `PATCH` notes)                                                        | Exposed (**T023**)         | Not exposed        | Mobile                     | **T044**                     |
+| **Bounty** create (`POST` + `createTaskSchema.bounty`)                                             | Not exposed                | Not exposed        | Both                       | **T053**, **T056**           |
+| **Bounty** edit/clear (`PATCH` bounty)                                                             | Not exposed                | Not exposed        | Both                       | **T051**, **T054**           |
+| Rewards / ledger / purchase                                                                        | Exposed (**T030**)         | Not exposed        | Mobile                     | **T045**                     |
 
 _Update this table when `updateTaskSchema` or routes gain fields._
 
@@ -138,10 +138,10 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 **Purpose**: Close **API vs client drift**: `PATCH /api/tasks/:id` and `createTask` accept a broad task shape; first-party clients today mostly toggle **done**, **notes**, and (web-only) **triage**. **Depends on**: **T013** (`DayPartyClient` / `getTask`), **T022**, **T049**–**T050**.
 
 - [x] T051 [US1] Web: add task **detail / edit** UI (e.g. `apps/web/src/components/TaskEditPanel.tsx` or drawer) wired from `apps/web/src/pages/RundownPage.tsx`, loading via `DayPartyClient.getTask` and saving via `updateTask` for **`title`**, **`size`**, **`estimatedMinutes`**, **`essentiality`**, **`tagKey`**, **`scheduledDate`**, **`status`** / **`deferredToDate`** when `deferred`, and **`bounty`** set or clear (align with `updateTaskSchema`; FR-008)
-- [ ] T052 [US1] Web: expose **Start / Pause** (or equivalent copy) for **`planned` ↔ `in_progress`** via `updateTask` on rundown and/or `apps/web/src/pages/OngoingPage.tsx` (FR-004)
+- [x] T052 [US1] Web: expose **Start / Pause** (or equivalent copy) for **`planned` ↔ `in_progress`** via `updateTask` on rundown and/or `apps/web/src/pages/OngoingPage.tsx` (FR-004)
 - [ ] T053 [P] [US4] Web: extend `apps/web/src/components/CreateTaskPanel.tsx` (**T049**) with optional **`bounty`** fields from `createTaskSchema` so new tasks can carry bounties without raw API
-- [ ] T054 [US1] Mobile: task **detail / edit** view (same field set as **T051**) in `apps/mobile/src/views/` (new `task-detail-view` or extend rundown), navigable from rundown, using `getTask` / `updateTask`
-- [ ] T055 [US1] Mobile: **`planned` ↔ `in_progress`** controls mirroring **T052** (`updateTask`)
+- [x] T054 [US1] Mobile: task **detail / edit** view (same field set as **T051**) in `apps/mobile/src/views/` (new `task-detail-view` or extend rundown), navigable from rundown, using `getTask` / `updateTask`
+- [x] T055 [US1] Mobile: **`planned` ↔ `in_progress`** controls mirroring **T052** (`updateTask`)
 - [ ] T056 [P] [US4] Mobile: optional **`bounty`** on create in **T050** flow + edit/clear in **T054** surface (`createTask` / `updateTask`)
 
 ---

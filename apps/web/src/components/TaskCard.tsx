@@ -9,9 +9,18 @@ type TaskCardProps = {
   tagColor?: string;
   runwayPlacement: TaskRunwayPlacement;
   onToggleComplete: (task: TaskRundownItemResponse) => void;
+  focusBusy?: boolean;
+  onToggleFocus?: (task: TaskRundownItemResponse) => void;
 };
 
-export function TaskCard({ task, tagColor, runwayPlacement, onToggleComplete }: TaskCardProps): ReactElement {
+export function TaskCard({
+  task,
+  tagColor,
+  runwayPlacement,
+  onToggleComplete,
+  focusBusy = false,
+  onToggleFocus,
+}: TaskCardProps): ReactElement {
   const cardClass =
     runwayPlacement === 'outside-runway'
       ? `${styles.card} ${styles.cardOutside}`
@@ -48,6 +57,11 @@ export function TaskCard({ task, tagColor, runwayPlacement, onToggleComplete }: 
             ) : null}
             {task.essentiality === 'optional' ? <span className={styles.optTag}>Optional</span> : null}
             {task.status === 'skipped' ? <span className={styles.skipTag}>Skipped today</span> : null}
+            {task.status === 'in_progress' ? (
+              <span className={styles.focusTag} title="Currently in focus">
+                In progress
+              </span>
+            ) : null}
             {runwayPlacement === 'outside-runway' && !task.isComplete ? (
               <span className={styles.runwayTag}>Outside window</span>
             ) : null}
@@ -67,6 +81,11 @@ export function TaskCard({ task, tagColor, runwayPlacement, onToggleComplete }: 
           <span className={styles.sizeBadge} data-size={task.size}>
             {task.size}
           </span>
+          {!task.isComplete && (task.status === 'planned' || task.status === 'in_progress') && onToggleFocus ? (
+            <button type="button" className={styles.focusBtn} disabled={focusBusy} onClick={() => onToggleFocus(task)}>
+              {focusBusy ? '…' : task.status === 'in_progress' ? 'Pause' : 'Start'}
+            </button>
+          ) : null}
         </div>
       </div>
     </article>

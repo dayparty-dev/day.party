@@ -20,10 +20,12 @@ export function OngoingPage(): ReactElement {
   const [tick, setTick] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [networkBanner, setNetworkBanner] = useState<string | null>(null);
+  const [focusBusy, setFocusBusy] = useState(false);
 
   const pickFocus = useCallback((tasks: TaskRundownItemResponse[]): TaskRundownItemResponse | null => {
     const open = tasks.filter((t) => !t.isComplete).sort((a, b) => a.position - b.position);
-    return open[0] ?? null;
+    const inProgress = open.find((t) => t.status === 'in_progress');
+    return inProgress ?? open[0] ?? null;
   }, []);
 
   const load = useCallback(async () => {
@@ -118,6 +120,32 @@ export function OngoingPage(): ReactElement {
     await load();
   }
 
+  async function toggleFocusStatus(): Promise<void> {
+    if (!focusTask || focusBusy) {
+      return;
+    }
+    if (focusTask.status !== 'planned' && focusTask.status !== 'in_progress') {
+      return;
+    }
+    const nextStatus = focusTask.status === 'in_progress' ? 'planned' : 'in_progress';
+    setFocusBusy(true);
+    const result = await client.updateTask(focusTask.id, { status: nextStatus });
+    setFocusBusy(false);
+    if (!result.ok) {
+      if (result.error.code === ERROR_CODES.UNAUTHORIZED) {
+        onUnauthorized();
+        return;
+      }
+      if (isLikelyNetworkFailure(result.error)) {
+        setNetworkBanner(result.error.message);
+        return;
+      }
+      setLoadError(result.error.message);
+      return;
+    }
+    await load();
+  }
+
   return (
     <div className={styles.page}>
       <header className={styles.top}>
@@ -166,6 +194,17 @@ export function OngoingPage(): ReactElement {
                 Progress is a gentle guide (~{focusTask.size * SIZE_MINUTES} min for this size).
               </p>
             </div>
+
+            {focusTask.status === 'planned' || focusTask.status === 'in_progress' ? (
+              <button
+                type="button"
+                className={styles.focusToggleBtn}
+                disabled={focusBusy}
+                onClick={() => void toggleFocusStatus()}
+              >
+                {focusBusy ? 'Updating…' : focusTask.status === 'in_progress' ? 'Pause' : 'Start'}
+              </button>
+            ) : null}
 
             <button type="button" className={styles.doneBtn} onClick={() => void markComplete()}>
               Mark complete

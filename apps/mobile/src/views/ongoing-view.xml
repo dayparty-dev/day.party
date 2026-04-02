@@ -22,6 +22,10 @@
 
         <Progress value="{{ progressValue }}" maxValue="100" class="m-t-12" height="8" />
 
+        <StackLayout visibility="{{ focusToggleVisibility }}" class="m-t-12">
+          <Button text="{{ focusToggleText }}" tap="{{ onToggleFocus }}" isEnabled="{{ focusToggleEnabled }}" class="-outline" />
+        </StackLayout>
+
         <Button text="Marcar completada" tap="{{ onComplete }}" class="-primary m-t-20" />
         <Button text="Ir al resumen" tap="{{ onBack }}" class="-outline m-t-8" />
       </StackLayout>

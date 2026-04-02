@@ -1,3 +1,4 @@
+import type { TaskRundownItemResponse } from '@dayparty/api-client';
 import type { EventData, Page } from '@nativescript/core';
 import { Observable } from '@nativescript/core';
 
@@ -12,18 +13,10 @@ function todayIso(): string {
   return `${y}-${mo}-${da}`;
 }
 
-type RundownTask = {
-  id: string;
-  title: string;
-  size: 1 | 2 | 3 | 4 | 5;
-  tagKey?: string;
-  isComplete: boolean;
-  position: number;
-};
-
-function pickFocusTask(tasks: RundownTask[]): RundownTask | null {
-  const sorted = [...tasks].sort((a, b) => a.position - b.position);
-  return sorted.find((t) => !t.isComplete) ?? null;
+function pickFocusTask(tasks: TaskRundownItemResponse[]): TaskRundownItemResponse | null {
+  const open = tasks.filter((t) => !t.isComplete).sort((a, b) => a.position - b.position);
+  const inProgress = open.find((t) => t.status === 'in_progress');
+  return inProgress ?? open[0] ?? null;
 }
 
 class OngoingViewModel extends Observable {
@@ -35,9 +28,13 @@ class OngoingViewModel extends Observable {
   errorBannerVisibility = 'collapse';
   emptyVisibility = 'collapse';
   focusVisibility = 'collapse';
+  focusToggleVisibility = 'collapse';
+  focusToggleText = '';
+  focusToggleEnabled = true;
   private tickHandle: ReturnType<typeof setInterval> | null = null;
   private focusStartedAt = 0;
   private currentTaskId: string | null = null;
+  private currentStatus: string | null = null;
 
   startTicker(): void {
     this.stopTicker();
@@ -92,18 +89,24 @@ class OngoingViewModel extends Observable {
       }
     }
 
-    const focus = pickFocusTask(rundownResult.data.tasks as RundownTask[]);
+    const focus = pickFocusTask(rundownResult.data.tasks);
     if (!focus) {
       this.stopTicker();
       this.currentTaskId = null;
+      this.currentStatus = null;
       this.set('emptyVisibility', 'visible');
       this.set('focusVisibility', 'collapse');
+      this.set('focusToggleVisibility', 'collapse');
       return;
     }
 
     this.currentTaskId = focus.id;
+    this.currentStatus = focus.status;
     this.set('emptyVisibility', 'collapse');
     this.set('focusVisibility', 'visible');
+    const canFocus = focus.status === 'planned' || focus.status === 'in_progress';
+    this.set('focusToggleVisibility', canFocus ? 'visible' : 'collapse');
+    this.set('focusToggleText', focus.status === 'in_progress' ? 'Pausa' : 'Enfoque');
     this.set('title', focus.title);
     const tag = focus.tagKey != null && tagNames.has(focus.tagKey) ? tagNames.get(focus.tagKey) : 'Sin etiqueta';
     this.set('metaLine', `Tamaño ${focus.size} · ${tag}`);
@@ -147,6 +150,33 @@ class OngoingViewModel extends Observable {
 
   onRetry(): void {
     void this.loadFocus();
+  }
+
+  async onToggleFocus(): Promise<void> {
+    if (!this.currentTaskId || !this.currentStatus) {
+      return;
+    }
+    if (this.currentStatus !== 'planned' && this.currentStatus !== 'in_progress') {
+      return;
+    }
+    const next = this.currentStatus === 'in_progress' ? 'planned' : 'in_progress';
+    this.set('focusToggleEnabled', false);
+    const client = authState.getClient();
+    const result = await client.updateTask(this.currentTaskId, { status: next });
+    this.set('focusToggleEnabled', true);
+    if (authState.consumeUnauthorized(result)) {
+      return;
+    }
+    if (result.ok === false) {
+      const net = isLikelyNetworkFailure(result.error);
+      this.set(
+        'errorMessage',
+        net ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.' : result.error.message,
+      );
+      this.set('errorBannerVisibility', 'visible');
+      return;
+    }
+    await this.loadFocus();
   }
 }
 

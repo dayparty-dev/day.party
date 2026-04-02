@@ -51,6 +51,7 @@ export function RundownPage(): ReactElement {
   const [savingWindow, setSavingWindow] = useState(false);
   const [capacityHints, setCapacityHints] = useState<DayCapacityHint[]>([]);
   const [triageBusyId, setTriageBusyId] = useState<string | null>(null);
+  const [focusBusyId, setFocusBusyId] = useState<string | null>(null);
 
   const tomorrowDate = useMemo(() => addLocalCalendarDays(date, 1), [date]);
 
@@ -127,6 +128,32 @@ export function RundownPage(): ReactElement {
 
   async function toggleTask(task: TaskRundownItemResponse): Promise<void> {
     const result = await client.updateTask(task.id, { isComplete: !task.isComplete });
+    if (!result.ok) {
+      if (result.error.code === ERROR_CODES.UNAUTHORIZED) {
+        onUnauthorized();
+        return;
+      }
+      if (isLikelyNetworkFailure(result.error)) {
+        setNetworkBanner(result.error.message);
+        return;
+      }
+      setLoadError(result.error.message);
+      return;
+    }
+    await load();
+  }
+
+  async function toggleTaskFocus(task: TaskRundownItemResponse): Promise<void> {
+    if (task.isComplete) {
+      return;
+    }
+    if (task.status !== 'planned' && task.status !== 'in_progress') {
+      return;
+    }
+    const nextStatus = task.status === 'in_progress' ? 'planned' : 'in_progress';
+    setFocusBusyId(task.id);
+    const result = await client.updateTask(task.id, { status: nextStatus });
+    setFocusBusyId(null);
     if (!result.ok) {
       if (result.error.code === ERROR_CODES.UNAUTHORIZED) {
         onUnauthorized();
@@ -327,6 +354,8 @@ export function RundownPage(): ReactElement {
               tagColor={task.tagKey ? tagColorByKey.get(task.tagKey) : undefined}
               runwayPlacement={rundown ? runwayPlacementForTask(task, rundown.dayFit) : 'in-runway'}
               onToggleComplete={toggleTask}
+              focusBusy={focusBusyId === task.id}
+              onToggleFocus={toggleTaskFocus}
             />
             <TaskEditPanel
               client={client}

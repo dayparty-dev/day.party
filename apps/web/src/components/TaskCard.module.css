@@ -124,6 +124,17 @@
   color: #5d4037;
 }
 
+.focusTag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: #e8eaf6;
+  color: #283593;
+}
+
 .badges {
   display: flex;
   flex-shrink: 0;
@@ -169,4 +180,26 @@
 .sizeBadge[data-size='5'] {
   background: #f3e5f5;
   color: #4a148c;
+}
+
+.focusBtn {
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--dp-border);
+  background: var(--dp-surface);
+  color: var(--dp-accent);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.focusBtn:hover:not(:disabled) {
+  background: #f5f2eb;
+}
+
+.focusBtn:disabled {
+  opacity: 0.55;
+  cursor: default;
 }

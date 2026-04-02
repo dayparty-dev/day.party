@@ -50,16 +50,20 @@
       </StackLayout>
     </ScrollView>
 
-    <ListView row="3" items="{{ taskRows }}" itemTap="{{ onTaskTap }}" class="list">
+    <ListView row="3" items="{{ taskRows }}" class="list">
       <ListView.itemTemplate>
         <GridLayout columns="5, *, auto, auto" class="p-12 task-row">
           <StackLayout col="0" width="5" backgroundColor="{{ tagColor }}" verticalAlignment="stretch" />
           <StackLayout col="1">
             <Label text="{{ title }}" textWrap="true" class="task-title" />
             <Label text="{{ metaLine }}" textWrap="true" class="task-meta" />
+            <StackLayout orientation="horizontal" class="m-t-6">
+              <Button text="Editar" tap="{{ onEditTap }}" class="-outline m-r-8" />
+              <Button text="{{ focusBtnText }}" tap="{{ onFocusTap }}" visibility="{{ focusBtnVisibility }}" class="-outline" />
+            </StackLayout>
           </StackLayout>
           <Label col="2" text="{{ runwayLabel }}" class="runway-badge" textWrap="true" />
-          <Label col="3" text="{{ completeIcon }}" class="complete-icon" />
+          <Label col="3" text="{{ completeIcon }}" tap="{{ onToggleComplete }}" class="complete-icon" />
         </GridLayout>
       </ListView.itemTemplate>
     </ListView>
