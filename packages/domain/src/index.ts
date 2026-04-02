@@ -4,6 +4,8 @@ export type { SessionRepository } from './interfaces/session-repository';
 export type { TagRepository } from './interfaces/tag-repository';
 export type { UserPreferencesRepository } from './interfaces/user-preferences-repository';
 
+export { computeDayFit, windowAvailableMinutes } from './day-fit';
+
 export { makeCreateTaskAction } from './actions/create-task';
 export type { CreateTaskInput } from './actions/create-task';
 export { makeToggleTaskCompletionAction } from './actions/toggle-task-completion';

@@ -1,7 +1,9 @@
-import { DEFAULT_DAY_WINDOW, EMPTY_DAY_FIT, type DayRundown } from '@dayparty/core';
+import { DEFAULT_DAY_WINDOW, type DayRundown } from '@dayparty/core';
 import type { TaskRepository } from '../interfaces/task-repository';
+import type { UserPreferencesRepository } from '../interfaces/user-preferences-repository';
+import { computeDayFit } from '../day-fit';
 
-export function makeReorderTasksAction(taskRepo: TaskRepository) {
+export function makeReorderTasksAction(taskRepo: TaskRepository, userPrefsRepo: UserPreferencesRepository) {
   return async (userId: string, date: string, taskIds: string[]): Promise<DayRundown> => {
     const tasks = await taskRepo.findByUserAndDate(userId, date);
     const taskMap = new Map(tasks.map((t) => [t.id, t]));
@@ -20,6 +22,10 @@ export function makeReorderTasksAction(taskRepo: TaskRepository) {
       position: index,
     }));
 
+    const prefs = await userPrefsRepo.findByUserId(userId);
+    const dayWindow = prefs?.dayWindow ?? DEFAULT_DAY_WINDOW;
+    const dayFit = computeDayFit(reorderedTasks, dayWindow, { sizeToMinutes: prefs?.sizeToMinutes });
+
     const capacity = reorderedTasks.reduce((sum, t) => sum + t.size, 0);
     const completed = reorderedTasks.filter((t) => t.isComplete).length;
     return {
@@ -28,8 +34,8 @@ export function makeReorderTasksAction(taskRepo: TaskRepository) {
       tasks: reorderedTasks,
       capacity,
       completed,
-      dayFit: EMPTY_DAY_FIT,
-      dayWindow: DEFAULT_DAY_WINDOW,
+      dayFit,
+      dayWindow,
     };
   };
 }

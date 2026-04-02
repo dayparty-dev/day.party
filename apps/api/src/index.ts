@@ -42,8 +42,8 @@ const env = {
   tagRepo,
   userPrefsRepo,
   createTask: makeCreateTaskAction(taskRepo, tagRepo),
-  getRundown: makeGetRundownAction(taskRepo),
-  reorderTasks: makeReorderTasksAction(taskRepo),
+  getRundown: makeGetRundownAction(taskRepo, userPrefsRepo),
+  reorderTasks: makeReorderTasksAction(taskRepo, userPrefsRepo),
   deleteTask: makeDeleteTaskAction(taskRepo),
   updateTask: makeUpdateTaskAction(taskRepo, tagRepo),
 };

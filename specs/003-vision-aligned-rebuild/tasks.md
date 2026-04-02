@@ -51,8 +51,8 @@
 ### Implementation for User Story 1
 
 - [x] T006 [US1] Extend `Task` and `DayRundown` in `packages/core/src/models/task.ts` and `packages/core/src/models/day-rundown.ts` with `estimatedMinutes`, priority/essentiality, and rundown fields for `dayFit` + echoed `dayWindow` per `specs/003-vision-aligned-rebuild/contracts/day-planning-rest.md`
-- [ ] T007 [US1] Implement `computeDayFit` (greedy pack, `overflowUnresolved` for essential overflow) in `packages/domain/src/day-fit.ts` per `specs/003-vision-aligned-rebuild/research.md`
-- [ ] T008 [US1] Update `makeGetRundownAction` in `packages/domain/src/actions/get-rundown.ts` to load prefs via `UserPreferencesRepository`, compute fit, and return extended rundown (depends on T005–T007)
+- [x] T007 [US1] Implement `computeDayFit` (greedy pack, `overflowUnresolved` for essential overflow) in `packages/domain/src/day-fit.ts` per `specs/003-vision-aligned-rebuild/research.md`
+- [x] T008 [US1] Update `makeGetRundownAction` in `packages/domain/src/actions/get-rundown.ts` to load prefs via `UserPreferencesRepository`, compute fit, and return extended rundown (depends on T005–T007)
 - [ ] T009 [P] [US1] Extend Zod task schemas in `packages/validation/src/schemas/task.ts` for new task fields; add `packages/validation/src/schemas/user-preferences.ts` and export from `packages/validation/src/index.ts`
 - [ ] T010 [P] [US1] Map new fields in `packages/db/src/repositories/task-repository.ts` with legacy-safe defaults (`estimatedMinutes` from `size` when missing) per `specs/003-vision-aligned-rebuild/research.md`
 - [ ] T011 [US1] Update `apps/api/src/routes/tasks.ts` to return extended rundown and accept new fields on create/update; keep existing auth and error patterns
