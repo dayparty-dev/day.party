@@ -75,7 +75,7 @@
 
 - [x] T012 [P] [US2] Add selected-date state synced to URL query (e.g. `?date=`) and day-navigation UI in `apps/web/src/pages/RundownPage.tsx`
 - [x] T013 [US2] Thread selected date into `client.getRundown`, capacity hints, create-task default `scheduledDate`, and triage targets in `apps/web/src/pages/RundownPage.tsx`, `apps/web/src/components/CreateTaskPanel.tsx`, and `apps/web/src/components/TaskEditPanel.tsx` as needed
-- [ ] T014 [P] [US2] Add date picker / stepper and load `getRundown(selectedDate)` in `apps/mobile/src/views/rundown-view.ts` and `apps/mobile/src/views/rundown-view.xml`
+- [x] T014 [P] [US2] Add date picker / stepper and load `getRundown(selectedDate)` in `apps/mobile/src/views/rundown-view.ts` and `apps/mobile/src/views/rundown-view.xml`
 
 **Checkpoint**: Multi-day planning works on both clients.
 
@@ -89,9 +89,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T015 [P] [US3] Implement drag-and-drop (e.g. `@dnd-kit`) calling `client.reorderTasks` in `apps/web/src/components/RunwayTaskList.tsx` (or equivalent) and integrate into `apps/web/src/pages/RundownPage.tsx`
-- [ ] T016 [US3] Add keyboard-accessible reorder (focus + move up/down) in `apps/web/src/components/RunwayTaskList.tsx` matching the same API calls as T015
-- [ ] T017 [P] [US3] Add mobile reorder (buttons or gesture) invoking `reorderTasks` in `apps/mobile/src/views/rundown-view.ts`
+- [x] T015 [P] [US3] Implement drag-and-drop (e.g. `@dnd-kit`) calling `client.reorderTasks` in `apps/web/src/components/RunwayTaskList.tsx` (or equivalent) and integrate into `apps/web/src/pages/RundownPage.tsx`
+- [x] T016 [US3] Add keyboard-accessible reorder (focus + move up/down) in `apps/web/src/components/RunwayTaskList.tsx` matching the same API calls as T015
+- [x] T017 [P] [US3] Add mobile reorder (buttons or gesture) invoking `reorderTasks` in `apps/mobile/src/views/rundown-view.ts`
 
 **Checkpoint**: US3 complete on web + mobile.
 

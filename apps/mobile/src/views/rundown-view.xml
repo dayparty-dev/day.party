@@ -5,18 +5,25 @@
     <ActionItem text="Salir" ios.position="right" android.position="actionBar" tap="{{ onLogout }}" />
   </ActionBar>
 
-  <GridLayout rows="auto, auto, auto, *">
+  <GridLayout rows="auto, auto, auto, auto, *">
     <StackLayout row="0" visibility="{{ errorBannerVisibility }}" class="error-banner">
       <Label text="{{ errorMessage }}" textWrap="true" class="error-text" />
       <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8" />
     </StackLayout>
 
-    <GridLayout row="1" rows="auto" columns="*, auto" class="p-12">
+    <GridLayout row="1" rows="auto" columns="auto, *, auto, auto" class="p-12 date-nav" verticalAlignment="center">
+      <Button col="0" text="‹" tap="{{ onDatePrev }}" class="-outline date-step-btn" />
+      <TextField col="1" text="{{ planningDate }}" hint="AAAA-MM-DD" class="input m-x-8" textChange="{{ onPlanningDateTextChange }}" />
+      <Button col="2" text="›" tap="{{ onDateNext }}" class="-outline date-step-btn" />
+      <Button col="3" text="Hoy" tap="{{ onDateToday }}" visibility="{{ dateTodayBtnVisibility }}" class="-outline" />
+    </GridLayout>
+
+    <GridLayout row="2" rows="auto" columns="*, auto" class="p-12">
       <Label col="0" text="{{ summaryText }}" class="h3" textWrap="true" />
       <Button col="1" text="En curso" tap="{{ onOngoing }}" class="-primary" />
     </GridLayout>
 
-    <ScrollView row="2" orientation="vertical" class="plan-scroll">
+    <ScrollView row="3" orientation="vertical" class="plan-scroll">
       <StackLayout class="p-12 plan-stack">
         <Label text="{{ planFootnote }}" textWrap="true" class="plan-footnote" />
         <Button text="Ajustar ventana" tap="{{ onToggleWindowEditor }}" class="-outline m-t-8" />
@@ -61,7 +68,7 @@
       </StackLayout>
     </ScrollView>
 
-    <ListView row="3" items="{{ taskRows }}" class="list">
+    <ListView row="4" items="{{ taskRows }}" class="list">
       <ListView.itemTemplate>
         <StackLayout class="task-item-wrap">
           <GridLayout columns="5, *, auto, auto" class="p-12 task-row">
@@ -79,6 +86,10 @@
                 <Button text="Editar" tap="{{ onEditTap }}" class="-outline m-r-8" />
                 <Button text="Notas" tap="{{ onNotesTap }}" class="-outline m-r-8" />
                 <Button text="{{ focusBtnText }}" tap="{{ onFocusTap }}" visibility="{{ focusBtnVisibility }}" class="-outline" />
+              </StackLayout>
+              <StackLayout orientation="horizontal" class="m-t-6" visibility="{{ reorderBarVisibility }}">
+                <Button text="↑" tap="{{ onReorderUp }}" isEnabled="{{ reorderMoveUpEnabled }}" class="-outline m-r-8" />
+                <Button text="↓" tap="{{ onReorderDown }}" isEnabled="{{ reorderMoveDownEnabled }}" class="-outline" />
               </StackLayout>
             </StackLayout>
             <Label col="2" text="{{ runwayLabel }}" class="runway-badge" textWrap="true" />

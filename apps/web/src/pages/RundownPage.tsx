@@ -11,36 +11,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { CreateTaskPanel } from '../components/CreateTaskPanel';
 import { PlanHistoryPanel } from '../components/PlanHistoryPanel';
-import { TaskCard, type TaskRunwayPlacement } from '../components/TaskCard';
-import { TaskEditPanel } from '../components/TaskEditPanel';
-import { TaskNotesPanel } from '../components/TaskNotesPanel';
-import { TaskTriageBar } from '../components/TaskTriageBar';
+import { RunwayTaskList } from '../components/RunwayTaskList';
 import { useVisualPreset } from '../context/visual-preset-context';
 import { useAuth } from '../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import { minutesToTimeInput, timeInputToMinutes } from '../utils/time-of-day';
 import { addLocalCalendarDays, isValidLocalIsoDate, todayLocalDateString } from '../utils/today-local';
 import styles from './RundownPage.module.css';
-
-function runwayPlacementForTask(
-  task: TaskRundownItemResponse,
-  dayFit: DayRundownResponse['dayFit'],
-): TaskRunwayPlacement {
-  if (task.isComplete) {
-    return 'complete';
-  }
-  return dayFit.outsideRunwayTaskIds.includes(task.id) ? 'outside-runway' : 'in-runway';
-}
-
-function showTriageForTask(task: TaskRundownItemResponse, dayFit: DayRundownResponse['dayFit']): boolean {
-  if (task.isComplete) {
-    return false;
-  }
-  if (task.status === 'skipped') {
-    return true;
-  }
-  return dayFit.overflowUnresolved || dayFit.outsideRunwayTaskIds.includes(task.id);
-}
 
 const PRESET_OPTIONS: { value: VisualPreset; label: string }[] = [
   { value: 'default', label: 'Default' },
@@ -462,53 +439,28 @@ export function RundownPage(): ReactElement {
         onSuccess={load}
       />
 
-      <ul className={styles.list}>
-        {sortedTasks.map((task) => (
-          <li key={task.id} className={styles.li}>
-            <TaskCard
-              task={task}
-              tagColor={task.tagKey ? tagColorByKey.get(task.tagKey) : undefined}
-              runwayPlacement={rundown ? runwayPlacementForTask(task, rundown.dayFit) : 'in-runway'}
-              onToggleComplete={toggleTask}
-              focusBusy={focusBusyId === task.id}
-              onToggleFocus={toggleTaskFocus}
-            />
-            <TaskEditPanel
-              client={client}
-              taskId={task.id}
-              tags={tags ?? []}
-              onUnauthorized={onUnauthorized}
-              onNetworkError={(msg) => setNetworkBanner(msg)}
-              onOtherError={(msg) => setLoadError(msg)}
-              onSaved={load}
-            />
-            {rundown && showTriageForTask(task, rundown.dayFit) ? (
-              <TaskTriageBar
-                task={task}
-                listDate={date}
-                tomorrowDate={tomorrowDate}
-                hints={capacityHints}
-                busy={triageBusyId === task.id}
-                onDeferTomorrow={() => runTriage(task.id, { action: 'defer_to_date', targetDate: tomorrowDate })}
-                onDeferToDate={(targetDate) => runTriage(task.id, { action: 'defer_to_date', targetDate })}
-                onDemote={() => runTriage(task.id, { action: 'demote' })}
-                onMarkSkipped={() => runTriage(task.id, { action: 'mark_skipped' })}
-                onClearSkipped={() => runTriage(task.id, { action: 'clear_skipped' })}
-              />
-            ) : null}
-            <TaskNotesPanel
-              client={client}
-              taskId={task.id}
-              taskTitle={task.title}
-              notesPreview={task.notesPreview}
-              onUnauthorized={onUnauthorized}
-              onSaved={onNotesSaved}
-            />
-          </li>
-        ))}
-      </ul>
-
-      {rundown && sortedTasks.length === 0 ? <p className={styles.empty}>No tasks for this day yet.</p> : null}
+      {rundown ? (
+        <RunwayTaskList
+          date={date}
+          tomorrowDate={tomorrowDate}
+          sortedTasks={sortedTasks}
+          rundown={rundown}
+          tags={tags ?? []}
+          tagColorByKey={tagColorByKey}
+          capacityHints={capacityHints}
+          triageBusyId={triageBusyId}
+          focusBusyId={focusBusyId}
+          client={client}
+          onUnauthorized={onUnauthorized}
+          onNetworkError={(msg) => setNetworkBanner(msg)}
+          onOtherError={(msg) => setLoadError(msg)}
+          load={load}
+          onNotesSaved={onNotesSaved}
+          toggleTask={toggleTask}
+          toggleTaskFocus={toggleTaskFocus}
+          runTriage={runTriage}
+        />
+      ) : null}
     </div>
   );
 }

@@ -43,6 +43,11 @@ type TaskRow = {
   onSkipTriage: () => void;
   onMoveToDate: () => void;
   onMoveDateTextChange: (args: EventData) => void;
+  reorderMoveUpEnabled: boolean;
+  reorderMoveDownEnabled: boolean;
+  onReorderUp: () => void;
+  onReorderDown: () => void;
+  reorderBarVisibility: 'visible' | 'collapse';
 };
 
 function todayIso(): string {
@@ -63,8 +68,19 @@ function addLocalCalendarDays(iso: string, delta: number): string {
   return `${yy}-${mo}-${da}`;
 }
 
-function isValidIsoDate(s: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(s);
+function isValidLocalIsoDate(s: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    return false;
+  }
+  const [y, m, d] = s.split('-').map(Number);
+  if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) {
+    return false;
+  }
+  if (m < 1 || m > 12 || d < 1 || d > 31) {
+    return false;
+  }
+  const dt = new Date(y!, m! - 1, d!);
+  return dt.getFullYear() === y && dt.getMonth() === m! - 1 && dt.getDate() === d!;
 }
 
 function showTriageForTask(task: TaskRundownItemResponse, dayFit: DayRundownResponse['dayFit']): boolean {
@@ -111,6 +127,13 @@ function parseTimeInput(value: string): number | null {
   return Math.max(0, Math.min(1439, h * 60 + m));
 }
 
+function arrayMoveIds(ids: string[], from: number, to: number): string[] {
+  const next = [...ids];
+  const [x] = next.splice(from, 1);
+  next.splice(to, 0, x!);
+  return next;
+}
+
 function parseBountyTagKeys(raw: string): string[] {
   return raw
     .split(',')
@@ -127,6 +150,7 @@ class RundownViewModel extends Observable {
 
   private capacityHints: DayCapacityHint[] = [];
   private tomorrowDateStr = '';
+  private reorderBusy = false;
 
   constructor() {
     super();
@@ -150,12 +174,47 @@ class RundownViewModel extends Observable {
     this.set('createTaskSaving', false);
     this.set('createTaskEnabled', true);
     this.set('createTaskButtonText', 'Añadir tarea');
+    this.set('planningDate', todayIso());
+    this.set('dateTodayBtnVisibility', 'collapse');
+  }
+
+  private getEffectivePlanningDate(): string {
+    const raw = String(this.get('planningDate') ?? '').trim();
+    return isValidLocalIsoDate(raw) ? raw : todayIso();
+  }
+
+  onDatePrev(): void {
+    const d = this.getEffectivePlanningDate();
+    this.set('planningDate', addLocalCalendarDays(d, -1));
+    void this.loadRundown();
+  }
+
+  onDateNext(): void {
+    const d = this.getEffectivePlanningDate();
+    this.set('planningDate', addLocalCalendarDays(d, 1));
+    void this.loadRundown();
+  }
+
+  onDateToday(): void {
+    this.set('planningDate', todayIso());
+    void this.loadRundown();
+  }
+
+  onPlanningDateTextChange(args: EventData): void {
+    const tf = args.object as { text?: string };
+    const text = String(tf.text ?? '').trim();
+    if (text.length === 10 && isValidLocalIsoDate(text)) {
+      this.set('planningDate', text);
+      void this.loadRundown();
+    }
   }
 
   async loadRundown(): Promise<void> {
     this.set('errorBannerVisibility', 'collapse');
     const client = authState.getClient();
-    const date = todayIso();
+    const date = this.getEffectivePlanningDate();
+    this.set('planningDate', date);
+    this.set('dateTodayBtnVisibility', date !== todayIso() ? 'visible' : 'collapse');
     const rundownResult = await client.getRundown(date);
     if (authState.consumeUnauthorized(rundownResult)) {
       return;
@@ -212,6 +271,7 @@ class RundownViewModel extends Observable {
     }
     const sorted = [...tasks].sort((a, b) => a.position - b.position);
     const tomorrow = this.tomorrowDateStr;
+    const reorderBarVisibility: 'visible' | 'collapse' = sorted.length >= 2 ? 'visible' : 'collapse';
     for (let i = 0; i < sorted.length; i++) {
       const t = sorted[i]!;
       const parts: string[] = [];
@@ -244,6 +304,7 @@ class RundownViewModel extends Observable {
       const moveHint = hintLabelForDate(this.capacityHints, moveDateInput);
       const canDemote = t.essentiality !== 'optional';
       const rowIndex = i;
+      const taskIdForReorder = taskId;
       const preview = (t.notesPreview ?? '').trim();
       this.taskRows.push({
         id: taskId,
@@ -267,7 +328,7 @@ class RundownViewModel extends Observable {
         skipBtnText: t.status === 'skipped' ? 'Deshacer omisión' : 'Omitir hoy',
         moveDateInput,
         moveHint,
-        moveEnabled: isValidIsoDate(moveDateInput) && moveDateInput !== scheduledDate,
+        moveEnabled: isValidLocalIsoDate(moveDateInput) && moveDateInput !== scheduledDate,
         onToggleComplete: () => void this.toggleAt(rowIndex),
         onEditTap: () => authState.navigateToTaskDetail(taskId),
         onNotesTap: () => authState.navigateToTaskDetail(taskId, { notesFocus: true }),
@@ -280,7 +341,7 @@ class RundownViewModel extends Observable {
           }),
         onMoveToDate: () => {
           const row = this.taskRows.getItem(rowIndex);
-          if (!row || !isValidIsoDate(row.moveDateInput)) {
+          if (!row || !isValidLocalIsoDate(row.moveDateInput)) {
             return;
           }
           void this.runTriageFor(taskId, { action: 'defer_to_date', targetDate: row.moveDateInput });
@@ -288,6 +349,11 @@ class RundownViewModel extends Observable {
         onMoveDateTextChange: (args: EventData) => {
           this.handleMoveDateTextChange(rowIndex, args);
         },
+        reorderMoveUpEnabled: i > 0 && !this.reorderBusy,
+        reorderMoveDownEnabled: i < sorted.length - 1 && !this.reorderBusy,
+        onReorderUp: () => void this.moveOrderedTask(taskIdForReorder, -1),
+        onReorderDown: () => void this.moveOrderedTask(taskIdForReorder, 1),
+        reorderBarVisibility,
       });
     }
   }
@@ -300,13 +366,65 @@ class RundownViewModel extends Observable {
       return;
     }
     const moveHint = hintLabelForDate(this.capacityHints, text);
-    const moveEnabled = isValidIsoDate(text) && text !== cur.scheduledDate;
+    const moveEnabled = isValidLocalIsoDate(text) && text !== cur.scheduledDate;
     this.taskRows.setItem(index, {
       ...cur,
       moveDateInput: text,
       moveHint,
       moveEnabled,
     });
+  }
+
+  private updateReorderRowStates(): void {
+    const n = this.taskRows.length;
+    for (let j = 0; j < n; j++) {
+      const r = this.taskRows.getItem(j);
+      if (!r) {
+        continue;
+      }
+      this.taskRows.setItem(j, {
+        ...r,
+        reorderMoveUpEnabled: j > 0 && !this.reorderBusy,
+        reorderMoveDownEnabled: j < n - 1 && !this.reorderBusy,
+      });
+    }
+  }
+
+  private async moveOrderedTask(taskId: string, delta: number): Promise<void> {
+    if (this.reorderBusy) {
+      return;
+    }
+    const n = this.taskRows.length;
+    const ids: string[] = [];
+    for (let i = 0; i < n; i++) {
+      ids.push(this.taskRows.getItem(i)!.id);
+    }
+    const idx = ids.indexOf(taskId);
+    const newIdx = idx + delta;
+    if (idx < 0 || newIdx < 0 || newIdx >= n) {
+      return;
+    }
+    const nextIds = arrayMoveIds(ids, idx, newIdx);
+    this.reorderBusy = true;
+    this.updateReorderRowStates();
+    const client = authState.getClient();
+    const date = this.getEffectivePlanningDate();
+    const res = await client.reorderTasks({ date, taskIds: nextIds });
+    this.reorderBusy = false;
+    this.updateReorderRowStates();
+    if (authState.consumeUnauthorized(res)) {
+      return;
+    }
+    if (res.ok === false) {
+      const net = isLikelyNetworkFailure(res.error);
+      this.set(
+        'errorMessage',
+        net ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.' : res.error.message,
+      );
+      this.set('errorBannerVisibility', 'visible');
+      return;
+    }
+    await this.loadRundown();
   }
 
   private refreshTriageBusy(busyTaskId: string | null): void {
@@ -316,7 +434,7 @@ class RundownViewModel extends Observable {
         continue;
       }
       const idle = busyTaskId == null || busyTaskId !== r.id;
-      const moveEnabled = idle && isValidIsoDate(r.moveDateInput) && r.moveDateInput !== r.scheduledDate;
+      const moveEnabled = idle && isValidLocalIsoDate(r.moveDateInput) && r.moveDateInput !== r.scheduledDate;
       this.taskRows.setItem(j, {
         ...r,
         deferTomorrowEnabled: idle && this.tomorrowDateStr !== r.scheduledDate,
@@ -497,7 +615,7 @@ class RundownViewModel extends Observable {
     }
 
     const client = authState.getClient();
-    const date = todayIso();
+    const date = this.getEffectivePlanningDate();
     const body: CreateTaskInput = {
       title,
       size: sizeNum as 1 | 2 | 3 | 4 | 5,
