@@ -10,6 +10,7 @@ import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { CreateTaskPanel } from '../components/CreateTaskPanel';
+import { PlanHistoryPanel } from '../components/PlanHistoryPanel';
 import { TaskCard, type TaskRunwayPlacement } from '../components/TaskCard';
 import { TaskEditPanel } from '../components/TaskEditPanel';
 import { TaskNotesPanel } from '../components/TaskNotesPanel';
@@ -366,6 +367,11 @@ export function RundownPage(): ReactElement {
               </div>
             </div>
           </details>
+          <PlanHistoryPanel
+            client={client}
+            onUnauthorized={onUnauthorized}
+            onNetworkError={(msg) => setNetworkBanner(msg)}
+          />
         </section>
       ) : null}
 

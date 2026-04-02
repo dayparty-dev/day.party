@@ -21,6 +21,7 @@ import {
   createTaskSchema,
   daySuggestionsQuerySchema,
   fromZodError,
+  historyQuerySchema,
   ledgerQuerySchema,
   loginSchema,
   marketplacePurchaseSchema,
@@ -58,6 +59,20 @@ type ApiLedgerEntry = Omit<LedgerEntry, 'userId'>;
 type LedgerPageResponse = {
   entries: ApiLedgerEntry[];
   balance: number;
+  nextCursor?: string;
+};
+
+type ApiPlanHistoryEvent = {
+  id: string;
+  timestamp: string;
+  type: string;
+  entityId: string;
+  payload: Record<string, unknown>;
+  correlation?: string;
+};
+
+type HistoryPageResponse = {
+  events: ApiPlanHistoryEvent[];
   nextCursor?: string;
 };
 
@@ -362,6 +377,28 @@ export class DayPartyClient {
       method: 'GET',
       requiresAuth: true,
       parse: parseLedgerPage,
+    });
+  }
+
+  async getHistory(query?: {
+    limit?: number;
+    cursor?: string;
+    order?: 'asc' | 'desc';
+  }): Promise<Result<HistoryPageResponse>> {
+    const parsed = historyQuerySchema.safeParse(query ?? {});
+    if (!parsed.success) {
+      return this.fail(fromZodError(parsed.error));
+    }
+    const q = new URLSearchParams();
+    q.set('limit', String(parsed.data.limit));
+    if (parsed.data.cursor) {
+      q.set('cursor', parsed.data.cursor);
+    }
+    q.set('order', parsed.data.order);
+    return this.request(`/history?${q}`, {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseHistoryPage,
     });
   }
 
@@ -805,6 +842,46 @@ function parseLedgerEntry(input: unknown): ApiLedgerEntry | null {
   };
 }
 
+function parseHistoryEvent(input: unknown): ApiPlanHistoryEvent | null {
+  if (
+    !isRecord(input) ||
+    typeof input.id !== 'string' ||
+    typeof input.timestamp !== 'string' ||
+    typeof input.type !== 'string' ||
+    typeof input.entityId !== 'string'
+  ) {
+    return null;
+  }
+  if (!isRecord(input.payload)) {
+    return null;
+  }
+  const correlation = typeof input.correlation === 'string' ? input.correlation : undefined;
+  return {
+    id: input.id,
+    timestamp: input.timestamp,
+    type: input.type,
+    entityId: input.entityId,
+    payload: { ...input.payload },
+    ...(correlation ? { correlation } : {}),
+  };
+}
+
+function parseHistoryPage(input: unknown): HistoryPageResponse | null {
+  if (!isRecord(input) || !Array.isArray(input.events)) {
+    return null;
+  }
+  const events: ApiPlanHistoryEvent[] = [];
+  for (const e of input.events) {
+    const row = parseHistoryEvent(e);
+    if (!row) {
+      return null;
+    }
+    events.push(row);
+  }
+  const nextCursor = typeof input.nextCursor === 'string' ? input.nextCursor : undefined;
+  return { events, ...(nextCursor ? { nextCursor } : {}) };
+}
+
 function parseLedgerPage(input: unknown): LedgerPageResponse | null {
   if (!isRecord(input) || !Array.isArray(input.entries) || typeof input.balance !== 'number') {
     return null;
@@ -954,6 +1031,7 @@ function createApiError(code: string, message: string, fields?: Record<string, s
 export type {
   ApiDayRundown as DayRundownResponse,
   ApiLedgerEntry,
+  ApiPlanHistoryEvent,
   ApiRewardDefinition,
   ApiRundownTask as TaskRundownItemResponse,
   ApiTag as TagResponse,
@@ -964,6 +1042,7 @@ export type {
   CreateTagInput,
   CreateTaskInput,
   DaySuggestionsQuery,
+  HistoryPageResponse,
   LedgerPageResponse,
   LoginInput,
   PatchUserPreferencesInput,

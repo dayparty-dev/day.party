@@ -11,6 +11,7 @@ import { serve } from '@hono/node-server';
 import {
   getDb,
   MongoLedgerRepository,
+  MongoPlanHistoryRepository,
   MongoRewardDefinitionRepository,
   MongoSessionRepository,
   MongoTagRepository,
@@ -23,6 +24,7 @@ import {
   makeCreateRewardDefinitionAction,
   makeCreateTaskAction,
   makeDeleteTaskAction,
+  makeGetHistoryPageAction,
   makeGetLedgerPageAction,
   makeGetRundownAction,
   makeGetUserPreferencesAction,
@@ -46,6 +48,7 @@ const tagRepo = new MongoTagRepository(db);
 const userPrefsRepo = new MongoUserPreferencesRepository(db);
 const rewardRepo = new MongoRewardDefinitionRepository(db);
 const ledgerRepo = new MongoLedgerRepository(db);
+const planHistoryRepo = new MongoPlanHistoryRepository(db);
 
 const env = {
   taskRepo,
@@ -55,19 +58,20 @@ const env = {
   userPrefsRepo,
   rewardRepo,
   ledgerRepo,
-  createTask: makeCreateTaskAction(taskRepo, tagRepo),
+  createTask: makeCreateTaskAction(taskRepo, tagRepo, planHistoryRepo),
   getRundown: makeGetRundownAction(taskRepo, userPrefsRepo),
-  reorderTasks: makeReorderTasksAction(taskRepo, userPrefsRepo),
-  deleteTask: makeDeleteTaskAction(taskRepo),
-  updateTask: makeUpdateTaskAction(taskRepo, tagRepo, ledgerRepo),
-  applyTaskTriage: makeApplyTaskTriageAction(taskRepo),
+  reorderTasks: makeReorderTasksAction(taskRepo, userPrefsRepo, planHistoryRepo),
+  deleteTask: makeDeleteTaskAction(taskRepo, planHistoryRepo),
+  updateTask: makeUpdateTaskAction(taskRepo, tagRepo, ledgerRepo, planHistoryRepo),
+  applyTaskTriage: makeApplyTaskTriageAction(taskRepo, planHistoryRepo),
   suggestDayCapacities: makeSuggestDayCapacitiesAction(taskRepo, userPrefsRepo),
   getUserPreferences: makeGetUserPreferencesAction(userPrefsRepo),
-  patchUserPreferences: makePatchUserPreferencesAction(userPrefsRepo),
+  patchUserPreferences: makePatchUserPreferencesAction(userPrefsRepo, planHistoryRepo),
   listRewardDefinitions: makeListRewardDefinitionsAction(rewardRepo),
-  createRewardDefinition: makeCreateRewardDefinitionAction(rewardRepo),
+  createRewardDefinition: makeCreateRewardDefinitionAction(rewardRepo, planHistoryRepo),
   getLedgerPage: makeGetLedgerPageAction(ledgerRepo),
-  purchaseReward: makePurchaseRewardAction(rewardRepo, ledgerRepo),
+  purchaseReward: makePurchaseRewardAction(rewardRepo, ledgerRepo, planHistoryRepo),
+  getHistoryPage: makeGetHistoryPageAction(planHistoryRepo),
 };
 
 const app = createApp(env);

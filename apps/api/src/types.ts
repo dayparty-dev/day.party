@@ -4,6 +4,8 @@ import type {
   DaySuggestionsResult,
   LedgerListParams,
   LedgerPageResult,
+  PlanHistoryListParams,
+  PlanHistoryListResult,
   SessionRepository,
   TagRepository,
   TaskRepository,
@@ -33,6 +35,7 @@ export type ApiEnv = {
   createRewardDefinition: (userId: string, input: Omit<RewardDefinition, 'id' | 'userId'>) => Promise<RewardDefinition>;
   getLedgerPage: (userId: string, params: LedgerListParams) => Promise<LedgerPageResult>;
   purchaseReward: (userId: string, rewardDefinitionId: string) => Promise<{ balance: number }>;
+  getHistoryPage: (userId: string, params: PlanHistoryListParams) => Promise<PlanHistoryListResult>;
 };
 
 export type ApiVariables = {

@@ -1,5 +1,6 @@
 import type { Task } from '@dayparty/core';
 import { describe, expect, it } from 'vitest';
+import type { PlanHistoryRepository } from '../interfaces/plan-history-repository';
 import type { TaskRepository } from '../interfaces/task-repository';
 import { makeApplyTaskTriageAction } from './triage-task';
 
@@ -18,6 +19,18 @@ function task(partial: Partial<Task> & Pick<Task, 'id' | 'userId'>): Task {
     ...partial,
   };
 }
+
+const noopHistory: PlanHistoryRepository = {
+  append: async (input) => ({
+    id: 'h1',
+    userId: input.userId,
+    timestamp: iso,
+    type: input.type,
+    entityId: input.entityId,
+    payload: input.payload,
+  }),
+  listByUserId: async () => ({ events: [] }),
+};
 
 describe('makeApplyTaskTriageAction', () => {
   it('defer_to_date moves the task to the target day at the next position', async () => {
@@ -42,7 +55,7 @@ describe('makeApplyTaskTriageAction', () => {
       nullifyTagKeyForUser: async () => {},
     };
 
-    const action = makeApplyTaskTriageAction(repo);
+    const action = makeApplyTaskTriageAction(repo, noopHistory);
     const updated = await action('u1', 'x', { action: 'defer_to_date', targetDate: '2026-04-03' });
 
     expect(updated.scheduledDate).toBe('2026-04-03');
@@ -63,7 +76,7 @@ describe('makeApplyTaskTriageAction', () => {
       reorder: async () => {},
       nullifyTagKeyForUser: async () => {},
     };
-    const action = makeApplyTaskTriageAction(repo);
+    const action = makeApplyTaskTriageAction(repo, noopHistory);
     await expect(action('u1', 'x', { action: 'defer_to_date', targetDate: '2026-04-02' })).rejects.toThrow(
       /must differ/,
     );

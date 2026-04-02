@@ -1,5 +1,6 @@
 import type { Task } from '@dayparty/core';
 import { mergeFocusForStatusTransition } from '../focus-session';
+import type { PlanHistoryRepository } from '../interfaces/plan-history-repository';
 import type { TaskRepository } from '../interfaces/task-repository';
 
 export type TaskTriageInput =
@@ -8,7 +9,7 @@ export type TaskTriageInput =
   | { action: 'mark_skipped' }
   | { action: 'clear_skipped' };
 
-export function makeApplyTaskTriageAction(taskRepo: TaskRepository) {
+export function makeApplyTaskTriageAction(taskRepo: TaskRepository, historyRepo: PlanHistoryRepository) {
   return async (userId: string, taskId: string, input: TaskTriageInput): Promise<Task> => {
     const task = await taskRepo.findById(taskId);
     if (!task || task.userId !== userId) {
@@ -33,6 +34,12 @@ export function makeApplyTaskTriageAction(taskRepo: TaskRepository) {
         if (!updated) {
           throw new Error(`Task "${taskId}" not found after update`);
         }
+        await historyRepo.append({
+          userId,
+          type: 'task.triage',
+          entityId: taskId,
+          payload: { action: 'defer_to_date', fromDate: task.scheduledDate, targetDate: input.targetDate },
+        });
         return updated;
       }
       case 'demote': {
@@ -40,6 +47,12 @@ export function makeApplyTaskTriageAction(taskRepo: TaskRepository) {
         if (!updated) {
           throw new Error(`Task "${taskId}" not found after update`);
         }
+        await historyRepo.append({
+          userId,
+          type: 'task.triage',
+          entityId: taskId,
+          payload: { action: 'demote' },
+        });
         return updated;
       }
       case 'mark_skipped': {
@@ -53,6 +66,12 @@ export function makeApplyTaskTriageAction(taskRepo: TaskRepository) {
         if (!updated) {
           throw new Error(`Task "${taskId}" not found after update`);
         }
+        await historyRepo.append({
+          userId,
+          type: 'task.triage',
+          entityId: taskId,
+          payload: { action: 'mark_skipped' },
+        });
         return updated;
       }
       case 'clear_skipped': {
@@ -64,6 +83,12 @@ export function makeApplyTaskTriageAction(taskRepo: TaskRepository) {
         if (!updated) {
           throw new Error(`Task "${taskId}" not found after update`);
         }
+        await historyRepo.append({
+          userId,
+          type: 'task.triage',
+          entityId: taskId,
+          payload: { action: 'clear_skipped' },
+        });
         return updated;
       }
     }

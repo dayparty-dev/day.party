@@ -188,12 +188,12 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 ### Implementation for User Story 6
 
-- [ ] T034 [P] [US6] Add `PlanHistoryEvent` type in `packages/core/src/models/plan-history.ts` and `PlanHistoryRepository` port in `packages/domain/src/interfaces/plan-history-repository.ts`; export from package indexes
-- [ ] T035 [US6] Implement `MongoPlanHistoryRepository` in `packages/db/src/repositories/plan-history-repository.ts` and export from `packages/db/src/index.ts`
-- [ ] T036 [US6] Record history from domain mutations in `packages/domain/src/actions/` (create/update/reorder/triage/prefs/rewards as applicable) per `specs/003-vision-aligned-rebuild/data-model.md`. **Idempotency**: one logical user action MUST NOT produce duplicate phantom history rows (supports **SC-007**); use stable correlation or single append per mutation path where retries exist.
-- [ ] T037 [P] [US6] Add `apps/api/src/routes/history.ts` with paginated `GET` per `specs/003-vision-aligned-rebuild/contracts/day-planning-rest.md`; wire in `apps/api/src/index.ts` and `apps/api/src/app.ts`
-- [ ] T038 [P] [US6] Extend `packages/api-client/src/client.ts` with history fetch API
-- [ ] T039 [US6] Add read-only `apps/web/src/components/PlanHistoryPanel.tsx` and integrate into the planning shell (e.g. from `apps/web/src/pages/RundownPage.tsx`)
+- [x] T034 [P] [US6] Add `PlanHistoryEvent` type in `packages/core/src/models/plan-history.ts` and `PlanHistoryRepository` port in `packages/domain/src/interfaces/plan-history-repository.ts`; export from package indexes
+- [x] T035 [US6] Implement `MongoPlanHistoryRepository` in `packages/db/src/repositories/plan-history-repository.ts` and export from `packages/db/src/index.ts`
+- [x] T036 [US6] Record history from domain mutations in `packages/domain/src/actions/` (create/update/reorder/triage/prefs/rewards as applicable) per `specs/003-vision-aligned-rebuild/data-model.md`. **Idempotency**: one logical user action MUST NOT produce duplicate phantom history rows (supports **SC-007**); use stable correlation or single append per mutation path where retries exist.
+- [x] T037 [P] [US6] Add `apps/api/src/routes/history.ts` with paginated `GET` per `specs/003-vision-aligned-rebuild/contracts/day-planning-rest.md`; wire in `apps/api/src/index.ts` and `apps/api/src/app.ts`
+- [x] T038 [P] [US6] Extend `packages/api-client/src/client.ts` with history fetch API
+- [x] T039 [US6] Add read-only `apps/web/src/components/PlanHistoryPanel.tsx` and integrate into the planning shell (e.g. from `apps/web/src/pages/RundownPage.tsx`)
 
 ---
 

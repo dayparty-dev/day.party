@@ -1,6 +1,7 @@
+import type { PlanHistoryRepository } from '../interfaces/plan-history-repository';
 import type { TaskRepository } from '../interfaces/task-repository';
 
-export function makeDeleteTaskAction(taskRepo: TaskRepository) {
+export function makeDeleteTaskAction(taskRepo: TaskRepository, historyRepo: PlanHistoryRepository) {
   return async (id: string): Promise<void> => {
     const task = await taskRepo.findById(id);
     if (!task) {
@@ -8,6 +9,13 @@ export function makeDeleteTaskAction(taskRepo: TaskRepository) {
     }
 
     const { userId, scheduledDate } = task;
+    await historyRepo.append({
+      userId: task.userId,
+      type: 'task.deleted',
+      entityId: task.id,
+      payload: { title: task.title, scheduledDate: task.scheduledDate },
+    });
+
     await taskRepo.delete(id);
 
     const remaining = await taskRepo.findByUserAndDate(userId, scheduledDate);

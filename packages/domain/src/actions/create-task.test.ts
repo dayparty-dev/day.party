@@ -1,5 +1,6 @@
 import type { Tag, Task } from '@dayparty/core';
 import { describe, expect, it } from 'vitest';
+import type { PlanHistoryRepository } from '../interfaces/plan-history-repository';
 import type { TagRepository } from '../interfaces/tag-repository';
 import type { TaskRepository } from '../interfaces/task-repository';
 import { makeCreateTaskAction } from './create-task';
@@ -30,6 +31,18 @@ function createInMemoryTaskRepo(initial: Task[] = []): { repo: TaskRepository; t
   return { repo, tasks };
 }
 
+const noopHistory: PlanHistoryRepository = {
+  append: async (input) => ({
+    id: 'h1',
+    userId: input.userId,
+    timestamp: iso,
+    type: input.type,
+    entityId: input.entityId,
+    payload: input.payload,
+  }),
+  listByUserId: async () => ({ events: [] }),
+};
+
 function createInMemoryTagRepo(byKey: Map<string, Tag | null>): TagRepository {
   return {
     findByUser: async () => [],
@@ -47,7 +60,7 @@ describe('makeCreateTaskAction', () => {
   it('creates a task at position 0 when no tasks exist for that day', async () => {
     const { repo: taskRepo, tasks } = createInMemoryTaskRepo([]);
     const tagRepo = createInMemoryTagRepo(new Map());
-    const action = makeCreateTaskAction(taskRepo, tagRepo);
+    const action = makeCreateTaskAction(taskRepo, tagRepo, noopHistory);
 
     const task = await action({
       userId: 'u1',
@@ -65,7 +78,7 @@ describe('makeCreateTaskAction', () => {
   it('rejects when tagKey is set and the tag does not exist', async () => {
     const { repo: taskRepo } = createInMemoryTaskRepo([]);
     const tagRepo = createInMemoryTagRepo(new Map());
-    const action = makeCreateTaskAction(taskRepo, tagRepo);
+    const action = makeCreateTaskAction(taskRepo, tagRepo, noopHistory);
 
     await expect(
       action({

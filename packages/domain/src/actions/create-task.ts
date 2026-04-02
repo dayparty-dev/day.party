@@ -1,4 +1,5 @@
 import type { Task, TaskBounty, TaskEssentiality } from '@dayparty/core';
+import type { PlanHistoryRepository } from '../interfaces/plan-history-repository';
 import type { TaskRepository } from '../interfaces/task-repository';
 import type { TagRepository } from '../interfaces/tag-repository';
 
@@ -14,7 +15,11 @@ export interface CreateTaskInput {
   bounty?: TaskBounty;
 }
 
-export function makeCreateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepository) {
+export function makeCreateTaskAction(
+  taskRepo: TaskRepository,
+  tagRepo: TagRepository,
+  historyRepo: PlanHistoryRepository,
+) {
   return async (input: CreateTaskInput): Promise<Task> => {
     if (input.tagKey) {
       const tag = await tagRepo.findByKey(input.userId, input.tagKey);
@@ -26,7 +31,7 @@ export function makeCreateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
     const existing = await taskRepo.findByUserAndDate(input.userId, input.scheduledDate);
     const position = existing.length;
 
-    return taskRepo.create({
+    const task = await taskRepo.create({
       userId: input.userId,
       title: input.title,
       size: input.size,
@@ -42,5 +47,14 @@ export function makeCreateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
         : {}),
       ...(input.bounty !== undefined && input.bounty.amount > 0 ? { bounty: input.bounty } : {}),
     });
+
+    await historyRepo.append({
+      userId: input.userId,
+      type: 'task.created',
+      entityId: task.id,
+      payload: { title: task.title, scheduledDate: task.scheduledDate },
+    });
+
+    return task;
   };
 }

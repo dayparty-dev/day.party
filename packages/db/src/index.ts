@@ -6,3 +6,4 @@ export { MongoTagRepository } from './repositories/tag-repository';
 export { MongoUserPreferencesRepository } from './repositories/user-preferences-repository';
 export { MongoRewardDefinitionRepository } from './repositories/reward-definition-repository';
 export { MongoLedgerRepository } from './repositories/ledger-repository';
+export { MongoPlanHistoryRepository } from './repositories/plan-history-repository';

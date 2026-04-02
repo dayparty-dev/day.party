@@ -1,9 +1,14 @@
 import { DEFAULT_DAY_WINDOW, taskToRundownItem, type DayRundown } from '@dayparty/core';
+import type { PlanHistoryRepository } from '../interfaces/plan-history-repository';
 import type { TaskRepository } from '../interfaces/task-repository';
 import type { UserPreferencesRepository } from '../interfaces/user-preferences-repository';
 import { computeDayFit } from '../day-fit';
 
-export function makeReorderTasksAction(taskRepo: TaskRepository, userPrefsRepo: UserPreferencesRepository) {
+export function makeReorderTasksAction(
+  taskRepo: TaskRepository,
+  userPrefsRepo: UserPreferencesRepository,
+  historyRepo: PlanHistoryRepository,
+) {
   return async (userId: string, date: string, taskIds: string[]): Promise<DayRundown> => {
     const tasks = await taskRepo.findByUserAndDate(userId, date);
     const taskMap = new Map(tasks.map((t) => [t.id, t]));
@@ -16,6 +21,13 @@ export function makeReorderTasksAction(taskRepo: TaskRepository, userPrefsRepo: 
 
     const updates = taskIds.map((id, index) => ({ id, position: index }));
     await taskRepo.reorder(updates);
+
+    await historyRepo.append({
+      userId,
+      type: 'plan.reordered',
+      entityId: date,
+      payload: { date, taskIds: [...taskIds] },
+    });
 
     const reorderedTasks = taskIds.map((id, index) => ({
       ...taskMap.get(id)!,

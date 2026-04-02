@@ -6,6 +6,7 @@ import {
   type UserPreferences,
   type VisualPreset,
 } from '@dayparty/core';
+import type { PlanHistoryRepository } from '../interfaces/plan-history-repository';
 import type { UserPreferencesRepository } from '../interfaces/user-preferences-repository';
 
 function defaultPreferences(userId: string): UserPreferences {
@@ -31,7 +32,10 @@ export function makeGetUserPreferencesAction(userPrefsRepo: UserPreferencesRepos
   };
 }
 
-export function makePatchUserPreferencesAction(userPrefsRepo: UserPreferencesRepository) {
+export function makePatchUserPreferencesAction(
+  userPrefsRepo: UserPreferencesRepository,
+  historyRepo: PlanHistoryRepository,
+) {
   return async (userId: string, patch: UserPreferencesPatch): Promise<UserPreferences> => {
     const existing = await userPrefsRepo.findByUserId(userId);
     const base = existing ?? defaultPreferences(userId);
@@ -43,6 +47,16 @@ export function makePatchUserPreferencesAction(userPrefsRepo: UserPreferencesRep
         patch.sizeToMinutes !== undefined ? { ...base.sizeToMinutes, ...patch.sizeToMinutes } : base.sizeToMinutes,
       updatedAt: new Date().toISOString(),
     };
-    return userPrefsRepo.put(next);
+    const saved = await userPrefsRepo.put(next);
+    const keys = Object.keys(patch) as (keyof UserPreferencesPatch)[];
+    if (keys.length > 0) {
+      await historyRepo.append({
+        userId,
+        type: 'preferences.updated',
+        entityId: userId,
+        payload: { keys },
+      });
+    }
+    return saved;
   };
 }

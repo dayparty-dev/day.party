@@ -15,6 +15,13 @@ export type {
   LedgerListResult,
   LedgerRepository,
 } from './interfaces/ledger-repository';
+export type {
+  PlanHistoryAppendInput,
+  PlanHistoryEvent,
+  PlanHistoryListParams,
+  PlanHistoryListResult,
+  PlanHistoryRepository,
+} from './interfaces/plan-history-repository';
 
 export { computeDayFit, windowAvailableMinutes, taskCountsTowardRunwayMinutes } from './day-fit';
 export {
@@ -36,6 +43,7 @@ export { makeUpdateTaskAction } from './actions/update-task';
 export type { UpdateTaskInput } from './actions/update-task';
 export { makeListRewardDefinitionsAction, makeCreateRewardDefinitionAction } from './actions/reward-definition-actions';
 export { makeGetLedgerPageAction } from './actions/get-ledger-page';
+export { makeGetHistoryPageAction } from './actions/get-history-page';
 export type { LedgerPageResult } from './actions/get-ledger-page';
 export { makePurchaseRewardAction } from './actions/purchase-reward';
 export { makeApplyTaskTriageAction } from './actions/triage-task';
