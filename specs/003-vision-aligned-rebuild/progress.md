@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Task notes (US3)**: `Task.notesMarkdown` optional; rundown rows are `TaskRundownItem` from `taskToRundownItem` (drops full notes, adds `notesPreview` from first line, max 120 chars + `…`). `GET /api/tasks/:id` returns full task including `notesMarkdown` (route after `/reorder`, still before `PATCH /:id`). Mongo `update` uses `$unset` for `notesMarkdown` when clearing (`''` in domain update). API client: `TaskRundownItemResponse` for rundown rows, `TaskResponse` / `getTask` for detail; `parseRundownTaskRow` strips any stray `notesMarkdown` in list JSON. Web: collapsible `TaskNotesPanel` with `react-markdown` preview.
 - **User preferences Mongo**: Collection `user_preferences`; documents are `UserPreferences` fields plus internal `_id`; query and upsert by `userId`. `put` uses `updateOne` when a row exists, else `insertOne` (avoids `replaceOne` typing issues with `WithoutId`).
 - **Core models**: Prefer `Partial<Record<TaskSize, number>>` for optional size→minutes maps aligned with `TaskSize` in `SIZE_SCALE`.
 - **`computeDayFit`**: Greedy pack in task order; `plannedMinutes` sums effective minutes for **incomplete** tasks only; completed tasks are always `inRunwayTaskIds` and use no runway minutes; `overflowUnresolved` when any incomplete **essential** task is outside the runway. Default size→minutes: 15/25/40/55/75 for sizes 1–5; overridden by prefs `sizeToMinutes`.
@@ -244,5 +245,37 @@ Started: 2026-04-02 15:10:01
 
 - Register `GET /suggestions` before any future `GET /:id` on the tasks router; static paths first.
 - NativeScript `EventData.object` needs `as unknown as { checked: boolean }` for strict `tsc` on the window checkbox handler.
+
+---
+
+## Iteration 8 - 2026-04-02
+
+**User Story**: User Story 3 — Richer notes on actionables (T021–T023)
+
+**Tasks Completed**:
+
+- [x] T021 [P] [US3]: `notesMarkdown` on `Task`, Zod + Mongo mapping; rundown omits body via `TaskRundownItem`
+- [x] T022 [US3]: `GET /api/tasks/:id` with correct route order; rundown uses `notesPreview` only
+- [x] T023 [US3]: `TaskNotesPanel` + `RundownPage` integration with `react-markdown` preview
+
+**Tasks Remaining in Story**: None — story complete
+
+**Commit**: 45e09cbe452089efb4ab344886e2beaaa464f3da
+
+**Files Changed**:
+
+- `packages/core/src/models/task.ts`, `packages/core/src/models/task-rundown.ts`, `packages/core/src/models/day-rundown.ts`, `packages/core/src/index.ts`
+- `packages/domain/src/actions/get-rundown.ts`, `reorder-tasks.ts`, `create-task.ts`, `update-task.ts`, `get-rundown.test.ts`
+- `packages/validation/src/schemas/task.ts`
+- `packages/db/src/repositories/task-repository.ts`
+- `apps/api/src/routes/tasks.ts`
+- `packages/api-client/src/client.ts`, `packages/api-client/src/index.ts`
+- `apps/web/package.json`, `pnpm-lock.yaml`, `apps/web/src/components/TaskNotesPanel.tsx`, `TaskNotesPanel.module.css`, `TaskCard.tsx`, `TaskCard.module.css`, `TaskTriageBar.tsx`, `RundownPage.tsx`, `OngoingPage.tsx`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Hono keeps `GET /suggestions` before `GET /:id` so `suggestions` is never parsed as an id.
+- Closing the notes panel resets `loaded` so the next open refetches (stays aligned after rundown reload).
 
 ---
