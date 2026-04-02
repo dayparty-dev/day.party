@@ -5,6 +5,8 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Focus `planned` ↔ `in_progress` (T052 / T055)**: Web `TaskCard` exposes optional `onToggleFocus` + `focusBusy`; `RundownPage` calls `updateTask` with flipped `status`; `OngoingPage` prefers the first incomplete task with `status === 'in_progress'`, then offers **Start** / **Pause** (`updateTask`). Mobile rundown rows use **Enfoque** / **Pausa** (`toggleFocusFor`); `ongoing-view` mirrors pick + toggle. **In progress** badge on web `TaskCard` (`focusTag`).
+- **Mobile task detail (T054)**: `apps/mobile/src/views/task-detail-view.{ts,xml}` — `authState.navigateToTaskDetail(taskId)` passes `Frame` `context`; `onNavigatingTo` reads `args.context` / `page.navigationContext`. Full edit + `notesMarkdown` + bounty (Spanish copy); `ListPicker` for status / essentiality / tag; `Observable.propertyChangeEvent` on `statusIndex` toggles deferred date visibility.
 - **Rewards / ledger (US4 T024–T030)**: `RewardDefinition` / `RewardDefinitionType` in `@dayparty/core` (`models/reward.ts`); `LedgerEntry` / `LedgerEntryReason` in `models/ledger.ts`. `Task.bounty?: TaskBounty` (`amount`, optional `tagKeys`, `highResistance`). Domain ports: `RewardDefinitionRepository` (`listByUserId`, `findById`, `create`), `LedgerRepository` (`insert` append-only omitting `id`/`createdAt`, `listByUserId` with `limit` + optional cursor, `findByCorrelation`, `sumAmountByUserId`). Mongo: `reward_definitions`, `ledger_entries`. Re-export document types from interface modules via `@dayparty/core` (avoid duplicate domain copies).
 - **US4 API**: `GET`/`POST /api/rewards`, `GET /api/ledger?limit=&cursor=`, `POST /api/marketplace/purchase` with `{ rewardDefinitionId }`. Responses omit `userId` on rewards and ledger rows. **Bounty**: `makeUpdateTaskAction` takes `LedgerRepository`; on first transition to complete for a task with `bounty.amount > 0`, inserts `task_completion` line with correlation `task-bounty:<taskId>` if none exists.
 - **US4 client**: `DayPartyClient.getRewards`, `createRewardDefinition`, `getLedger`, `purchaseReward`; `parseTask` accepts optional `bounty`. Types: `ApiRewardDefinition`, `ApiLedgerEntry`, `LedgerPageResponse`.
@@ -421,5 +423,42 @@ Started: 2026-04-02 15:10:01
 
 - Empty “Est. minutes” omits `estimatedMinutes` on PATCH so existing stored estimates are unchanged (no `$unset` path in task repo for that field).
 - Bounty updates replace the whole subdocument; omitting `highResistance` on a new `{ amount }` clears a previously set flag when the stored object is overwritten.
+
+---
+
+## Iteration 13 - 2026-04-02
+
+**User Story**: Gap closure — US1 focus + mobile task editor (**T052**, **T054**, **T055**)
+
+**Tasks Completed**:
+
+- [x] T052 [US1]: Web **Start** / **Pause** on `TaskCard` + `RundownPage`; `OngoingPage` prefers `in_progress` and toggles `planned` ↔ `in_progress` via `updateTask`
+- [x] T054 [US1]: Mobile `task-detail-view` (mirror **T051** field set + notes + bounty), **Editar** from rundown, `navigateToTaskDetail` in `auth-state`
+- [x] T055 [US1]: Mobile rundown **Enfoque** / **Pausa** + `ongoing-view` parity
+
+**Tasks Remaining in Story**: None — **T053** / **T056** are US4 tasks in the same gap block (not part of this US1 story)
+
+**Commit**: e9de6cbe9fbeb3cbc10579d47aa334eb04437b6a
+
+**Files Changed**:
+
+- `apps/web/src/components/TaskCard.tsx`
+- `apps/web/src/components/TaskCard.module.css`
+- `apps/web/src/pages/RundownPage.tsx`
+- `apps/web/src/pages/OngoingPage.tsx`
+- `apps/web/src/pages/OngoingPage.module.css`
+- `apps/mobile/src/services/auth-state.ts`
+- `apps/mobile/src/views/rundown-view.ts`
+- `apps/mobile/src/views/rundown-view.xml`
+- `apps/mobile/src/views/ongoing-view.ts`
+- `apps/mobile/src/views/ongoing-view.xml`
+- `apps/mobile/src/views/task-detail-view.ts`
+- `apps/mobile/src/views/task-detail-view.xml`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Rundown list rows use per-row `tap` handlers (`onToggleComplete` on status icon, **Editar** / **Enfoque** buttons) instead of `ListView.itemTap` so inner buttons do not conflict with row-level toggle.
+- Mobile `task-detail` save always sends `notesMarkdown` from the `TextView` (aligned with full-detail surface; web still splits notes via `TaskNotesPanel`).
 
 ---
