@@ -1,0 +1,154 @@
+.wrap {
+  margin-top: 8px;
+  border: 1px solid var(--dp-border);
+  border-radius: 8px;
+  background: var(--dp-surface);
+  overflow: hidden;
+}
+
+.summary {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--dp-text);
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 0.15s ease;
+  color: var(--dp-muted);
+}
+
+.wrap[open] .summary::before {
+  transform: rotate(90deg);
+}
+
+.summaryLabel {
+  font-weight: 600;
+}
+
+.body {
+  padding: 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.caption {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--dp-muted);
+}
+
+.muted {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--dp-muted);
+}
+
+.err {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #b71c1c;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dp-muted);
+}
+
+.textInput,
+.select,
+.numberInput,
+.dateInput {
+  font-size: 0.88rem;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--dp-border);
+  background: #fff;
+  color: var(--dp-text);
+}
+
+.textInput {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.select {
+  min-width: 0;
+}
+
+.inlineChecks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--dp-text);
+}
+
+.inlineChecks label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.bountyBlock {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px dashed var(--dp-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.saveBtn {
+  align-self: flex-start;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background: var(--dp-accent);
+  color: #fff;
+}
+
+.saveBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

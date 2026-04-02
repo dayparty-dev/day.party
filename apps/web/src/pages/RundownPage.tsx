@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { CreateTaskPanel } from '../components/CreateTaskPanel';
 import { TaskCard, type TaskRunwayPlacement } from '../components/TaskCard';
+import { TaskEditPanel } from '../components/TaskEditPanel';
 import { TaskNotesPanel } from '../components/TaskNotesPanel';
 import { TaskTriageBar } from '../components/TaskTriageBar';
 import { useAuth } from '../hooks/useAuth';
@@ -326,6 +327,15 @@ export function RundownPage(): ReactElement {
               tagColor={task.tagKey ? tagColorByKey.get(task.tagKey) : undefined}
               runwayPlacement={rundown ? runwayPlacementForTask(task, rundown.dayFit) : 'in-runway'}
               onToggleComplete={toggleTask}
+            />
+            <TaskEditPanel
+              client={client}
+              taskId={task.id}
+              tags={tags ?? []}
+              onUnauthorized={onUnauthorized}
+              onNetworkError={(msg) => setNetworkBanner(msg)}
+              onOtherError={(msg) => setLoadError(msg)}
+              onSaved={load}
             />
             {rundown && showTriageForTask(task, rundown.dayFit) ? (
               <TaskTriageBar
