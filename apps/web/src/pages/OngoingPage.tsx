@@ -1,4 +1,4 @@
-import { ERROR_CODES } from '@dayparty/core';
+import { ERROR_CODES, taskFocusedElapsedMs } from '@dayparty/core';
 import type { TaskRundownItemResponse } from '@dayparty/api-client';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -16,7 +16,6 @@ export function OngoingPage(): ReactElement {
   const date = useMemo(() => todayLocalDateString(), []);
   const [focusTask, setFocusTask] = useState<TaskRundownItemResponse | null>(null);
   const [tagColor, setTagColor] = useState<string | undefined>(undefined);
-  const [startedAt, setStartedAt] = useState<number | null>(null);
   const [tick, setTick] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [networkBanner, setNetworkBanner] = useState<string | null>(null);
@@ -64,7 +63,6 @@ export function OngoingPage(): ReactElement {
     } else {
       setTagColor(undefined);
     }
-    setStartedAt(next ? Date.now() : null);
   }, [client, date, onUnauthorized, pickFocus]);
 
   useEffect(() => {
@@ -79,26 +77,28 @@ export function OngoingPage(): ReactElement {
     return () => window.clearInterval(id);
   }, [focusTask]);
 
+  const targetMinutes = focusTask ? (focusTask.estimatedMinutes ?? focusTask.size * SIZE_MINUTES) : 0;
+  const targetMs = Math.max(1, targetMinutes) * 60 * 1000;
+
   const progress = useMemo(() => {
-    if (!focusTask || startedAt === null) {
+    if (!focusTask) {
       return 0;
     }
     void tick;
-    const targetMs = focusTask.size * SIZE_MINUTES * 60 * 1000;
-    const elapsed = Date.now() - startedAt;
+    const elapsed = taskFocusedElapsedMs(focusTask);
     return Math.min(100, (elapsed / targetMs) * 100);
-  }, [focusTask, startedAt, tick]);
+  }, [focusTask, targetMs, tick]);
 
   const elapsedLabel = useMemo(() => {
-    if (!focusTask || startedAt === null) {
+    if (!focusTask) {
       return '0:00';
     }
     void tick;
-    const secs = Math.floor((Date.now() - startedAt) / 1000);
+    const secs = Math.floor(taskFocusedElapsedMs(focusTask) / 1000);
     const m = Math.floor(secs / 60);
     const s = secs % 60;
     return `${m}:${String(s).padStart(2, '0')}`;
-  }, [focusTask, startedAt, tick]);
+  }, [focusTask, tick]);
 
   async function markComplete(): Promise<void> {
     if (!focusTask) {
@@ -191,7 +191,7 @@ export function OngoingPage(): ReactElement {
                 <div className={styles.progressFill} style={{ width: `${progress}%` }} />
               </div>
               <p className={styles.progressHint}>
-                Progress is a gentle guide (~{focusTask.size * SIZE_MINUTES} min for this size).
+                Progress is a gentle guide (~{targetMinutes} min target; synced across your devices).
               </p>
             </div>
 

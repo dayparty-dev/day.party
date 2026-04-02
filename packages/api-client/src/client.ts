@@ -502,6 +502,15 @@ function parseTask(input: unknown): ApiTask | null {
   const deferredToDate = typeof input.deferredToDate === 'string' ? input.deferredToDate : undefined;
   const notesMarkdown = typeof input.notesMarkdown === 'string' ? input.notesMarkdown : undefined;
 
+  const focusedSecondsTotal =
+    typeof input.focusedSecondsTotal === 'number' && Number.isFinite(input.focusedSecondsTotal)
+      ? Math.max(0, Math.floor(input.focusedSecondsTotal))
+      : undefined;
+  const focusSessionStartedAt =
+    typeof input.focusSessionStartedAt === 'string' && input.focusSessionStartedAt.length > 0
+      ? input.focusSessionStartedAt
+      : undefined;
+
   let bounty: TaskBounty | undefined;
   if ('bounty' in input && input.bounty != null) {
     if (!isTaskBounty(input.bounty)) {
@@ -520,6 +529,8 @@ function parseTask(input: unknown): ApiTask | null {
     ...(essentiality !== undefined ? { essentiality } : {}),
     ...(notesMarkdown !== undefined ? { notesMarkdown } : {}),
     ...(bounty !== undefined ? { bounty } : {}),
+    ...(focusedSecondsTotal !== undefined ? { focusedSecondsTotal } : {}),
+    ...(focusSessionStartedAt !== undefined ? { focusSessionStartedAt } : {}),
     tagKey,
     isComplete: input.isComplete,
     scheduledDate: input.scheduledDate,

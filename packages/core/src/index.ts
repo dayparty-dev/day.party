@@ -1,4 +1,5 @@
 export type { Task, TaskBounty, TaskEssentiality, TaskStatus } from './models/task';
+export { taskFocusedElapsedMs } from './focus-elapsed';
 export type { LedgerEntry, LedgerEntryReason } from './models/ledger';
 export type { RewardDefinition, RewardDefinitionType } from './models/reward';
 export type { TaskRundownItem } from './models/task-rundown';

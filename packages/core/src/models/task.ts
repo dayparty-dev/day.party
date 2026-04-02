@@ -35,6 +35,13 @@ export interface Task {
   notesMarkdown?: string;
   /** Optional reward config (data-model.md P4). */
   bounty?: TaskBounty;
+  /**
+   * Cumulative focused seconds (excluding the current open in_progress session).
+   * Updated server-side when leaving `in_progress` or completing.
+   */
+  focusedSecondsTotal?: number;
+  /** ISO time when the current in_progress session started; only meaningful while `in_progress`. */
+  focusSessionStartedAt?: string;
   createdAt: string;
   updatedAt: string;
 }

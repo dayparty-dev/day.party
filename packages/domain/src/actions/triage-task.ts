@@ -1,4 +1,5 @@
 import type { Task } from '@dayparty/core';
+import { mergeFocusForStatusTransition } from '../focus-session';
 import type { TaskRepository } from '../interfaces/task-repository';
 
 export type TaskTriageInput =
@@ -20,12 +21,14 @@ export function makeApplyTaskTriageAction(taskRepo: TaskRepository) {
           throw new Error('targetDate must differ from the task scheduledDate');
         }
         const targetTasks = await taskRepo.findByUserAndDate(userId, input.targetDate);
+        const focus = mergeFocusForStatusTransition(task, 'planned');
         const updated = await taskRepo.update(taskId, {
           scheduledDate: input.targetDate,
           position: targetTasks.length,
           status: 'planned',
           isComplete: false,
           deferredToDate: undefined,
+          ...focus,
         });
         if (!updated) {
           throw new Error(`Task "${taskId}" not found after update`);
@@ -40,10 +43,12 @@ export function makeApplyTaskTriageAction(taskRepo: TaskRepository) {
         return updated;
       }
       case 'mark_skipped': {
+        const focus = mergeFocusForStatusTransition(task, 'skipped');
         const updated = await taskRepo.update(taskId, {
           status: 'skipped',
           isComplete: false,
           deferredToDate: undefined,
+          ...focus,
         });
         if (!updated) {
           throw new Error(`Task "${taskId}" not found after update`);
@@ -54,7 +59,8 @@ export function makeApplyTaskTriageAction(taskRepo: TaskRepository) {
         if (task.status !== 'skipped') {
           throw new Error('Task is not skipped');
         }
-        const updated = await taskRepo.update(taskId, { status: 'planned' });
+        const focus = mergeFocusForStatusTransition(task, 'planned');
+        const updated = await taskRepo.update(taskId, { status: 'planned', ...focus });
         if (!updated) {
           throw new Error(`Task "${taskId}" not found after update`);
         }

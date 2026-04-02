@@ -1,4 +1,5 @@
 import type { TaskRundownItemResponse } from '@dayparty/api-client';
+import { taskFocusedElapsedMs } from '@dayparty/core';
 import type { EventData, Page } from '@nativescript/core';
 import { Observable } from '@nativescript/core';
 
@@ -12,6 +13,8 @@ function todayIso(): string {
   const da = String(d.getDate()).padStart(2, '0');
   return `${y}-${mo}-${da}`;
 }
+
+const SIZE_MINUTES = 15;
 
 function pickFocusTask(tasks: TaskRundownItemResponse[]): TaskRundownItemResponse | null {
   const open = tasks.filter((t) => !t.isComplete).sort((a, b) => a.position - b.position);
@@ -32,13 +35,12 @@ class OngoingViewModel extends Observable {
   focusToggleText = '';
   focusToggleEnabled = true;
   private tickHandle: ReturnType<typeof setInterval> | null = null;
-  private focusStartedAt = 0;
+  private currentFocus: TaskRundownItemResponse | null = null;
   private currentTaskId: string | null = null;
   private currentStatus: string | null = null;
 
   startTicker(): void {
     this.stopTicker();
-    this.focusStartedAt = Date.now();
     this.tickHandle = setInterval(() => this.updateElapsed(), 1000);
     this.updateElapsed();
   }
@@ -51,10 +53,19 @@ class OngoingViewModel extends Observable {
   }
 
   private updateElapsed(): void {
-    const secs = Math.floor((Date.now() - this.focusStartedAt) / 1000);
+    const focus = this.currentFocus;
+    if (!focus) {
+      return;
+    }
+    const elapsedMs = taskFocusedElapsedMs(focus);
+    const secs = Math.floor(elapsedMs / 1000);
     const m = Math.floor(secs / 60);
     const s = secs % 60;
+    const targetMin = focus.estimatedMinutes ?? focus.size * SIZE_MINUTES;
+    const targetMs = Math.max(1, targetMin) * 60 * 1000;
+    const pct = Math.min(100, Math.round((elapsedMs / targetMs) * 100));
     this.set('elapsedLabel', `Tiempo en esta tarea: ${m}m ${String(s).padStart(2, '0')}s`);
+    this.set('progressValue', pct);
   }
 
   async loadFocus(): Promise<void> {
@@ -92,6 +103,7 @@ class OngoingViewModel extends Observable {
     const focus = pickFocusTask(rundownResult.data.tasks);
     if (!focus) {
       this.stopTicker();
+      this.currentFocus = null;
       this.currentTaskId = null;
       this.currentStatus = null;
       this.set('emptyVisibility', 'visible');
@@ -102,6 +114,7 @@ class OngoingViewModel extends Observable {
 
     this.currentTaskId = focus.id;
     this.currentStatus = focus.status;
+    this.currentFocus = focus;
     this.set('emptyVisibility', 'collapse');
     this.set('focusVisibility', 'visible');
     const canFocus = focus.status === 'planned' || focus.status === 'in_progress';
@@ -110,8 +123,6 @@ class OngoingViewModel extends Observable {
     this.set('title', focus.title);
     const tag = focus.tagKey != null && tagNames.has(focus.tagKey) ? tagNames.get(focus.tagKey) : 'Sin etiqueta';
     this.set('metaLine', `Tamaño ${focus.size} · ${tag}`);
-    const pct = Math.min(100, Math.round((focus.size / 5) * 100));
-    this.set('progressValue', pct);
     this.startTicker();
   }
 

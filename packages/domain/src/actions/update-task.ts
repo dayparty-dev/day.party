@@ -1,4 +1,5 @@
 import type { Task, TaskBounty, TaskEssentiality, TaskStatus } from '@dayparty/core';
+import { mergeFocusForStatusTransition } from '../focus-session';
 import type { LedgerRepository } from '../interfaces/ledger-repository';
 import type { TaskRepository } from '../interfaces/task-repository';
 import type { TagRepository } from '../interfaces/tag-repository';
@@ -98,6 +99,7 @@ export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
       fields.isComplete = next.isComplete;
       fields.status = next.status;
       fields.deferredToDate = next.deferredToDate;
+      Object.assign(fields, mergeFocusForStatusTransition(task, next.status));
     }
 
     const updated = await taskRepo.update(id, fields);

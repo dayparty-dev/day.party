@@ -21,6 +21,8 @@ type TaskDoc = {
   tagKey?: string;
   notesMarkdown?: string;
   bounty?: TaskBounty;
+  focusedSecondsTotal?: number;
+  focusSessionStartedAt?: string;
   isComplete: boolean;
   scheduledDate: string;
   position: number;
@@ -50,6 +52,16 @@ function docToTask(doc: TaskDoc): Task {
       ? rest.bounty
       : undefined;
 
+  const focusedSecondsTotal =
+    typeof rest.focusedSecondsTotal === 'number' && Number.isFinite(rest.focusedSecondsTotal)
+      ? Math.max(0, Math.floor(rest.focusedSecondsTotal))
+      : undefined;
+
+  const focusSessionStartedAt =
+    typeof rest.focusSessionStartedAt === 'string' && rest.focusSessionStartedAt.length > 0
+      ? rest.focusSessionStartedAt
+      : undefined;
+
   return {
     id,
     userId: rest.userId,
@@ -62,6 +74,8 @@ function docToTask(doc: TaskDoc): Task {
     tagKey: rest.tagKey,
     ...(notesMarkdown !== undefined ? { notesMarkdown } : {}),
     ...(bounty !== undefined ? { bounty } : {}),
+    ...(focusedSecondsTotal !== undefined ? { focusedSecondsTotal } : {}),
+    ...(focusSessionStartedAt !== undefined ? { focusSessionStartedAt } : {}),
     isComplete: rest.isComplete,
     scheduledDate: rest.scheduledDate,
     position: rest.position,
@@ -99,9 +113,17 @@ export class MongoTaskRepository implements TaskRepository {
   async update(id: string, fields: Partial<Omit<Task, 'id' | 'userId' | 'createdAt'>>): Promise<Task | null> {
     if (!ObjectId.isValid(id)) return null;
     const updatedAt = new Date().toISOString();
-    const { notesMarkdown, bounty, ...rest } = fields;
+    const { notesMarkdown, bounty, focusSessionStartedAt, ...rest } = fields;
     const $set: Record<string, unknown> = { ...rest, updatedAt };
     const $unset: Record<string, ''> = {};
+    if ('focusSessionStartedAt' in fields) {
+      delete $set.focusSessionStartedAt;
+      if (typeof focusSessionStartedAt === 'string' && focusSessionStartedAt.length > 0) {
+        $set.focusSessionStartedAt = focusSessionStartedAt;
+      } else {
+        $unset.focusSessionStartedAt = '';
+      }
+    }
     if ('notesMarkdown' in fields) {
       delete $set.notesMarkdown;
       if (notesMarkdown && notesMarkdown.length > 0) {
