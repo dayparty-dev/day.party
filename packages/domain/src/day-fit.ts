@@ -1,13 +1,4 @@
-import type { DayFit, DayWindow, Task, TaskSize } from '@dayparty/core';
-
-/** Platform defaults when `estimatedMinutes` is absent (research.md §2). */
-const DEFAULT_SIZE_TO_MINUTES: Record<TaskSize, number> = {
-  1: 15,
-  2: 25,
-  3: 40,
-  4: 55,
-  5: 75,
-};
+import { DEFAULT_SIZE_TO_MINUTES, type DayFit, type DayWindow, type Task, type TaskSize } from '@dayparty/core';
 
 /** Minutes available in the user's `dayWindow` (research.md §3). */
 export function windowAvailableMinutes(dayWindow: DayWindow): number {

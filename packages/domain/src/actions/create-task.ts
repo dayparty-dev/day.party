@@ -1,4 +1,4 @@
-import type { Task } from '@dayparty/core';
+import type { Task, TaskEssentiality } from '@dayparty/core';
 import type { TaskRepository } from '../interfaces/task-repository';
 import type { TagRepository } from '../interfaces/tag-repository';
 
@@ -8,6 +8,8 @@ export interface CreateTaskInput {
   size: 1 | 2 | 3 | 4 | 5;
   tagKey?: string;
   scheduledDate: string;
+  estimatedMinutes?: number;
+  essentiality?: TaskEssentiality;
 }
 
 export function makeCreateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepository) {
@@ -30,6 +32,8 @@ export function makeCreateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
       isComplete: false,
       scheduledDate: input.scheduledDate,
       position,
+      ...(input.estimatedMinutes !== undefined ? { estimatedMinutes: input.estimatedMinutes } : {}),
+      ...(input.essentiality !== undefined ? { essentiality: input.essentiality } : {}),
     });
   };
 }

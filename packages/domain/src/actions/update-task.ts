@@ -1,4 +1,4 @@
-import type { Task } from '@dayparty/core';
+import type { Task, TaskEssentiality } from '@dayparty/core';
 import type { TaskRepository } from '../interfaces/task-repository';
 import type { TagRepository } from '../interfaces/tag-repository';
 
@@ -8,6 +8,8 @@ export type UpdateTaskInput = Partial<{
   tagKey: string | null;
   scheduledDate: string;
   isComplete: boolean;
+  estimatedMinutes: number;
+  essentiality: TaskEssentiality;
 }>;
 
 export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepository) {
@@ -30,6 +32,8 @@ export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
     if ('tagKey' in input) fields.tagKey = input.tagKey ?? undefined;
     if (input.scheduledDate !== undefined) fields.scheduledDate = input.scheduledDate;
     if (input.isComplete !== undefined) fields.isComplete = input.isComplete;
+    if (input.estimatedMinutes !== undefined) fields.estimatedMinutes = input.estimatedMinutes;
+    if (input.essentiality !== undefined) fields.essentiality = input.essentiality;
 
     const updated = await taskRepo.update(id, fields);
     if (!updated) {

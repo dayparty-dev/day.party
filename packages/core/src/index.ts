@@ -7,5 +7,5 @@ export { EMPTY_DAY_FIT } from './models/day-rundown';
 export type { DayWindow, UserPreferences, VisualPreset } from './models/user-preferences';
 export { DEFAULT_DAY_WINDOW } from './models/user-preferences';
 export type { ApiError } from './models/api-error';
-export { SIZE_SCALE, DEFAULT_TAGS, ERROR_CODES } from './constants/index';
+export { SIZE_SCALE, DEFAULT_SIZE_TO_MINUTES, DEFAULT_TAGS, ERROR_CODES } from './constants/index';
 export type { TaskSize, ErrorCode } from './constants/index';

@@ -4,6 +4,15 @@ export const SIZE_SCALE = [1, 2, 3, 4, 5] as const;
 
 export type TaskSize = (typeof SIZE_SCALE)[number];
 
+/** Default `size` → minutes when `estimatedMinutes` is absent (research.md §2). */
+export const DEFAULT_SIZE_TO_MINUTES: Record<TaskSize, number> = {
+  1: 15,
+  2: 25,
+  3: 40,
+  4: 55,
+  5: 75,
+};
+
 export const DEFAULT_TAGS: Omit<Tag, 'id' | 'userId' | 'createdAt'>[] = [
   { key: 'work', displayName: 'Work', isDefault: true },
   { key: 'health', displayName: 'Health', isDefault: true },

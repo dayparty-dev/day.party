@@ -1,5 +1,5 @@
 import { ObjectId, type Db, type Collection } from 'mongodb';
-import type { Task } from '@dayparty/core';
+import { DEFAULT_SIZE_TO_MINUTES, type Task } from '@dayparty/core';
 import type { TaskRepository } from '@dayparty/domain';
 import { bsonIdToString } from '../bson-id';
 
@@ -7,7 +7,12 @@ type TaskDoc = Omit<Task, 'id'> & { _id: ObjectId };
 
 function docToTask(doc: TaskDoc): Task {
   const { _id, ...rest } = doc;
-  return { id: bsonIdToString(_id), ...rest };
+  const id = bsonIdToString(_id);
+  const estimatedMinutes =
+    rest.estimatedMinutes != null && Number.isFinite(rest.estimatedMinutes)
+      ? rest.estimatedMinutes
+      : DEFAULT_SIZE_TO_MINUTES[rest.size];
+  return { id, ...rest, estimatedMinutes };
 }
 
 export class MongoTaskRepository implements TaskRepository {
