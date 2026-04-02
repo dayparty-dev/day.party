@@ -20,6 +20,8 @@ type TaskRow = {
   completeIcon: string;
   isComplete: boolean;
   metaLine: string;
+  notesPreviewLine: string;
+  notesPreviewVisibility: 'visible' | 'collapse';
   runwayLabel: string;
   focusBtnText: string;
   focusBtnVisibility: 'visible' | 'collapse';
@@ -34,6 +36,7 @@ type TaskRow = {
   moveEnabled: boolean;
   onToggleComplete: () => void;
   onEditTap: () => void;
+  onNotesTap: () => void;
   onFocusTap: () => void;
   onDeferTomorrow: () => void;
   onDemote: () => void;
@@ -241,6 +244,7 @@ class RundownViewModel extends Observable {
       const moveHint = hintLabelForDate(this.capacityHints, moveDateInput);
       const canDemote = t.essentiality !== 'optional';
       const rowIndex = i;
+      const preview = (t.notesPreview ?? '').trim();
       this.taskRows.push({
         id: taskId,
         scheduledDate,
@@ -250,6 +254,8 @@ class RundownViewModel extends Observable {
         completeIcon: t.isComplete ? '✓' : '○',
         isComplete: t.isComplete,
         metaLine: parts.join(' · '),
+        notesPreviewLine: preview,
+        notesPreviewVisibility: preview.length > 0 ? 'visible' : 'collapse',
         runwayLabel,
         focusBtnText: t.status === 'in_progress' ? 'Pausa' : 'Enfoque',
         focusBtnVisibility: canFocus ? 'visible' : 'collapse',
@@ -264,6 +270,7 @@ class RundownViewModel extends Observable {
         moveEnabled: isValidIsoDate(moveDateInput) && moveDateInput !== scheduledDate,
         onToggleComplete: () => void this.toggleAt(rowIndex),
         onEditTap: () => authState.navigateToTaskDetail(taskId),
+        onNotesTap: () => authState.navigateToTaskDetail(taskId, { notesFocus: true }),
         onFocusTap: () => void this.toggleFocusFor(taskId, status),
         onDeferTomorrow: () => void this.runTriageFor(taskId, { action: 'defer_to_date', targetDate: tomorrow }),
         onDemote: () => void this.runTriageFor(taskId, { action: 'demote' }),

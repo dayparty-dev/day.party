@@ -63,10 +63,10 @@ class AuthStateService {
     });
   }
 
-  navigateToTaskDetail(taskId: string): void {
+  navigateToTaskDetail(taskId: string, options?: { notesFocus?: boolean }): void {
     Frame.topmost()?.navigate({
       moduleName: 'views/task-detail-view',
-      context: { taskId },
+      context: { taskId, notesFocus: options?.notesFocus === true },
       clearHistory: false,
       animated: true,
     });

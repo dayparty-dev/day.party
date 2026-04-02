@@ -1,5 +1,5 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" loaded="onLoaded" class="page">
-  <ActionBar title="Editar tarea">
+  <ActionBar title="{{ pageTitle }}">
     <NavigationButton text="Atrás" tap="{{ onBack }}" android.systemIcon="ic_menu_back" />
   </ActionBar>
 
@@ -19,6 +19,15 @@
 
         <Label text="Título" class="footnote" />
         <TextField text="{{ title }}" hint="Título" class="input m-t-4" />
+
+        <Label text="Notas" class="h3 m-t-12" />
+        <Label text="Markdown o texto plano. Se guardan al pulsar Guardar abajo." class="footnote" textWrap="true" />
+        <TextView
+          text="{{ notesMarkdown }}"
+          hint="Escribe notas…"
+          class="input notes-text m-t-4"
+          height="{{ notesEditorHeight }}"
+        />
 
         <Label text="Tamaño (1–5)" class="footnote m-t-12" />
         <TextField text="{{ sizeText }}" hint="2" keyboardType="number" class="input m-t-4" />
@@ -42,9 +51,6 @@
           <Label text="Volver a ver el" class="footnote" />
           <TextField text="{{ deferredToDate }}" hint="AAAA-MM-DD" class="input m-t-4" />
         </StackLayout>
-
-        <Label text="Notas (markdown)" class="footnote m-t-12" />
-        <TextView text="{{ notesMarkdown }}" hint="Notas…" class="input m-t-4" height="120" />
 
         <Label text="Recompensa (puntos)" class="h3 m-t-16" />
         <Label text="Cantidad (vacío = sin cambio; 0 con quitar = eliminar)" class="footnote" textWrap="true" />

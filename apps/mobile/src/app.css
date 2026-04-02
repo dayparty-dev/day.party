@@ -53,6 +53,19 @@ Button.-primary {
   font-weight: 400;
 }
 
+.notes-preview {
+  font-size: 13;
+  color: #4b5563;
+  margin-top: 6;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.notes-text {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 15;
+}
+
 .plan-footnote {
   font-size: 13;
   color: #4b5563;

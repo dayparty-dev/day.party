@@ -23,9 +23,11 @@ class TaskDetailViewModel extends Observable {
   private readonly taskId: string;
   private tagKeysList: string[] = [''];
 
-  constructor(taskId: string) {
+  constructor(taskId: string, notesFocus: boolean) {
     super();
     this.taskId = taskId;
+    this.set('pageTitle', notesFocus ? 'Notas' : 'Editar tarea');
+    this.set('notesEditorHeight', notesFocus ? 220 : 150);
     this.set('title', '');
     this.set('sizeText', '2');
     this.set('minutesText', '');
@@ -292,9 +294,10 @@ class TaskDetailViewModel extends Observable {
 
 export function onNavigatingTo(args: NavigatedData): void {
   const page = args.object as Page;
-  const ctx = (args.context ?? page.navigationContext) as { taskId?: string } | undefined;
+  const ctx = (args.context ?? page.navigationContext) as { taskId?: string; notesFocus?: boolean } | undefined;
   const taskId = typeof ctx?.taskId === 'string' ? ctx.taskId : '';
-  page.bindingContext = new TaskDetailViewModel(taskId);
+  const notesFocus = ctx?.notesFocus === true;
+  page.bindingContext = new TaskDetailViewModel(taskId, notesFocus);
 }
 
 export function onLoaded(args: EventData): void {

@@ -67,8 +67,15 @@
             <StackLayout col="1">
               <Label text="{{ title }}" textWrap="true" class="task-title" />
               <Label text="{{ metaLine }}" textWrap="true" class="task-meta" />
+              <Label
+                text="{{ notesPreviewLine }}"
+                textWrap="true"
+                class="notes-preview"
+                visibility="{{ notesPreviewVisibility }}"
+              />
               <StackLayout orientation="horizontal" class="m-t-6">
                 <Button text="Editar" tap="{{ onEditTap }}" class="-outline m-r-8" />
+                <Button text="Notas" tap="{{ onNotesTap }}" class="-outline m-r-8" />
                 <Button text="{{ focusBtnText }}" tap="{{ onFocusTap }}" visibility="{{ focusBtnVisibility }}" class="-outline" />
               </StackLayout>
             </StackLayout>
