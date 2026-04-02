@@ -180,13 +180,15 @@ Button.-primary {
   padding: 16;
 }
 
-.reward-touch {
+.reward-touch,
+.history-touch {
   min-height: 48;
   padding-top: 12;
   padding-bottom: 12;
 }
 
-.reward-card {
+.reward-card,
+.history-card {
   background-color: #ffffff;
   border-radius: 8;
   border-width: 1;
@@ -261,7 +263,8 @@ Button.-primary {
   background-color: #dfe8f2;
 }
 
-.page.preset-calm .reward-card {
+.page.preset-calm .reward-card,
+.page.preset-calm .history-card {
   background-color: #fbfcfe;
   border-color: #c5d0e0;
 }
@@ -326,7 +329,8 @@ Button.-primary {
   background-color: #ffe8cc;
 }
 
-.page.preset-playful .reward-card {
+.page.preset-playful .reward-card,
+.page.preset-playful .history-card {
   background-color: #fffaf3;
   border-color: #f0d4b8;
 }
@@ -392,7 +396,8 @@ Button.-primary {
   background-color: #161616;
 }
 
-.page.preset-highContrast .reward-card {
+.page.preset-highContrast .reward-card,
+.page.preset-highContrast .history-card {
   background-color: #161616;
   border-color: #f5f5f5;
 }

@@ -1,0 +1,49 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" loaded="onLoaded" class="page">
+  <ActionBar title="Historial">
+    <NavigationButton text="Atrás" tap="{{ onBack }}" android.systemIcon="ic_menu_back" />
+  </ActionBar>
+
+  <ScrollView>
+    <StackLayout class="p-16">
+      <Label text="{{ hintText }}" textWrap="true" class="footnote m-b-12" />
+
+      <StackLayout visibility="{{ networkBannerVisibility }}" class="error-banner m-b-12">
+        <Label text="{{ networkBanner }}" textWrap="true" class="error-text" />
+        <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8 history-touch" />
+      </StackLayout>
+
+      <StackLayout visibility="{{ loadErrorVisibility }}">
+        <Label text="{{ loadError }}" textWrap="true" class="window-error" />
+        <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8 history-touch" />
+      </StackLayout>
+
+      <Label text="Cargando…" class="task-meta" visibility="{{ initialLoadingVisibility }}" />
+
+      <Label
+        text="Aún no hay eventos."
+        textWrap="true"
+        class="footnote"
+        visibility="{{ emptyVisibility }}"
+      />
+
+      <Repeater items="{{ eventRows }}">
+        <Repeater.itemTemplate>
+          <StackLayout class="p-12 history-card">
+            <Label text="{{ whenLine }}" class="task-meta" />
+            <Label text="{{ typeLine }}" textWrap="true" class="task-title m-t-4" />
+            <Label text="{{ entityLine }}" textWrap="true" class="task-meta m-t-4" />
+            <Label text="{{ payloadLine }}" textWrap="true" class="notes-text m-t-6" />
+          </StackLayout>
+        </Repeater.itemTemplate>
+      </Repeater>
+
+      <Button
+        text="{{ moreButtonText }}"
+        tap="{{ onLoadMore }}"
+        isEnabled="{{ moreEnabled }}"
+        class="-outline m-t-12 history-touch"
+        visibility="{{ moreVisibility }}"
+      />
+    </StackLayout>
+  </ScrollView>
+</Page>

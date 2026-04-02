@@ -408,6 +408,10 @@ class RundownViewModel extends Observable {
     authState.navigateToRewards();
   }
 
+  onHistory(): void {
+    authState.navigateToHistory();
+  }
+
   async onLogout(): Promise<void> {
     await authState.logout();
   }

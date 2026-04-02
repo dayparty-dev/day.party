@@ -222,7 +222,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 - [x] T044 [P] [US3] Add actionable **notes** UX (view/edit markdown or plain text detail) in new `apps/mobile/src/views/task-detail-view.ts` + `task-detail-view.xml`, navigable from rundown — **see US3 “T044 vs T054”**; prefer one combined detail route when **T054** runs
 - [x] T045 [P] [US4] Add rewards balance + marketplace minimal flow in new `apps/mobile/src/views/rewards-view.ts` + `rewards-view.xml` and wire navigation in `apps/mobile/src/app.ts`
 - [x] T046 [P] [US5] Apply `visualPreset` from preferences API to mobile chrome (theme classes or `App_Resources` colors) in `apps/mobile/src/app.ts` with at least two presets matching web intent. Respect **constitution** platform fidelity: **iOS** ~44pt / **Android** ~48dp minimum touch targets per **`spec.md` US5 AS2`. **Depends on**: **T031** (prefs API round-trip for `visualPreset`) and **T032** (web preset CSS variable / root-class intent so mobile can mirror tokens). **T033** (web preset selector UI) is **not\*\* a hard blocker—mobile can read and apply `visualPreset` from the API without it.
-- [ ] T047 [P] [US6] Add read-only plan history list in new `apps/mobile/src/views/history-view.ts` + `history-view.xml` and entry from `apps/mobile/src/app.ts`
+- [x] T047 [P] [US6] Add read-only plan history list in new `apps/mobile/src/views/history-view.ts` + `history-view.xml` and entry from `apps/mobile/src/app.ts`
 
 ---
 

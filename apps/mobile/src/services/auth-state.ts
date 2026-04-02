@@ -72,6 +72,14 @@ class AuthStateService {
     });
   }
 
+  navigateToHistory(): void {
+    Frame.topmost()?.navigate({
+      moduleName: 'views/history-view',
+      clearHistory: false,
+      animated: true,
+    });
+  }
+
   navigateToTaskDetail(taskId: string, options?: { notesFocus?: boolean }): void {
     Frame.topmost()?.navigate({
       moduleName: 'views/task-detail-view',
