@@ -31,6 +31,28 @@ function formatMinuteOfDay(m: number): string {
   return `${h}:${String(min).padStart(2, '0')}`;
 }
 
+/** `HH:MM` for TextField (leading zero on hour). */
+function formatMinuteOfDayForInput(m: number): string {
+  const clamped = Math.max(0, Math.min(1439, Math.round(m)));
+  const h = Math.floor(clamped / 60);
+  const min = clamped % 60;
+  return `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+}
+
+function parseTimeInput(value: string): number | null {
+  const v = value.trim();
+  const parts = v.split(':');
+  if (parts.length < 2) {
+    return null;
+  }
+  const h = Number(parts[0]);
+  const m = Number(parts[1]);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) {
+    return null;
+  }
+  return Math.max(0, Math.min(1439, h * 60 + m));
+}
+
 class RundownViewModel extends Observable {
   taskRows = new ObservableArray<TaskRow>();
   summaryText = '';
@@ -40,6 +62,14 @@ class RundownViewModel extends Observable {
 
   constructor() {
     super();
+    this.set('windowStartInput', '09:00');
+    this.set('windowEndInput', '17:00');
+    this.set('windowCrosses', false);
+    this.set('windowEditorVisibility', 'collapse');
+    this.set('windowSaveError', '');
+    this.set('windowSaving', false);
+    this.set('saveWindowEnabled', true);
+    this.set('saveButtonText', 'Guardar ventana');
   }
 
   async loadRundown(): Promise<void> {
@@ -84,6 +114,10 @@ class RundownViewModel extends Observable {
       'planFootnote',
       `Ventana ${start}–${end}${cross} · ${dayFit.plannedMinutes}/${dayFit.availableMinutes} min previstos${over}`,
     );
+
+    this.set('windowStartInput', formatMinuteOfDayForInput(dayWindow.startMinuteOfDay));
+    this.set('windowEndInput', formatMinuteOfDayForInput(dayWindow.endMinuteOfDay));
+    this.set('windowCrosses', dayWindow.crossesMidnight);
 
     while (this.taskRows.length > 0) {
       this.taskRows.pop();
@@ -158,6 +192,65 @@ class RundownViewModel extends Observable {
 
   onRetry(): void {
     void this.loadRundown();
+  }
+
+  onToggleWindowEditor(): void {
+    const next = this.get('windowEditorVisibility') === 'visible' ? 'collapse' : 'visible';
+    this.set('windowEditorVisibility', next);
+    if (next === 'visible') {
+      this.set('windowSaveError', '');
+    }
+  }
+
+  onWindowCrossChange(args: EventData): void {
+    const sw = args.object as { checked: boolean };
+    this.set('windowCrosses', sw.checked);
+  }
+
+  async onSaveWindow(): Promise<void> {
+    this.set('windowSaveError', '');
+    const startMin = parseTimeInput(String(this.get('windowStartInput') ?? ''));
+    const endMin = parseTimeInput(String(this.get('windowEndInput') ?? ''));
+    const crosses = Boolean(this.get('windowCrosses'));
+    if (startMin === null || endMin === null) {
+      this.set('windowSaveError', 'Formato inválido. Usa HH:MM en 24h (ej. 09:00).');
+      return;
+    }
+    if (!crosses && startMin >= endMin) {
+      this.set('windowSaveError', 'Si no cruza medianoche, el inicio debe ser antes del fin.');
+      return;
+    }
+    if (crosses && startMin <= endMin) {
+      this.set('windowSaveError', 'Si cruza medianoche, el inicio (tarde) debe ser después del fin (mañana).');
+      return;
+    }
+
+    this.set('windowSaving', true);
+    this.set('saveWindowEnabled', false);
+    this.set('saveButtonText', 'Guardando…');
+    const client = authState.getClient();
+    const res = await client.patchUserPreferences({
+      dayWindow: {
+        startMinuteOfDay: startMin,
+        endMinuteOfDay: endMin,
+        crossesMidnight: crosses,
+      },
+    });
+    this.set('windowSaving', false);
+    this.set('saveWindowEnabled', true);
+    this.set('saveButtonText', 'Guardar ventana');
+
+    if (authState.consumeUnauthorized(res)) {
+      return;
+    }
+    if (res.ok === false) {
+      const net = isLikelyNetworkFailure(res.error);
+      this.set('windowSaveError', net ? 'Sin conexión. Revisa la red o la API.' : res.error.message);
+      return;
+    }
+
+    this.set('windowEditorVisibility', 'collapse');
+    await this.loadRundown();
   }
 }
 

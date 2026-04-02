@@ -6,8 +6,11 @@ import { createAuthMiddleware } from '../middleware/auth-middleware';
 import type { ApiEnv, ApiVariables } from '../types';
 
 function prefsPublic(p: UserPreferences): Omit<UserPreferences, 'userId'> {
-  const { userId: _u, ...rest } = p;
-  return rest;
+  const { userId: _u, sizeToMinutes, ...rest } = p;
+  return {
+    ...rest,
+    ...(sizeToMinutes != null && Object.keys(sizeToMinutes).length > 0 ? { sizeToMinutes } : {}),
+  };
 }
 
 export function createPreferenceRoutes(env: ApiEnv) {

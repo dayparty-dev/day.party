@@ -14,7 +14,24 @@
       <Button col="1" text="En curso" tap="{{ onOngoing }}" class="-primary" />
     </GridLayout>
 
-    <Label row="2" text="{{ planFootnote }}" textWrap="true" class="plan-footnote" />
+    <ScrollView row="2" orientation="vertical" class="plan-scroll">
+      <StackLayout class="p-12 plan-stack">
+        <Label text="{{ planFootnote }}" textWrap="true" class="plan-footnote" />
+        <Button text="Ajustar ventana" tap="{{ onToggleWindowEditor }}" class="-outline m-t-8" />
+        <StackLayout visibility="{{ windowEditorVisibility }}" class="window-editor m-t-12">
+          <Label text="Inicio (24h, HH:MM)" class="footnote" />
+          <TextField text="{{ windowStartInput }}" hint="09:00" class="input m-t-4" />
+          <Label text="Fin (24h, HH:MM)" class="footnote m-t-8" />
+          <TextField text="{{ windowEndInput }}" hint="17:00" class="input m-t-4" />
+          <GridLayout columns="auto, *" class="m-t-12">
+            <Switch col="0" checked="{{ windowCrosses }}" checkedChange="{{ onWindowCrossChange }}" verticalAlignment="center" />
+            <Label col="1" text="Cruza medianoche" class="footnote" textWrap="true" verticalAlignment="center" />
+          </GridLayout>
+          <Label text="{{ windowSaveError }}" textWrap="true" class="window-error m-t-8" />
+          <Button text="{{ saveButtonText }}" tap="{{ onSaveWindow }}" isEnabled="{{ saveWindowEnabled }}" class="-primary m-t-12" />
+        </StackLayout>
+      </StackLayout>
+    </ScrollView>
 
     <ListView row="3" items="{{ taskRows }}" itemTap="{{ onTaskTap }}" class="list">
       <ListView.itemTemplate>

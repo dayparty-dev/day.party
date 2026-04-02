@@ -587,7 +587,8 @@ function isVisualPreset(value: unknown): value is VisualPreset {
 }
 
 function parseSizeToMinutesOverrides(input: unknown): Partial<Record<TaskSize, number>> | undefined | null {
-  if (input === undefined) {
+  /** API / Mongo may serialize absent overrides as JSON `null`. */
+  if (input === undefined || input === null) {
     return undefined;
   }
   if (!isRecord(input)) {
@@ -619,7 +620,7 @@ function parseUserPreferences(input: unknown): ApiUserPreferences | null {
     return null;
   }
   const sizeToMinutes = parseSizeToMinutesOverrides(input.sizeToMinutes);
-  if (input.sizeToMinutes !== undefined && sizeToMinutes === null) {
+  if (input.sizeToMinutes != null && sizeToMinutes === null) {
     return null;
   }
   return {

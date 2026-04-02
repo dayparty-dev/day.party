@@ -56,8 +56,24 @@ Button.-primary {
 .plan-footnote {
   font-size: 13;
   color: #4b5563;
-  padding: 0 12 8 12;
   font-weight: 500;
+}
+
+.plan-scroll {
+  max-height: 320;
+}
+
+.window-editor {
+  padding: 12;
+  background-color: #ffffff;
+  border-radius: 8;
+  border-width: 1;
+  border-color: #e5e7eb;
+}
+
+.window-error {
+  font-size: 13;
+  color: #b91c1c;
 }
 
 .runway-badge {
