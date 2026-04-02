@@ -4,11 +4,11 @@ Autonomous implementation loop for [spec-kit](https://github.com/github/spec-kit
 
 ## Prerequisites
 
-| Requirement | Why |
-|---|---|
-| [spec-kit](https://github.com/github/spec-kit) (`specify` CLI) | Extension host — provides project structure and task management |
-| [GitHub Copilot CLI](https://docs.github.com/en/copilot) (`copilot` binary in PATH) | Default agent CLI used to execute each iteration |
-| [Git](https://git-scm.com/) | Version control — Ralph commits completed work units automatically |
+| Requirement                                                                         | Why                                                                |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [spec-kit](https://github.com/github/spec-kit) (`specify` CLI)                      | Extension host — provides project structure and task management    |
+| [GitHub Copilot CLI](https://docs.github.com/en/copilot) (`copilot` binary in PATH) | Default agent CLI used to execute each iteration                   |
+| [Git](https://git-scm.com/)                                                         | Version control — Ralph commits completed work units automatically |
 
 Your project must be initialized with `specify init` and have a feature branch checked out with a completed `tasks.md`.
 
@@ -17,7 +17,9 @@ Your project must be initialized with `specify init` and have a feature branch c
 ```bash
 specify extension add ralph
 ```
+
 Or install from repository directly
+
 ```bash
 specify extension add ralph --from https://github.com/Rubiss/spec-kit-ralph/archive/refs/tags/v1.0.0.zip
 ```
@@ -83,34 +85,34 @@ Edit `.specify/extensions/ralph/ralph-config.yml` to customize defaults:
 
 ```yaml
 # AI model for agent iterations
-model: "claude-sonnet-4.6"
+model: 'claude-sonnet-4.6'
 
 # Maximum loop iterations before stopping
 max_iterations: 10
 
 # Path or name of the agent CLI binary
-agent_cli: "copilot"
+agent_cli: 'copilot'
 ```
 
 ### Configuration Precedence
 
 Settings are resolved from lowest to highest priority:
 
-| Priority | Source | Example |
-|---|---|---|
-| 1 (lowest) | Extension defaults | Hardcoded in `extension.yml` |
-| 2 | Project config | `.specify/extensions/ralph/ralph-config.yml` |
-| 3 | Local overrides | `.specify/extensions/ralph/ralph-config.local.yml` (gitignored) |
-| 4 | Environment variables | `SPECKIT_RALPH_MODEL` |
-| 5 (highest) | CLI parameters | `--model`, `--max-iterations` |
+| Priority    | Source                | Example                                                         |
+| ----------- | --------------------- | --------------------------------------------------------------- |
+| 1 (lowest)  | Extension defaults    | Hardcoded in `extension.yml`                                    |
+| 2           | Project config        | `.specify/extensions/ralph/ralph-config.yml`                    |
+| 3           | Local overrides       | `.specify/extensions/ralph/ralph-config.local.yml` (gitignored) |
+| 4           | Environment variables | `SPECKIT_RALPH_MODEL`                                           |
+| 5 (highest) | CLI parameters        | `--model`, `--max-iterations`                                   |
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|---|---|---|
-| `SPECKIT_RALPH_MODEL` | AI model to use | `claude-sonnet-4.6` |
-| `SPECKIT_RALPH_MAX_ITERATIONS` | Maximum iterations before stopping | `10` |
-| `SPECKIT_RALPH_AGENT_CLI` | Agent CLI binary name or path | `copilot` |
+| Variable                       | Description                        | Default             |
+| ------------------------------ | ---------------------------------- | ------------------- |
+| `SPECKIT_RALPH_MODEL`          | AI model to use                    | `claude-sonnet-4.6` |
+| `SPECKIT_RALPH_MAX_ITERATIONS` | Maximum iterations before stopping | `10`                |
+| `SPECKIT_RALPH_AGENT_CLI`      | Agent CLI binary name or path      | `copilot`           |
 
 ```bash
 export SPECKIT_RALPH_MODEL="gpt-5.1"
@@ -142,6 +144,8 @@ export SPECKIT_RALPH_AGENT_CLI="copilot"
   │  Agent reads tasks.md +       │
   │  progress.md, implements      │
   │  ONE work unit, commits       │
+  │  (implementation then         │
+  │   progress.md follow-up)      │
   └──────────────┬────────────────┘
                  ▼
        ┌──────────────────┐
@@ -156,19 +160,19 @@ export SPECKIT_RALPH_AGENT_CLI="copilot"
 
 1. The orchestrator spawns a **fresh** `copilot --agent speckit.ralph` process each iteration.
 2. The agent reads `tasks.md` to find the first incomplete work unit (phase, user story, or task group).
-3. It implements tasks within that single work unit, marks them `[x]` in `tasks.md`, and commits on completion.
-4. It appends an iteration entry to `progress.md` with files changed and lessons learned.
+3. It implements tasks within that single work unit, marks them `[x]` in `tasks.md`, and creates an **implementation commit** (exclude `progress.md` from that commit so its hash stays stable).
+4. It appends an iteration entry to `progress.md` (with `git rev-parse HEAD` from step 3) and commits **only** `progress.md` in a **separate** follow-up commit — never `git commit --amend` to fix the recorded hash (that rewrites the implementation commit and loops).
 5. Control returns to the orchestrator, which checks termination conditions and loops.
 
 ### Termination Conditions
 
-| Condition | Exit Code | Meaning |
-|---|---|---|
-| All tasks in `tasks.md` marked `[x]` | `0` | Success — nothing left to do |
-| Agent outputs `<promise>COMPLETE</promise>` | `0` | Agent confirmed all work is done |
-| Max iterations reached | `1` | Safety limit — increase `max_iterations` if needed |
-| 3 consecutive failures | `1` | Circuit breaker — agent is stuck |
-| Ctrl+C | `130` | User interrupted the loop |
+| Condition                                   | Exit Code | Meaning                                            |
+| ------------------------------------------- | --------- | -------------------------------------------------- |
+| All tasks in `tasks.md` marked `[x]`        | `0`       | Success — nothing left to do                       |
+| Agent outputs `<promise>COMPLETE</promise>` | `0`       | Agent confirmed all work is done                   |
+| Max iterations reached                      | `1`       | Safety limit — increase `max_iterations` if needed |
+| 3 consecutive failures                      | `1`       | Circuit breaker — agent is stuck                   |
+| Ctrl+C                                      | `130`     | User interrupted the loop                          |
 
 ## Resuming After Interruption
 

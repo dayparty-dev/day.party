@@ -58,11 +58,12 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Run quality checks after each task (typecheck, lint, test as appropriate)
    - Mark each completed task by changing `[ ]` to `[x]` in tasks.md
 
-6. **Commit on user story completion**:
-   - When ALL tasks in the current user story are complete (`[x]`), create a commit:
+6. **Commit on user story completion (implementation commit)**:
+   - When ALL tasks in the current user story are complete (`[x]`), create the **implementation commit** first.
+   - Stage changed files **except** `FEATURE_DIR/progress.md` (e.g. `git add -A` then `git reset HEAD -- FEATURE_DIR/progress.md`, or add paths explicitly). That keeps the progress report able to point at a **stable** hash for this commit.
+   - Commit:
 
      ```sh
-     git add -A
      git commit -m "<emoji> (<scope>): <description lowercase>" [-m "<body>"]
      ```
 
@@ -71,10 +72,13 @@ You **MUST** consider the user input before proceeding (if not empty).
    - If repository instruction files define commit style, follow them exactly
    - If only partial progress, NO commit -- let the next iteration continue
 
-7. **Update progress log**:
+7. **Update progress log (follow-up commit)**:
+   - Run `git rev-parse HEAD` and use the **full** hash as the **Commit** value in the new iteration block **only if** step 6 created a commit (otherwise use `No commit - partial progress`).
    - Create or append to `FEATURE_DIR/progress.md`
    - Add any discovered patterns to `## Codebase Patterns` section at TOP of file
    - Use the Progress Report Format below
+   - Commit **only** `FEATURE_DIR/progress.md` in a **new** commit (e.g. `📝 (specs): update ralph progress for iteration N`).
+   - **Do not** use `git commit --amend` to attach `progress.md` to the implementation commit or to “fix” the recorded **Commit** hash. Amending **rewrites** the implementation commit’s hash, which invalidates the hash you wrote in `progress.md` and causes a **hash-mismatch loop**. A separate progress commit is always correct.
 
 ## Progress Report Format
 
