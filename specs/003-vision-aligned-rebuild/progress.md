@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Mobile rewards (T045 / US4)**: `views/rewards-view` loads `getRewards` + `getLedger({ limit: 30 })` in parallel; **Comprar** uses `purchaseReward`; create form uses `createRewardDefinition` (Spanish copy). **Repeater** (not nested **ListView**) inside **ScrollView** for catalog + ledger rows. `authState.navigateToRewards()`; rundown **ActionBar** **Recompensas** `ActionItem`. `.reward-touch` **min-height: 48** for marketplace buttons. Shell route list in `app.ts` file comment.
 - **Mobile notes (T044 / US3)**: Rundown `TaskRow` includes optional `notesPreviewLine` + `notesPreviewVisibility` from `TaskRundownItemResponse.notesPreview`; **Notas** → `authState.navigateToTaskDetail(taskId, { notesFocus: true })`. `task-detail-view` reads `context.notesFocus`, sets `pageTitle` **Notas** vs **Editar tarea**, `notesEditorHeight` 220 vs 150; notes **TextView** after **Título** with `.notes-text` (monospace) and short helper copy.
 - **Quickstart (Phase 9 T042/T048)**: `specs/003-vision-aligned-rebuild/quickstart.md` documents API env vars (`MONGODB_*`, `PORT`, `API_PUBLIC_URL`, `WEB_PUBLIC_URL`, `CORS_ORIGIN`, `MAGIC_LINK_SECRET`), auth → JWT flow, curl samples for tasks/prefs/triage/suggestions/rewards/ledger/marketplace/history, **FR-011** cross-session checklist, and **Session / offline (v1)** scope (server-authoritative; retry + refresh; no offline queue / merge UI in 003 v1).
 - **Mobile triage (T043)**: `rundown-view` ListView rows include a collapsible triage block (`triageVisibility`) when `showTriageForTask` matches web (`skipped` | `overflowUnresolved` | `outsideRunwayTaskIds`). Uses `DayPartyClient.triageTask` + `getDaySuggestions` (7-day window); `TaskRow` holds `moveDateInput` / `moveHint`; `textChange` on `TextField` + `ObservableArray.setItem` updates hint and `moveEnabled`; `refreshTriageBusy` disables actions on the in-flight row only. Spanish copy; triage buttons `min-height: 44` in `app.css`.
@@ -662,5 +663,35 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - Kept a single **task-detail** route per T044 vs T054 guidance; **Notas** is an entry point + `notesFocus` UX, not a second screen.
+
+---
+
+## Iteration 21 - 2026-04-02
+
+**User Story**: Phase 10 — US4 mobile rewards (**T045**)
+
+**Tasks Completed**:
+
+- [x] T045 [P] [US4]: `rewards-view.ts` / `rewards-view.xml` — balance, catalog + purchase, create reward, recent ledger; rundown entry + `navigateToRewards`; `app.ts` shell route comment
+
+**Tasks Remaining in Story**: Phase 10 still has **T046**–**T047**
+
+**Commit**: 1548b971ade8f0b493cc4886e9fda92e6ef6d892
+
+**Files Changed**:
+
+- `apps/mobile/src/views/rewards-view.ts`
+- `apps/mobile/src/views/rewards-view.xml`
+- `apps/mobile/src/services/auth-state.ts`
+- `apps/mobile/src/views/rundown-view.ts`
+- `apps/mobile/src/views/rundown-view.xml`
+- `apps/mobile/src/app.ts`
+- `apps/mobile/src/app.css`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Use `result.ok === false` before reading `Result.error` so TypeScript narrows (same as other mobile views).
+- Avoid **ListView** inside **ScrollView**; **Repeater** + **ObservableArray** keeps one scroll container.
 
 ---
