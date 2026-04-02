@@ -11,6 +11,8 @@ Started: 2026-04-02 15:10:01
 - **`DEFAULT_SIZE_TO_MINUTES`**: Single export from `@dayparty/core` for domain fit + Mongo read-path legacy fill; keep aligned.
 - **Prefs Zod**: `patchUserPreferencesSchema` / `dayWindowSchema` enforce midnight-crossing vs same-day window rules; `sizeToMinutes` patch uses strict keys `1`–`5` only.
 - **Prefs HTTP**: `GET` / `PATCH /api/me/preferences` (session auth). Response body omits `userId`. `GET` synthesizes defaults from `@dayparty/core` when no Mongo doc exists (not persisted until `PATCH`). `PATCH` merges `sizeToMinutes` shallowly over any stored overrides.
+- **Web rundown**: `RundownPage` holds full `DayRundownResponse`; plan bar uses `plannedMinutes` / `availableMinutes`; day window uses `<input type="time" step={300}>` + `minutesToTimeInput` / `timeInputToMinutes` helpers; `TaskCard` takes explicit `runwayPlacement` from `dayFit` task id lists.
+- **Mobile rundown**: Spanish copy for plan footnote and runway labels (`En ventana` / `Extra`); `metaLine` shows estimate, size, essentiality.
 
 ---
 
@@ -170,5 +172,36 @@ Started: 2026-04-02 15:10:01
 **Learnings**:
 
 - Empty `PATCH` body `{}` passes Zod but is rejected at the handler with 422 so clients get a clear error; client mirrors the same check before `request`.
+
+---
+
+## Iteration 6 - 2026-04-02
+
+**User Story**: User Story 1 (Phase 3) — **complete** (T014–T015; MVP day planning slice)
+
+**Tasks Completed**:
+
+- [x] T014: Web `RundownPage` plan panel + window editor + `TaskCard` runway / essentiality / minutes UI.
+- [x] T015: NativeScript rundown plan footnote + per-row meta and runway labels.
+
+**Tasks Remaining in Story**: None — US1 complete (later phases in `tasks.md` still open).
+
+**Commit**: 8d180c6a2713145f11c829ed1d7090a37354bc77
+
+**Files Changed**:
+
+- `apps/web/src/utils/time-of-day.ts`
+- `apps/web/src/pages/RundownPage.tsx`
+- `apps/web/src/pages/RundownPage.module.css`
+- `apps/web/src/components/TaskCard.tsx`
+- `apps/web/src/components/TaskCard.module.css`
+- `apps/mobile/src/views/rundown-view.ts`
+- `apps/mobile/src/views/rundown-view.xml`
+- `apps/mobile/src/app.css`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Full US1 checklist in Phase 3 is done; US2+ tasks remain elsewhere in `tasks.md` — Ralph `COMPLETE` only when **all** feature tasks are checked.
 
 ---
