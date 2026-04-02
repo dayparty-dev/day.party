@@ -163,3 +163,52 @@ Button.-primary {
 .m-b-12 {
   margin-bottom: 12;
 }
+
+.m-b-8 {
+  margin-bottom: 8;
+}
+
+.m-b-24 {
+  margin-bottom: 24;
+}
+
+.p-10 {
+  padding: 10;
+}
+
+.p-16 {
+  padding: 16;
+}
+
+.reward-touch {
+  min-height: 48;
+  padding-top: 12;
+  padding-bottom: 12;
+}
+
+.reward-card {
+  background-color: #ffffff;
+  border-radius: 8;
+  border-width: 1;
+  border-color: #e5e7eb;
+  margin-bottom: 8;
+}
+
+.ledger-row {
+  border-bottom-width: 1;
+  border-bottom-color: #f3f4f6;
+}
+
+.ledger-amount-credit {
+  font-size: 15;
+  font-weight: 700;
+  color: #15803d;
+  margin-left: 8;
+}
+
+.ledger-amount-debit {
+  font-size: 15;
+  font-weight: 700;
+  color: #b91c1c;
+  margin-left: 8;
+}

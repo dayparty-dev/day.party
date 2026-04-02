@@ -63,6 +63,14 @@ class AuthStateService {
     });
   }
 
+  navigateToRewards(): void {
+    Frame.topmost()?.navigate({
+      moduleName: 'views/rewards-view',
+      clearHistory: false,
+      animated: true,
+    });
+  }
+
   navigateToTaskDetail(taskId: string, options?: { notesFocus?: boolean }): void {
     Frame.topmost()?.navigate({
       moduleName: 'views/task-detail-view',

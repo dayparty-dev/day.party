@@ -404,6 +404,10 @@ class RundownViewModel extends Observable {
     authState.navigateToOngoing();
   }
 
+  onRewards(): void {
+    authState.navigateToRewards();
+  }
+
   async onLogout(): Promise<void> {
     await authState.logout();
   }

@@ -1,0 +1,56 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" loaded="onLoaded" class="page">
+  <ActionBar title="Recompensas">
+    <NavigationButton text="Atrás" tap="{{ onBack }}" android.systemIcon="ic_menu_back" />
+  </ActionBar>
+
+  <ScrollView>
+    <StackLayout class="p-16">
+      <Label text="{{ balanceLabel }}" class="h3 m-b-8" />
+
+      <StackLayout visibility="{{ networkBannerVisibility }}" class="error-banner m-b-12">
+        <Label text="{{ networkBanner }}" textWrap="true" class="error-text" />
+        <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8 reward-touch" />
+      </StackLayout>
+
+      <StackLayout visibility="{{ loadErrorVisibility }}">
+        <Label text="{{ loadError }}" textWrap="true" class="window-error" />
+        <Button text="Reintentar" tap="{{ onRetry }}" class="-outline m-t-8 reward-touch" />
+      </StackLayout>
+
+      <Label text="Catálogo" class="h3 m-t-8" />
+      <Label text="Aún no hay recompensas. Añade una abajo." textWrap="true" class="footnote m-b-8" visibility="{{ emptyCatalogVisibility }}" />
+
+      <Repeater items="{{ rewardRows }}">
+        <Repeater.itemTemplate>
+          <GridLayout columns="*, auto" class="p-12 reward-card">
+            <StackLayout col="0">
+              <Label text="{{ name }}" textWrap="true" class="task-title" />
+              <Label text="{{ metaLine }}" textWrap="true" class="task-meta m-t-4" />
+            </StackLayout>
+            <Button col="1" text="{{ buyButtonText }}" tap="{{ onBuyTap }}" isEnabled="{{ buyEnabled }}" class="-primary reward-touch" verticalAlignment="center" />
+          </GridLayout>
+        </Repeater.itemTemplate>
+      </Repeater>
+
+      <Label text="Nueva recompensa" class="h3 m-t-16" />
+      <Label text="Nombre" class="footnote m-t-8" />
+      <TextField text="{{ newRewardName }}" hint="Nombre" class="input m-t-4" maxLength="200" />
+      <Label text="Tipo" class="footnote m-t-8" />
+      <ListPicker items="{{ rewardTypeLabels }}" selectedIndex="{{ rewardTypeIndex }}" class="input m-t-4" />
+      <Label text="Coste (puntos)" class="footnote m-t-8" />
+      <TextField text="{{ newRewardCost }}" hint="0" keyboardType="number" class="input m-t-4" />
+      <Label text="{{ createRewardError }}" textWrap="true" class="window-error m-t-8" />
+      <Button text="{{ createRewardButtonText }}" tap="{{ onCreateReward }}" isEnabled="{{ createRewardEnabled }}" class="-primary m-t-12 reward-touch" />
+
+      <Label text="Movimientos recientes" class="h3 m-t-20" />
+      <Repeater items="{{ ledgerRows }}">
+        <Repeater.itemTemplate>
+          <GridLayout columns="*, auto" class="p-10 ledger-row">
+            <Label col="0" text="{{ line }}" textWrap="true" class="task-meta" />
+            <Label col="1" text="{{ amountText }}" class="{{ amountClass }}" verticalAlignment="top" />
+          </GridLayout>
+        </Repeater.itemTemplate>
+      </Repeater>
+    </StackLayout>
+  </ScrollView>
+</Page>

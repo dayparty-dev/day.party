@@ -20,7 +20,7 @@
 Per `spec.md` (**Mobile / web parity** and **Definition of done (first-party clients)**), a user story is **product-done** only when **both** `apps/web` and `apps/mobile` ship that story’s **intended** UX—not merely when the API accepts payloads.
 
 - **US2** / **US3**: **US2** mobile triage is **`T043` `[x]`**; **US3** mobile notes are **`T044` `[x]`** (Phase 10). **US3** is **product-closed** on first-party clients for the notes slice.
-- **US4**: **Web** marketplace (**T030**) shipped without **mobile** rewards (**T045**) or **bounty** create/edit in clients (**T053**, **T056**, **T051**/`T054`). Until **T045** + **T053** + **T056** + editor bounty paths are `[x]`, treat US4 as **web/API slice complete**, not product-closed.
+- **US4**: **Web** marketplace (**T030**) and **mobile** rewards (**T045**) ship with **bounty** create/edit in clients (**T053**, **T056**, **T051**/**T054**) — treat **US4** as **product-closed** on first-party clients when those tasks are `[x]`.
 - **US1**: **Full lifecycle** (edit fields, **`in_progress`**, optional **bounty** on create/edit, not only done-toggle) requires **T051–T056** in addition to earlier US1 tasks.
 
 ### API ↔ client coverage matrix (003)
@@ -34,7 +34,7 @@ Per `spec.md` (**Mobile / web parity** and **Definition of done (first-party cli
 | **Notes** detail (`GET :id`, `PATCH` notes)                                                        | Exposed (**T023**)         | Exposed (**T044**) | Both clients               | —                            |
 | **Bounty** create (`POST` + `createTaskSchema.bounty`)                                             | Exposed (**T053**)         | Exposed (**T056**) | Both                       | —                            |
 | **Bounty** edit/clear (`PATCH` bounty)                                                             | Exposed (**T051**)         | Exposed (**T054**) | Both                       | —                            |
-| Rewards / ledger / purchase                                                                        | Exposed (**T030**)         | Not exposed        | Mobile                     | **T045**                     |
+| Rewards / ledger / purchase                                                                        | Exposed (**T030**)         | Exposed (**T045**) | Both                       | —                            |
 
 _Update this table when `updateTaskSchema` or routes gain fields._
 
@@ -150,9 +150,9 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 **Goal**: Bounty on completion, ledger balance, catalog purchase flow (FR-004, FR-007, FR-008, SC-005).
 
-**Product story-done**: **US4** requires **T030** + **T045** + **T053** + **T056** + bounty path on **T051** / **T054** (see **coverage matrix**).
+**Product story-done**: **US4** is satisfied when **T030** + **T045** + **T053** + **T056** + bounty path on **T051** / **T054** are all `[x]` (see **coverage matrix**).
 
-**Independent Test**: On **`apps/web`**, complete a bounty task → balance increases → purchase reward → ledger reflects debit. **Product-complete** US4 also requires **`apps/mobile`** rewards (**T045**) and client bounty surfaces (**T053**, **T056**, **T051** / **T054**).
+**Independent Test**: On **`apps/web`** or **`apps/mobile`**, complete a bounty task → balance increases → purchase reward → ledger reflects debit; catalog and balance match REST contracts.
 
 ### Implementation for User Story 4
 
@@ -220,7 +220,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 - [x] T043 [P] [US2] Implement triage / defer / move-day flows on mobile in `apps/mobile/src/views/rundown-view.ts` and `apps/mobile/src/views/rundown-view.xml` (or add `apps/mobile/src/views/triage-view.ts` + `triage-view.xml` and register in `apps/mobile/src/app.ts`)
 - [x] T044 [P] [US3] Add actionable **notes** UX (view/edit markdown or plain text detail) in new `apps/mobile/src/views/task-detail-view.ts` + `task-detail-view.xml`, navigable from rundown — **see US3 “T044 vs T054”**; prefer one combined detail route when **T054** runs
-- [ ] T045 [P] [US4] Add rewards balance + marketplace minimal flow in new `apps/mobile/src/views/rewards-view.ts` + `rewards-view.xml` and wire navigation in `apps/mobile/src/app.ts`
+- [x] T045 [P] [US4] Add rewards balance + marketplace minimal flow in new `apps/mobile/src/views/rewards-view.ts` + `rewards-view.xml` and wire navigation in `apps/mobile/src/app.ts`
 - [ ] T046 [P] [US5] Apply `visualPreset` from preferences API to mobile chrome (theme classes or `App_Resources` colors) in `apps/mobile/src/app.ts` with at least two presets matching web intent. Respect **constitution** platform fidelity: **iOS** ~44pt / **Android** ~48dp minimum touch targets per **`spec.md` US5 AS2`. **Depends on**: **T031** (prefs API round-trip for `visualPreset`) and **T032** (web preset CSS variable / root-class intent so mobile can mirror tokens). **T033** (web preset selector UI) is **not\*\* a hard blocker—mobile can read and apply `visualPreset` from the API without it.
 - [ ] T047 [P] [US6] Add read-only plan history list in new `apps/mobile/src/views/history-view.ts` + `history-view.xml` and entry from `apps/mobile/src/app.ts`
 

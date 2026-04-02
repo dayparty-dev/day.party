@@ -1,5 +1,6 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" loaded="onLoaded" class="page">
   <ActionBar title="Resumen del día">
+    <ActionItem text="Recompensas" ios.position="right" android.position="actionBar" tap="{{ onRewards }}" />
     <ActionItem text="Salir" ios.position="right" android.position="actionBar" tap="{{ onLogout }}" />
   </ActionBar>
 

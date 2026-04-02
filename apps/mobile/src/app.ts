@@ -1,5 +1,7 @@
 /*
  * NativeScript entry: root Frame + initial route from persisted session.
+ * Authenticated routes (moduleName): views/rundown-view, views/ongoing-view,
+ * views/task-detail-view, views/rewards-view
  */
 import { Application, Frame } from '@nativescript/core';
 
