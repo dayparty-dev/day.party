@@ -1,4 +1,10 @@
-import type { CreateTaskInput } from '@dayparty/api-client';
+import type {
+  CreateTaskInput,
+  DayCapacityHint,
+  DayRundownResponse,
+  TaskRundownItemResponse,
+  TaskTriageInput,
+} from '@dayparty/api-client';
 import type { EventData, Page } from '@nativescript/core';
 import { Observable, ObservableArray } from '@nativescript/core';
 
@@ -7,6 +13,7 @@ import { isLikelyNetworkFailure } from '../utils/network-error';
 
 type TaskRow = {
   id: string;
+  scheduledDate: string;
   title: string;
   size: string;
   tagColor: string;
@@ -16,9 +23,23 @@ type TaskRow = {
   runwayLabel: string;
   focusBtnText: string;
   focusBtnVisibility: 'visible' | 'collapse';
+  triageVisibility: 'visible' | 'collapse';
+  canDemote: boolean;
+  deferTomorrowEnabled: boolean;
+  demoteEnabled: boolean;
+  skipTriageEnabled: boolean;
+  skipBtnText: string;
+  moveDateInput: string;
+  moveHint: string;
+  moveEnabled: boolean;
   onToggleComplete: () => void;
   onEditTap: () => void;
   onFocusTap: () => void;
+  onDeferTomorrow: () => void;
+  onDemote: () => void;
+  onSkipTriage: () => void;
+  onMoveToDate: () => void;
+  onMoveDateTextChange: (args: EventData) => void;
 };
 
 function todayIso(): string {
@@ -27,6 +48,35 @@ function todayIso(): string {
   const mo = String(d.getMonth() + 1).padStart(2, '0');
   const da = String(d.getDate()).padStart(2, '0');
   return `${y}-${mo}-${da}`;
+}
+
+function addLocalCalendarDays(iso: string, delta: number): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  const dt = new Date(y!, m! - 1, d!);
+  dt.setDate(dt.getDate() + delta);
+  const yy = dt.getFullYear();
+  const mo = String(dt.getMonth() + 1).padStart(2, '0');
+  const da = String(dt.getDate()).padStart(2, '0');
+  return `${yy}-${mo}-${da}`;
+}
+
+function isValidIsoDate(s: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(s);
+}
+
+function showTriageForTask(task: TaskRundownItemResponse, dayFit: DayRundownResponse['dayFit']): boolean {
+  if (task.isComplete) {
+    return false;
+  }
+  if (task.status === 'skipped') {
+    return true;
+  }
+  return dayFit.overflowUnresolved || dayFit.outsideRunwayTaskIds.includes(task.id);
+}
+
+function hintLabelForDate(hints: DayCapacityHint[], date: string): string {
+  const h = hints.find((x) => x.date === date);
+  return h != null ? `≈ ${h.remainingMinutes} min libres` : '';
 }
 
 function formatMinuteOfDay(m: number): string {
@@ -71,6 +121,9 @@ class RundownViewModel extends Observable {
   planFootnote = '';
   errorMessage = '';
   errorBannerVisibility = 'collapse';
+
+  private capacityHints: DayCapacityHint[] = [];
+  private tomorrowDateStr = '';
 
   constructor() {
     super();
@@ -128,6 +181,14 @@ class RundownViewModel extends Observable {
     }
 
     const { capacity, completed, tasks, dayFit, dayWindow } = rundownResult.data;
+    this.tomorrowDateStr = addLocalCalendarDays(date, 1);
+
+    const sug = await client.getDaySuggestions({ fromDate: date, toDate: addLocalCalendarDays(date, 7) });
+    if (authState.consumeUnauthorized(sug)) {
+      return;
+    }
+    this.capacityHints = sug.ok ? sug.data.hints : [];
+
     this.set('summaryText', `${completed}/${capacity} completadas · ${date}`);
 
     const start = formatMinuteOfDay(dayWindow.startMinuteOfDay);
@@ -147,6 +208,7 @@ class RundownViewModel extends Observable {
       this.taskRows.pop();
     }
     const sorted = [...tasks].sort((a, b) => a.position - b.position);
+    const tomorrow = this.tomorrowDateStr;
     for (let i = 0; i < sorted.length; i++) {
       const t = sorted[i]!;
       const parts: string[] = [];
@@ -160,6 +222,9 @@ class RundownViewModel extends Observable {
       if (t.essentiality === 'optional') {
         parts.push('Opcional');
       }
+      if (t.status === 'skipped') {
+        parts.push('Omitida hoy');
+      }
       if (t.status === 'in_progress') {
         parts.push('En curso');
       }
@@ -170,8 +235,15 @@ class RundownViewModel extends Observable {
       const canFocus = !t.isComplete && (t.status === 'planned' || t.status === 'in_progress');
       const taskId = t.id;
       const status = t.status;
+      const scheduledDate = t.scheduledDate ?? date;
+      const showTriage = showTriageForTask(t, dayFit);
+      const moveDateInput = tomorrow;
+      const moveHint = hintLabelForDate(this.capacityHints, moveDateInput);
+      const canDemote = t.essentiality !== 'optional';
+      const rowIndex = i;
       this.taskRows.push({
         id: taskId,
+        scheduledDate,
         title: t.title,
         size: String(t.size),
         tagColor: t.tagKey ? (tagColors.get(t.tagKey) ?? '#6b7280') : '#9ca3af',
@@ -181,10 +253,95 @@ class RundownViewModel extends Observable {
         runwayLabel,
         focusBtnText: t.status === 'in_progress' ? 'Pausa' : 'Enfoque',
         focusBtnVisibility: canFocus ? 'visible' : 'collapse',
-        onToggleComplete: () => void this.toggleAt(i),
+        triageVisibility: showTriage ? 'visible' : 'collapse',
+        canDemote,
+        deferTomorrowEnabled: tomorrow !== scheduledDate,
+        demoteEnabled: canDemote,
+        skipTriageEnabled: true,
+        skipBtnText: t.status === 'skipped' ? 'Deshacer omisión' : 'Omitir hoy',
+        moveDateInput,
+        moveHint,
+        moveEnabled: isValidIsoDate(moveDateInput) && moveDateInput !== scheduledDate,
+        onToggleComplete: () => void this.toggleAt(rowIndex),
         onEditTap: () => authState.navigateToTaskDetail(taskId),
         onFocusTap: () => void this.toggleFocusFor(taskId, status),
+        onDeferTomorrow: () => void this.runTriageFor(taskId, { action: 'defer_to_date', targetDate: tomorrow }),
+        onDemote: () => void this.runTriageFor(taskId, { action: 'demote' }),
+        onSkipTriage: () =>
+          void this.runTriageFor(taskId, {
+            action: t.status === 'skipped' ? 'clear_skipped' : 'mark_skipped',
+          }),
+        onMoveToDate: () => {
+          const row = this.taskRows.getItem(rowIndex);
+          if (!row || !isValidIsoDate(row.moveDateInput)) {
+            return;
+          }
+          void this.runTriageFor(taskId, { action: 'defer_to_date', targetDate: row.moveDateInput });
+        },
+        onMoveDateTextChange: (args: EventData) => {
+          this.handleMoveDateTextChange(rowIndex, args);
+        },
       });
+    }
+  }
+
+  private handleMoveDateTextChange(index: number, args: EventData): void {
+    const tf = args.object as { text?: string };
+    const text = String(tf.text ?? '').trim();
+    const cur = this.taskRows.getItem(index);
+    if (!cur) {
+      return;
+    }
+    const moveHint = hintLabelForDate(this.capacityHints, text);
+    const moveEnabled = isValidIsoDate(text) && text !== cur.scheduledDate;
+    this.taskRows.setItem(index, {
+      ...cur,
+      moveDateInput: text,
+      moveHint,
+      moveEnabled,
+    });
+  }
+
+  private refreshTriageBusy(busyTaskId: string | null): void {
+    for (let j = 0; j < this.taskRows.length; j++) {
+      const r = this.taskRows.getItem(j);
+      if (!r) {
+        continue;
+      }
+      const idle = busyTaskId == null || busyTaskId !== r.id;
+      const moveEnabled = idle && isValidIsoDate(r.moveDateInput) && r.moveDateInput !== r.scheduledDate;
+      this.taskRows.setItem(j, {
+        ...r,
+        deferTomorrowEnabled: idle && this.tomorrowDateStr !== r.scheduledDate,
+        demoteEnabled: idle && r.canDemote,
+        skipTriageEnabled: idle,
+        moveEnabled,
+      });
+    }
+  }
+
+  private async runTriageFor(taskId: string, body: TaskTriageInput): Promise<void> {
+    this.refreshTriageBusy(taskId);
+    try {
+      const client = authState.getClient();
+      const result = await client.triageTask(taskId, body);
+      if (authState.consumeUnauthorized(result)) {
+        return;
+      }
+      if (result.ok === false) {
+        const net = isLikelyNetworkFailure(result.error);
+        this.set(
+          'errorMessage',
+          net
+            ? 'No se pudo contactar al servidor. Comprueba la red o que la API esté en marcha.'
+            : result.error.message,
+        );
+        this.set('errorBannerVisibility', 'visible');
+        return;
+      }
+      await this.loadRundown();
+    } finally {
+      this.refreshTriageBusy(null);
     }
   }
 

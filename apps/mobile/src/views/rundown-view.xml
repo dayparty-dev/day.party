@@ -61,19 +61,33 @@
 
     <ListView row="3" items="{{ taskRows }}" class="list">
       <ListView.itemTemplate>
-        <GridLayout columns="5, *, auto, auto" class="p-12 task-row">
-          <StackLayout col="0" width="5" backgroundColor="{{ tagColor }}" verticalAlignment="stretch" />
-          <StackLayout col="1">
-            <Label text="{{ title }}" textWrap="true" class="task-title" />
-            <Label text="{{ metaLine }}" textWrap="true" class="task-meta" />
-            <StackLayout orientation="horizontal" class="m-t-6">
-              <Button text="Editar" tap="{{ onEditTap }}" class="-outline m-r-8" />
-              <Button text="{{ focusBtnText }}" tap="{{ onFocusTap }}" visibility="{{ focusBtnVisibility }}" class="-outline" />
+        <StackLayout class="task-item-wrap">
+          <GridLayout columns="5, *, auto, auto" class="p-12 task-row">
+            <StackLayout col="0" width="5" backgroundColor="{{ tagColor }}" verticalAlignment="stretch" />
+            <StackLayout col="1">
+              <Label text="{{ title }}" textWrap="true" class="task-title" />
+              <Label text="{{ metaLine }}" textWrap="true" class="task-meta" />
+              <StackLayout orientation="horizontal" class="m-t-6">
+                <Button text="Editar" tap="{{ onEditTap }}" class="-outline m-r-8" />
+                <Button text="{{ focusBtnText }}" tap="{{ onFocusTap }}" visibility="{{ focusBtnVisibility }}" class="-outline" />
+              </StackLayout>
             </StackLayout>
+            <Label col="2" text="{{ runwayLabel }}" class="runway-badge" textWrap="true" />
+            <Label col="3" text="{{ completeIcon }}" tap="{{ onToggleComplete }}" class="complete-icon" />
+          </GridLayout>
+          <StackLayout visibility="{{ triageVisibility }}" class="triage-block">
+            <Label text="Reorganizar (fuera de ventana o esencial sin caber)" textWrap="true" class="triage-intro" />
+            <GridLayout columns="*, *" rows="auto, auto" class="triage-grid">
+              <Button col="0" row="0" text="Mañana" tap="{{ onDeferTomorrow }}" isEnabled="{{ deferTomorrowEnabled }}" class="-outline triage-btn" />
+              <Button col="1" row="0" text="Bajar prioridad" tap="{{ onDemote }}" isEnabled="{{ demoteEnabled }}" class="-outline triage-btn" />
+              <Button col="0" row="1" colSpan="2" text="{{ skipBtnText }}" tap="{{ onSkipTriage }}" isEnabled="{{ skipTriageEnabled }}" class="-outline triage-btn m-t-8" />
+            </GridLayout>
+            <Label text="Mover a (AAAA-MM-DD)" class="footnote m-t-12" textWrap="true" />
+            <TextField text="{{ moveDateInput }}" hint="2026-04-03" class="input m-t-4" textChange="{{ onMoveDateTextChange }}" />
+            <Label text="{{ moveHint }}" textWrap="true" class="triage-hint m-t-4" />
+            <Button text="Mover" tap="{{ onMoveToDate }}" isEnabled="{{ moveEnabled }}" class="-primary triage-btn m-t-8" />
           </StackLayout>
-          <Label col="2" text="{{ runwayLabel }}" class="runway-badge" textWrap="true" />
-          <Label col="3" text="{{ completeIcon }}" tap="{{ onToggleComplete }}" class="complete-icon" />
-        </GridLayout>
+        </StackLayout>
       </ListView.itemTemplate>
     </ListView>
   </GridLayout>

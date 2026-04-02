@@ -101,6 +101,36 @@ Button.-primary {
   separator-color: #e5e7eb;
 }
 
+.task-item-wrap {
+  border-bottom-width: 1;
+  border-bottom-color: #e5e7eb;
+}
+
+.triage-block {
+  padding: 12 16 16 16;
+  background-color: #f3f4f6;
+}
+
+.triage-intro {
+  font-size: 12;
+  color: #4b5563;
+  margin-bottom: 8;
+}
+
+.triage-grid {
+  margin-top: 4;
+}
+
+.triage-btn {
+  min-height: 44;
+  margin: 4;
+}
+
+.triage-hint {
+  font-size: 12;
+  color: #6b7280;
+}
+
 .m-t-8 {
   margin-top: 8;
 }

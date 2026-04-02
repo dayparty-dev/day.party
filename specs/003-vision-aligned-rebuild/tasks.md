@@ -19,7 +19,7 @@
 
 Per `spec.md` (**Mobile / web parity** and **Definition of done (first-party clients)**), a user story is **product-done** only when **both** `apps/web` and `apps/mobile` ship that story’s **intended** UX—not merely when the API accepts payloads.
 
-- **US2** / **US3**: **Web + API** slices (**T016–T023**, **T020**, **T023**) are `[x]`; **mobile** triage/notes are **T043** / **T044** (Phase 10). Until those are `[x]`, US2/US3 are **web slice complete**, not product-closed.
+- **US2** / **US3**: **US2** mobile triage is **`T043` `[x]`**; **US3** mobile notes remain **`T044`** (Phase 10). Until **T044** is `[x]`, **US3** is **web slice complete**, not product-closed.
 - **US4**: **Web** marketplace (**T030**) shipped without **mobile** rewards (**T045**) or **bounty** create/edit in clients (**T053**, **T056**, **T051**/`T054`). Until **T045** + **T053** + **T056** + editor bounty paths are `[x]`, treat US4 as **web/API slice complete**, not product-closed.
 - **US1**: **Full lifecycle** (edit fields, **`in_progress`**, optional **bounty** on create/edit, not only done-toggle) requires **T051–T056** in addition to earlier US1 tasks.
 
@@ -30,7 +30,7 @@ Per `spec.md` (**Mobile / web parity** and **Definition of done (first-party cli
 | `PATCH` **title**, **size**, **estimatedMinutes**, **essentiality**, **tagKey**, **scheduledDate** | Exposed (**T051**)         | Exposed (**T054**) | Both clients               | —                            |
 | `PATCH` **status** `planned` ↔ `in_progress` (“focus / pause”)                                     | Exposed (**T052**)         | Exposed (**T055**) | Both clients               | —                            |
 | `PATCH` **status** / **deferredToDate** (`deferred`)                                               | Partial (via triage defer) | Not exposed        | Both + editor where needed | **T051**, **T054**, **T043** |
-| **Triage** (`POST …/triage`)                                                                       | Exposed (**T020**)         | Not exposed        | Mobile                     | **T043**                     |
+| **Triage** (`POST …/triage`)                                                                       | Exposed (**T020**)         | Exposed (**T043**) | Both clients               | —                            |
 | **Notes** detail (`GET :id`, `PATCH` notes)                                                        | Exposed (**T023**)         | Not exposed        | Mobile                     | **T044**                     |
 | **Bounty** create (`POST` + `createTaskSchema.bounty`)                                             | Exposed (**T053**)         | Exposed (**T056**) | Both                       | —                            |
 | **Bounty** edit/clear (`PATCH` bounty)                                                             | Exposed (**T051**)         | Exposed (**T054**) | Both                       | —                            |
@@ -218,7 +218,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 **⚠️ Lifecycle parity**: **T043–T047** alone do not complete **product story-done** for **full task lifecycle** if **T051–T056** remain open—users must be able to **edit tasks**, set **in progress**, and configure **bounties** on **mobile** as well as web.
 
-- [ ] T043 [P] [US2] Implement triage / defer / move-day flows on mobile in `apps/mobile/src/views/rundown-view.ts` and `apps/mobile/src/views/rundown-view.xml` (or add `apps/mobile/src/views/triage-view.ts` + `triage-view.xml` and register in `apps/mobile/src/app.ts`)
+- [x] T043 [P] [US2] Implement triage / defer / move-day flows on mobile in `apps/mobile/src/views/rundown-view.ts` and `apps/mobile/src/views/rundown-view.xml` (or add `apps/mobile/src/views/triage-view.ts` + `triage-view.xml` and register in `apps/mobile/src/app.ts`)
 - [ ] T044 [P] [US3] Add actionable **notes** UX (view/edit markdown or plain text detail) in new `apps/mobile/src/views/task-detail-view.ts` + `task-detail-view.xml`, navigable from rundown — **see US3 “T044 vs T054”**; prefer one combined detail route when **T054** runs
 - [ ] T045 [P] [US4] Add rewards balance + marketplace minimal flow in new `apps/mobile/src/views/rewards-view.ts` + `rewards-view.xml` and wire navigation in `apps/mobile/src/app.ts`
 - [ ] T046 [P] [US5] Apply `visualPreset` from preferences API to mobile chrome (theme classes or `App_Resources` colors) in `apps/mobile/src/app.ts` with at least two presets matching web intent. Respect **constitution** platform fidelity: **iOS** ~44pt / **Android** ~48dp minimum touch targets per **`spec.md` US5 AS2`. **Depends on**: **T031** (prefs API round-trip for `visualPreset`) and **T032** (web preset CSS variable / root-class intent so mobile can mirror tokens). **T033** (web preset selector UI) is **not\*\* a hard blocker—mobile can read and apply `visualPreset` from the API without it.
