@@ -13,6 +13,7 @@ import {
   MongoSessionRepository,
   MongoTagRepository,
   MongoTaskRepository,
+  MongoUserPreferencesRepository,
   MongoUserRepository,
 } from '@dayparty/db';
 import {
@@ -32,12 +33,14 @@ const taskRepo = new MongoTaskRepository(db);
 const userRepo = new MongoUserRepository(db);
 const sessionRepo = new MongoSessionRepository(db);
 const tagRepo = new MongoTagRepository(db);
+const userPrefsRepo = new MongoUserPreferencesRepository(db);
 
 const env = {
   taskRepo,
   userRepo,
   sessionRepo,
   tagRepo,
+  userPrefsRepo,
   createTask: makeCreateTaskAction(taskRepo, tagRepo),
   getRundown: makeGetRundownAction(taskRepo),
   reorderTasks: makeReorderTasksAction(taskRepo),

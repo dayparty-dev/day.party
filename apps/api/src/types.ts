@@ -5,6 +5,7 @@ import type {
   TagRepository,
   TaskRepository,
   UpdateTaskInput,
+  UserPreferencesRepository,
   UserRepository,
 } from '@dayparty/domain';
 
@@ -13,6 +14,7 @@ export type ApiEnv = {
   sessionRepo: SessionRepository;
   tagRepo: TagRepository;
   taskRepo: TaskRepository;
+  userPrefsRepo: UserPreferencesRepository;
   createTask: (input: CreateTaskInput) => Promise<Task>;
   getRundown: (userId: string, date: string) => Promise<DayRundown>;
   reorderTasks: (userId: string, date: string, taskIds: string[]) => Promise<DayRundown>;

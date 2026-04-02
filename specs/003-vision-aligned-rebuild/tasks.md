@@ -31,10 +31,10 @@
 
 **⚠️ CRITICAL**: Complete before **User Story 1** implementation tasks that read or write the daily window.
 
-- [ ] T002 [P] Add `DayWindow` and `UserPreferences` types in `packages/core/src/models/user-preferences.ts` and export them from `packages/core/src/index.ts` per `specs/003-vision-aligned-rebuild/data-model.md`
-- [ ] T003 [P] Add `UserPreferencesRepository` in `packages/domain/src/interfaces/user-preferences-repository.ts` and export from `packages/domain/src/index.ts`
-- [ ] T004 Implement `MongoUserPreferencesRepository` in `packages/db/src/repositories/user-preferences-repository.ts` following existing repository patterns; export from `packages/db/src/index.ts`
-- [ ] T005 Construct `MongoUserPreferencesRepository` in `apps/api/src/index.ts`, add `userPrefsRepo` to `ApiEnv` in `apps/api/src/types.ts` typed as `UserPreferencesRepository` from `@dayparty/domain`
+- [x] T002 [P] Add `DayWindow` and `UserPreferences` types in `packages/core/src/models/user-preferences.ts` and export them from `packages/core/src/index.ts` per `specs/003-vision-aligned-rebuild/data-model.md`
+- [x] T003 [P] Add `UserPreferencesRepository` in `packages/domain/src/interfaces/user-preferences-repository.ts` and export from `packages/domain/src/index.ts`
+- [x] T004 Implement `MongoUserPreferencesRepository` in `packages/db/src/repositories/user-preferences-repository.ts` following existing repository patterns; export from `packages/db/src/index.ts`
+- [x] T005 Construct `MongoUserPreferencesRepository` in `apps/api/src/index.ts`, add `userPrefsRepo` to `ApiEnv` in `apps/api/src/types.ts` typed as `UserPreferencesRepository` from `@dayparty/domain`
 
 **Checkpoint**: Preferences port is live in composition root — **US1** prefs routes can be added.
 

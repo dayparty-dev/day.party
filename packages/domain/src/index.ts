@@ -2,6 +2,7 @@ export type { TaskRepository } from './interfaces/task-repository';
 export type { UserRepository } from './interfaces/user-repository';
 export type { SessionRepository } from './interfaces/session-repository';
 export type { TagRepository } from './interfaces/tag-repository';
+export type { UserPreferencesRepository } from './interfaces/user-preferences-repository';
 
 export { makeCreateTaskAction } from './actions/create-task';
 export type { CreateTaskInput } from './actions/create-task';
