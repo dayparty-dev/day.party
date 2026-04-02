@@ -170,12 +170,12 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 **Goal**: At least two UI presets across core screens; persisted preference (FR-009, SC-006).
 
-**Independent Test**: Switch preset; planning + triage + rewards entry points pick up tokens without unreadable text.
+**Independent Test**: Switch preset; planning + triage + rewards entry points pick up tokens. Confirm **spec.md** US5 measurable bounds (≥16px body on web, ≥44×44px primary targets or native minimums on mobile).
 
 ### Implementation for User Story 5
 
-- [ ] T031 [US5] Ensure `visualPreset` is on `UserPreferences` in `packages/core/src/models/user-preferences.ts`, validated in `packages/validation/src/schemas/user-preferences.ts`, and persisted via `MongoUserPreferencesRepository` in `packages/db/src/repositories/user-preferences-repository.ts`
-- [ ] T032 [P] [US5] Add preset CSS variable maps (e.g. calm vs playful) in `apps/web/src/styles/presets.css` and apply root class switching in `apps/web/src/App.tsx` or `apps/web/src/main.tsx`
+- [ ] T031 [US5] **Verify prefs pipeline for `visualPreset` (no new modeling)**: `UserPreferences` in `packages/core`, Zod in `packages/validation/src/schemas/user-preferences.ts`, and Mongo `put`/`findByUserId` in `packages/db/src/repositories/user-preferences-repository.ts` already include `visualPreset` from Phase 2. Confirm **`GET`/`PATCH /api/me/preferences`** in `apps/api/src/routes/preferences.ts` round-trips `visualPreset` per `contracts/day-planning-rest.md` and `data-model.md`, including sensible **default** when a user has no prefs doc yet.
+- [ ] T032 [P] [US5] Add preset CSS variable maps (e.g. calm vs playful) in `apps/web/src/styles/presets.css` and apply root class switching in `apps/web/src/App.tsx` or `apps/web/src/main.tsx`. Preset styles MUST respect **`spec.md` US5 AS2** (body copy ≥16px, primary controls ≥44×44 CSS px).
 - [ ] T033 [US5] Add preset selector UI bound to preferences API in `apps/web/src/pages/RundownPage.tsx` or new `apps/web/src/pages/SettingsPage.tsx`
 
 ---
@@ -190,7 +190,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 - [ ] T034 [P] [US6] Add `PlanHistoryEvent` type in `packages/core/src/models/plan-history.ts` and `PlanHistoryRepository` port in `packages/domain/src/interfaces/plan-history-repository.ts`; export from package indexes
 - [ ] T035 [US6] Implement `MongoPlanHistoryRepository` in `packages/db/src/repositories/plan-history-repository.ts` and export from `packages/db/src/index.ts`
-- [ ] T036 [US6] Record history from domain mutations in `packages/domain/src/actions/` (create/update/reorder/triage/prefs/rewards as applicable) per `specs/003-vision-aligned-rebuild/data-model.md`
+- [ ] T036 [US6] Record history from domain mutations in `packages/domain/src/actions/` (create/update/reorder/triage/prefs/rewards as applicable) per `specs/003-vision-aligned-rebuild/data-model.md`. **Idempotency**: one logical user action MUST NOT produce duplicate phantom history rows (supports **SC-007**); use stable correlation or single append per mutation path where retries exist.
 - [ ] T037 [P] [US6] Add `apps/api/src/routes/history.ts` with paginated `GET` per `specs/003-vision-aligned-rebuild/contracts/day-planning-rest.md`; wire in `apps/api/src/index.ts` and `apps/api/src/app.ts`
 - [ ] T038 [P] [US6] Extend `packages/api-client/src/client.ts` with history fetch API
 - [ ] T039 [US6] Add read-only `apps/web/src/components/PlanHistoryPanel.tsx` and integrate into the planning shell (e.g. from `apps/web/src/pages/RundownPage.tsx`)
@@ -203,7 +203,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 - [ ] T040 [P] Run `pnpm build` from repository root and fix TypeScript errors from 003 changes
 - [ ] T041 [P] Run `pnpm test` from repository root (or scoped filters per package) and fix regressions introduced by 003 tasks
-- [ ] T042 [P] Refresh `specs/003-vision-aligned-rebuild/quickstart.md` with final routes, env vars, and curl examples matching shipped code
+- [ ] T042 [P] Refresh `specs/003-vision-aligned-rebuild/quickstart.md` with final routes, env vars, and curl examples matching shipped code. Include **FR-011** cross-session checks: same authenticated user after logout/login (or new browser session) sees consistent plan, notes, ledger balance, and history as applicable.
 - [ ] T048 [P] Add **Session / offline (v1)** subsection to `specs/003-vision-aligned-rebuild/quickstart.md`: server-authoritative persistence, client retry after failed mutations, refresh-after-success; state that **offline write queue** and **merge UI** are out of scope for 003 v1 (see `spec.md` Assumptions)
 
 ---
@@ -219,7 +219,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 - [ ] T043 [P] [US2] Implement triage / defer / move-day flows on mobile in `apps/mobile/src/views/rundown-view.ts` and `apps/mobile/src/views/rundown-view.xml` (or add `apps/mobile/src/views/triage-view.ts` + `triage-view.xml` and register in `apps/mobile/src/app.ts`)
 - [ ] T044 [P] [US3] Add actionable **notes** UX (view/edit markdown or plain text detail) in new `apps/mobile/src/views/task-detail-view.ts` + `task-detail-view.xml`, navigable from rundown — **see US3 “T044 vs T054”**; prefer one combined detail route when **T054** runs
 - [ ] T045 [P] [US4] Add rewards balance + marketplace minimal flow in new `apps/mobile/src/views/rewards-view.ts` + `rewards-view.xml` and wire navigation in `apps/mobile/src/app.ts`
-- [ ] T046 [P] [US5] Apply `visualPreset` from preferences API to mobile chrome (theme classes or `App_Resources` colors) in `apps/mobile/src/app.ts` with at least two presets matching web intent
+- [ ] T046 [P] [US5] Apply `visualPreset` from preferences API to mobile chrome (theme classes or `App_Resources` colors) in `apps/mobile/src/app.ts` with at least two presets matching web intent. Respect **constitution** platform fidelity: **iOS** ~44pt / **Android** ~48dp minimum touch targets per **`spec.md` US5 AS2**.
 - [ ] T047 [P] [US6] Add read-only plan history list in new `apps/mobile/src/views/history-view.ts` + `history-view.xml` and entry from `apps/mobile/src/app.ts`
 
 ---
@@ -299,5 +299,5 @@ Task: "T015 [P] [US1] … apps/mobile/src/views/rundown-view.ts …"
 
 - Prefer **additive** REST and Mongo fields per `specs/003-vision-aligned-rebuild/research.md` §11.
 - Keep **domain** free of Hono/Mongo imports; use ports in `packages/domain/src/interfaces/`.
-- **FR-011** (persistence) is satisfied incrementally as each slice persists its new fields; no separate task if each story writes through existing session-backed API.
+- **FR-011** (persistence) is satisfied incrementally as each slice persists its new fields through the session-backed API. **Explicit verification**: **T042** (quickstart checklist), **T048** (session/offline v1 boundary), and **T041** (regressions)—see **`spec.md` FR-011**.
 - **T048** can run as soon as quickstart exists — document recovery boundary early to avoid scope creep on “offline.”

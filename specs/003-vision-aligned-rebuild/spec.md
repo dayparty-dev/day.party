@@ -2,7 +2,7 @@
 
 **Feature Branch**: `003-vision-aligned-rebuild`  
 **Created**: 2026-04-02  
-**Status**: Draft  
+**Status**: Active  
 **Input**: User description: "Re-implement legacy day planning in the current product architecture, aligned with the original gamified flexible-day vision (docs/idea.md) and documented next-steps (docs/next-steps.md). Context: original vision emphasizes flexible time pockets (not rigid time-blocking), stimulating presentation, reorderable day “runway,” rewards and optional currency, deferral of non-essential items, and future playful interfaces; next-steps list UI themes, expanded notes, change history, reliable persistence across sessions, reward marketplace, physical integrations (later), and a portable task core for multiple products."
 
 **Related artifacts**: [`plan.md`](./plan.md) · [`tasks.md`](./tasks.md) · [`data-model.md`](./data-model.md) · [`contracts/day-planning-rest.md`](./contracts/day-planning-rest.md)
@@ -84,7 +84,7 @@ Users choose a presentation preset (e.g., calm, playful, high-contrast) so the e
 **Acceptance Scenarios**:
 
 1. **Given** account or device settings, **When** the user selects a visual preset, **Then** primary planning screens adopt that preset until changed.
-2. **Given** a preset, **When** the user uses core flows (plan, triage, rewards), **Then** readability and touch targets remain usable (no critical text below a minimum comfortable size).
+2. **Given** a preset, **When** the user uses core flows (plan, triage, rewards), **Then** UI remains within measurable usability bounds: **web** body copy at least **16px** at default zoom; **primary interactive targets** at least **44×44 CSS px** (or platform-native minimums—iOS ~44pt, Android ~48dp—on mobile). Headings and decorative text may be smaller if not required to read core actions.
 
 ---
 
@@ -119,6 +119,8 @@ A user story is **product-complete** for **003** only when **both** **`apps/web`
 
 ### Functional Requirements
 
+**Note**: **FR-004** (lifecycle) and **User Story 4** (rewards) both mention completion and ledger consistency; they describe the **same** product behavior from lifecycle vs gamification angles—not conflicting requirements.
+
 - **FR-001**: The system MUST let users define actionables with a human-readable title, optional priority or essentiality, and an estimated duration or effort unit suitable for flexible scheduling. **First-party `apps/web` and `apps/mobile` MUST expose in-app creation** for the planner’s selected day (**`tasks.md` T049–T050**); not only via `POST /api/tasks` or `apps/web-legacy` (see **User Story 1** independent test).
 - **FR-002**: The system MUST let users compose a day plan as an ordered collection of actionables against a user-defined daily window (start/end or equivalent).
 - **FR-003**: The system MUST recalculate fit/overflow feedback when estimates, order, priorities, or the daily window change.
@@ -127,9 +129,9 @@ A user story is **product-complete** for **003** only when **both** **`apps/web`
 - **FR-006**: The system MUST let users attach expanded content to an actionable, including lightweight structured formatting, without forcing that content into the main list row. **First-party `apps/web` and `apps/mobile` MUST expose in-app** notes/detail for this (**`tasks.md` T023**, **T044**); not only via `GET`/`PATCH /api/tasks` alone.
 - **FR-007**: The system MUST maintain a reward balance (or equivalent ledger) and let users acquire configured rewards through a marketplace or catalog interaction. **First-party `apps/web` and `apps/mobile` MUST expose in-app** balance and purchase/catalog flows once the story is product-complete (**`tasks.md` T030**, **T045**).
 - **FR-008**: The system MUST allow configuration of bounties or rewards associated with specific actionables, including differentiated rewards for “high resistance” work when the user sets them up. **Bounty configuration MUST be user-editable in-app** on **both** web and mobile (**`tasks.md` T053**, **T056**, and bounty fields on the task editor **T051** / **T054**)—not only accepted by the API.
-- **FR-009**: The system MUST offer at least one alternate visual preset affecting colors and density (or clearly scoped style families) across core screens. When **User Story 5** is product-complete, **first-party `apps/web` and `apps/mobile` MUST** apply presets in-app (**`tasks.md` T031–T033**, **T046**).
+- **FR-009**: The system MUST offer at least one alternate visual preset affecting colors and density (or clearly scoped style families) across core screens. When **User Story 5** is product-complete, **first-party `apps/web` and `apps/mobile` MUST** apply presets in-app: prefs/API verification (**`tasks.md` T031**), web tokens + selector (**T032–T033**), mobile chrome (**T046**).
 - **FR-010**: The system MUST record a retrievable history of material plan and actionable changes with timestamps and enough identifiers for the user to understand each event. When **User Story 6** is product-complete, **first-party `apps/web` and `apps/mobile` MUST** expose read-only history (**`tasks.md` T039**, **T047**).
-- **FR-011**: The system MUST persist user data across sessions so the same user sees a consistent plan, notes, balances, and history after leaving and returning.
+- **FR-011**: The system MUST persist user data across sessions so the same user sees a consistent plan, notes, balances, and history after leaving and returning. **Verification** is tracked in **`tasks.md`** (**T042** manual checklist + **T048** session boundary, **T041** regression safety net)—not a separate persistence feature task.
 - **FR-012**: The system SHOULD visualize or label actionables that fall outside the current day plan (the “shaded runway” concept—left out of today’s feasible set) when overflow occurs.
 
 ### Key Entities _(include if feature involves data)_
@@ -152,6 +154,10 @@ A user story is **product-complete** for **003** only when **both** **`apps/web`
 - **SC-005**: Completing a bounty-bearing actionable updates balance or perks in the same session with no conflicting figures visible in marketplace and profile surfaces.
 - **SC-006**: Switching visual presets applies consistently to planning, triage, and rewards entry points with no more than two screen revisits to see the change (heuristic evaluation).
 - **SC-007**: For a week of simulated edits, history lists events in chronological order with no duplicate phantom entries for single user actions (verified in test scenarios).
+
+### How success criteria map to delivery
+
+**SC-001** through **SC-004**, **SC-006**: validated by **moderated usability / heuristic sessions** after the relevant user stories ship (see **`tasks.md`** and **`quickstart.md`**); they are **not** automated build tasks. **SC-005** and **SC-007**: covered by implementation (**US4** / **US6** tasks) plus **T041** integration checks where applicable.
 
 ## Assumptions
 
@@ -199,6 +205,15 @@ A user story is **product-complete** for **003** only when **both** **`apps/web`
 **Change**: Align **US1** lifecycle line with **T051–T056**; clarify **US2**/**US4** independent tests (web vs **product-complete**); pin **T023** to **`TaskNotesPanel.tsx`**; fix **`quickstart.md`** same-folder links and intro; align **`plan.md`** ASCII tree spacing; add **FR-007** / **FR-009** / **FR-010** task traceability for client parity.
 **Scope**: Spec / plan / tasks / quickstart wording and consistency only.
 **Artifacts updated**: `spec.md`, `plan.md`, `tasks.md`, `quickstart.md`
+**Tasks added**: —
+**Tasks removed**: —
+**Tasks marked complete**: —
+
+### Iteration 2026-04-02: Speckit-analyze full remediation
+
+**Change**: Set spec **Status** to **Active**; quantify **US5** acceptance (typography / touch targets); document **SC** validation vs build tasks; add **FR-004** / **US4** traceability note; tie **FR-011** to **T041** / **T042** / **T048**; split **FR-009** task roles (**T031** vs **T032–T033** / **T046**). **`plan.md`**: align tasks-generation command name. **`tasks.md`**: refocus **T031** on prefs/API verification; strengthen **T036** (no phantom duplicate history); expand **T042** and Notes for **FR-011**.
+**Scope**: Spec / plan / tasks only (post-analyze closure).
+**Artifacts updated**: `spec.md`, `plan.md`, `tasks.md`
 **Tasks added**: —
 **Tasks removed**: —
 **Tasks marked complete**: —

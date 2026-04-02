@@ -67,7 +67,7 @@ specs/003-vision-aligned-rebuild/
     └── requirements.md
 ```
 
-`tasks.md` is produced by **`/speckit-tasks`**, not by this command.
+`tasks.md` is produced by **`/speckit.tasks`** (SpecKit task generation), not by this command.
 
 ### Source Code (repository root)
 
