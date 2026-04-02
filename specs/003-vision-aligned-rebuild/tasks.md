@@ -17,7 +17,26 @@
 
 ### Product story-done vs web-only slice
 
-Per `spec.md` (**Mobile / web parity**), a user story is **product-done** only when **both** `apps/web` and `apps/mobile` ship that story’s UX. For **US2** and **US3**, phases below mark **web + API** work complete (**T016–T023**, **T020**, **T023**); **mobile parity** is **T043** / **T044** (Phase 10). Until those are `[x]`, treat US2/US3 as **web slice complete**, not fully story-closed on the product.
+Per `spec.md` (**Mobile / web parity** and **Definition of done (first-party clients)**), a user story is **product-done** only when **both** `apps/web` and `apps/mobile` ship that story’s **intended** UX—not merely when the API accepts payloads.
+
+- **US2** / **US3**: **Web + API** slices (**T016–T023**, **T020**, **T023**) are `[x]`; **mobile** triage/notes are **T043** / **T044** (Phase 10). Until those are `[x]`, US2/US3 are **web slice complete**, not product-closed.
+- **US4**: **Web** marketplace (**T030**) shipped without **mobile** rewards (**T045**) or **bounty** create/edit in clients (**T053**, **T056**, **T051**/`T054`). Until **T045** + **T053** + **T056** + editor bounty paths are `[x]`, treat US4 as **web/API slice complete**, not product-closed.
+- **US1**: **Full lifecycle** (edit fields, **`in_progress`**, not only done-toggle) requires **T051–T055** in addition to earlier US1 tasks.
+
+### API ↔ client coverage matrix (003)
+
+| Capability (REST / client)                                                                         | Web today                  | Mobile today | Product-complete when      | Task IDs                     |
+| -------------------------------------------------------------------------------------------------- | -------------------------- | ------------ | -------------------------- | ---------------------------- |
+| `PATCH` **title**, **size**, **estimatedMinutes**, **essentiality**, **tagKey**, **scheduledDate** | Not exposed                | Not exposed  | Both clients               | **T051**, **T054**           |
+| `PATCH` **status** `planned` ↔ `in_progress` (“focus / pause”)                                     | Not exposed                | Not exposed  | Both clients               | **T052**, **T055**           |
+| `PATCH` **status** / **deferredToDate** (`deferred`)                                               | Partial (via triage defer) | Not exposed  | Both + editor where needed | **T051**, **T054**, **T043** |
+| **Triage** (`POST …/triage`)                                                                       | Exposed (**T020**)         | Not exposed  | Mobile                     | **T043**                     |
+| **Notes** detail (`GET :id`, `PATCH` notes)                                                        | Exposed (**T023**)         | Not exposed  | Mobile                     | **T044**                     |
+| **Bounty** create (`POST` + `createTaskSchema.bounty`)                                             | Not exposed                | Not exposed  | Both                       | **T053**, **T056**           |
+| **Bounty** edit/clear (`PATCH` bounty)                                                             | Not exposed                | Not exposed  | Both                       | **T051**, **T054**           |
+| Rewards / ledger / purchase                                                                        | Exposed (**T030**)         | Not exposed  | Mobile                     | **T045**                     |
+
+_Update this table when `updateTaskSchema` or routes gain fields._
 
 ---
 
@@ -112,9 +131,24 @@ Per `spec.md` (**Mobile / web parity**), a user story is **product-done** only w
 
 ---
 
+## Gap closure: Task editor, focus status, and bounty (web + mobile)
+
+**Purpose**: Close **API vs client drift**: `PATCH /api/tasks/:id` and `createTask` accept a broad task shape; first-party clients today mostly toggle **done**, **notes**, and (web-only) **triage**. **Depends on**: **T013** (`DayPartyClient` / `getTask`), **T022**, **T049**–**T050**.
+
+- [ ] T051 [US1] Web: add task **detail / edit** UI (e.g. `apps/web/src/components/TaskEditPanel.tsx` or drawer) wired from `apps/web/src/pages/RundownPage.tsx`, loading via `DayPartyClient.getTask` and saving via `updateTask` for **`title`**, **`size`**, **`estimatedMinutes`**, **`essentiality`**, **`tagKey`**, **`scheduledDate`**, **`status`** / **`deferredToDate`** when `deferred`, and **`bounty`** set or clear (align with `updateTaskSchema`; FR-008)
+- [ ] T052 [US1] Web: expose **Start / Pause** (or equivalent copy) for **`planned` ↔ `in_progress`** via `updateTask` on rundown and/or `apps/web/src/pages/OngoingPage.tsx` (FR-004)
+- [ ] T053 [P] [US4] Web: extend `apps/web/src/components/CreateTaskPanel.tsx` (**T049**) with optional **`bounty`** fields from `createTaskSchema` so new tasks can carry bounties without raw API
+- [ ] T054 [US1] Mobile: task **detail / edit** view (same field set as **T051**) in `apps/mobile/src/views/` (new `task-detail-view` or extend rundown), navigable from rundown, using `getTask` / `updateTask`
+- [ ] T055 [US1] Mobile: **`planned` ↔ `in_progress`** controls mirroring **T052** (`updateTask`)
+- [ ] T056 [P] [US4] Mobile: optional **`bounty`** on create in **T050** flow + edit/clear in **T054** surface (`createTask` / `updateTask`)
+
+---
+
 ## Phase 6: User Story 4 — Rewards, bounties, marketplace (Priority: P4)
 
 **Goal**: Bounty on completion, ledger balance, catalog purchase flow (FR-004, FR-007, FR-008, SC-005).
+
+**Product story-done**: **US4** requires **T030** + **T045** + **T053** + **T056** + bounty path on **T051** / **T054** (see **coverage matrix**).
 
 **Independent Test**: Complete a bounty task → balance increases → purchase reward → ledger reflects debit.
 
@@ -174,9 +208,11 @@ Per `spec.md` (**Mobile / web parity**), a user story is **product-done** only w
 
 ## Phase 10: NativeScript parity (US2–US6)
 
-**Purpose**: Satisfy constitution **mobile-native fidelity** and `spec.md` **mobile / web parity** for **US2–US6** — each surface owns its UI; consume the same REST/`api-client` contracts. (**US1** mobile/web create parity is **T049–T050** in the gap-closure section above, not Phase 10.)
+**Purpose**: Satisfy constitution **mobile-native fidelity** and `spec.md` **mobile / web parity** for **US2–US6** — each surface owns its UI; consume the same REST/`api-client` contracts. (**US1** mobile/web create parity is **T049–T050**; **task edit / focus / bounty** parity is **T051–T056** in the gap-closure section above.)
 
 **⚠️ Depends on**: Corresponding API + web slices existing or in progress so contracts are stable.
+
+**⚠️ Lifecycle parity**: **T043–T047** alone do not complete **product story-done** for **full task lifecycle** if **T051–T056** remain open—users must be able to **edit tasks**, set **in progress**, and configure **bounties** on **mobile** as well as web.
 
 - [ ] T043 [P] [US2] Implement triage / defer / move-day flows on mobile in `apps/mobile/src/views/rundown-view.ts` and `apps/mobile/src/views/rundown-view.xml` (or add `apps/mobile/src/views/triage-view.ts` + `triage-view.xml` and register in `apps/mobile/src/app.ts`)
 - [ ] T044 [P] [US3] Add actionable notes UX (view/edit markdown or plain text detail) in new `apps/mobile/src/views/task-detail-view.ts` + `task-detail-view.xml`, navigable from rundown
@@ -192,6 +228,7 @@ Per `spec.md` (**Mobile / web parity**), a user story is **product-done** only w
 
 - **Phase 1** → **Phase 2** → **US1 (Phase 3)** → later stories in priority order **or** parallelize **after US1** where stories do not depend on each other’s UI (server-side US4 can proceed before US3 if task shapes already support bounty fields).
 - **Gap closure T049–T050**: SHOULD finish **before** treating US1 as fully shippable on `apps/web` / `apps/mobile`; **T049** and **T050** may run **in parallel** and may overlap with early **Phase 6** if staffed.
+- **Gap closure T051–T056**: SHOULD finish **before** treating **US1** / **US4** as **product-complete** per **`spec.md`** definition of done; **T051** depends on **T022**/`getTask`; **T053**/**T056** extend **T049**/**T050**; **T054**–**T055** can parallelize after **T051** patterns exist.
 - **Polish (Phase 9)**: After all target user stories for the milestone are complete.
 - **Phase 10 (mobile parity)**: Run **after** each story’s API is available — **T043** after US2 routes, **T044** after T022–T023 patterns, **T045** after T028, **T046** after T031–T032, **T047** after T037. Can parallelize with web polish if staffed.
 
@@ -209,6 +246,7 @@ Per `spec.md` (**Mobile / web parity**), a user story is **product-done** only w
 - **Phase 2**: T002 and T003 in parallel; T004 after both.
 - **US1**: T009 and T010 after **T006** (parallel with **T007**); **T008** after T005–T007; T015 parallel to T014 once API stable.
 - **US4**: T024 and T025 in parallel; T029 parallel to T028 after routes exist.
+- **Client gap T051–T056**: **T052**/**T055** can parallel **T053**/**T056** after **T051**/**T054** shapes exist; **T054** may follow **T051** for copy parity.
 - **US6**: T034, T037, T038 parallel once port shape is agreed.
 
 ---

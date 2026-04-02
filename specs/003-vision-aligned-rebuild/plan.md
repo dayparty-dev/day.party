@@ -91,7 +91,14 @@ specs/003-vision-aligned-rebuild/
 
 **Structure Decision**: Single monorepo with **shared domain + validation + api-client** and **per-platform UI**, matching existing day.party layout and constitution. Feature work **extends** the task/day-plan slice first (P1–P3), then adds rewards/history routes and collections (P4–P6) as separate vertical slices.
 
-**Mobile + web**: Each user story closes when **both** `apps/web` and `apps/mobile` implement that story’s flows (constitution §IV–V). API contracts stabilize first; UIs can proceed in parallel (`tasks.md` Phase 10).
+**Mobile + web**: Each user story closes when **both** `apps/web` and `apps/mobile` implement that story’s flows (constitution §IV–V). API contracts stabilize first; UIs can proceed in parallel (`tasks.md` Phase 10 and **gap-closure** tasks **T051–T056**).
+
+### Vertical slices & client parity
+
+- Each **user story** SHOULD ship as a **vertical slice**: shared **`@dayparty/core`** / **`@dayparty/validation`** / **`@dayparty/domain`** / **`@dayparty/db`** (as needed) + **`apps/api`** + **`DayPartyClient`** + **`apps/web`** + **`apps/mobile`** for every **user-visible** capability in that story.
+- When extending **`updateTask`** payloads or task routes, update **`tasks.md` API ↔ client coverage matrix** (or add a task) so **in-app** exposure on **web and mobile** is tracked—avoid long-lived **API-only** fields without a **`tasks.md`** follow-up.
+- **Web** (evolving layout): task editing / detail surfaces (e.g. **`TaskEditPanel`**, **`TaskDetail`**) under `apps/web/src/components/`, alongside **`TaskNotesPanel`**, **`CreateTaskPanel`**, **`TaskTriageBar`**, **`TaskCard`**.
+- **Mobile**: mirror **edit**, **focus / in-progress**, **triage**, **notes**, and **rewards** in `apps/mobile/src/views/` using the same REST / **`DayPartyClient`** contracts.
 
 ## Complexity Tracking
 

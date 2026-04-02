@@ -66,6 +66,8 @@ Relationships: belongs to one `scheduledDate` plan context; may reference tags; 
 
 **State notes**: Prefer a single **status** source of truth over time; if `isComplete` retained, domain actions must keep **consistent** with `status`.
 
+**Client exposure**: `PATCH /api/tasks/:id` and triage routes accept a **superset** of transitions; which **`status`** and fields users can set **in-app** on **web vs mobile** is governed by **`spec.md`** (FR-004, FR-005, FR-008) and **`tasks.md`** (coverage matrix + **T051–T056**, **T043–T047**). Domain/triage rules remain authoritative for **valid** transitions; clients implement the **product** subset per story.
+
 ---
 
 ## Entity: Day plan (derived)

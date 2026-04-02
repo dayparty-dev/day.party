@@ -115,3 +115,13 @@ Consolidated decisions for open questions from the implementation plan Technical
 **Rationale**: `DayPartyClient` and any external consumers keep working while web/mobile adopt new fields.
 
 **Alternatives considered**: `/v2/tasks` namespace (only if additive becomes untenable).
+
+---
+
+## 12. API-first vs client-first surfacing
+
+**Decision**: Ship new **`Task`** / REST fields together with a **`tasks.md`** entry (row in the **API ↔ client coverage matrix** and/or an open task ID) that names **which first-party clients** expose them. If a field is **API-only** for a sprint, keep an **explicit open task**; do **not** treat the user story as **product-complete** until **`spec.md`** **Definition of done (first-party clients)** is satisfied on **both** `apps/web` and `apps/mobile`.
+
+**Rationale**: Prevents drift between `updateTaskSchema` and user-visible product (common failure mode: domain ships while clients only toggle **done** / use triage shortcuts).
+
+**Alternatives considered**: Client-led-only development (rejected: breaks shared contract testing); unlimited API surface without tasks (rejected: same drift).

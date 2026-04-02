@@ -31,7 +31,7 @@ When not everything planned gets done or fits, the user quickly decides what to 
 
 **Why this priority**: The vision explicitly calls out deferral, “what stays outside the plan,” and moving items—reducing guilt and preserving momentum for neurodivergent-friendly use.
 
-**Independent Test**: With a plan that overflows or with incomplete items at day end, the user can defer or move items without editing each one manually in a calendar grid.
+**Independent Test**: With a plan that overflows or with incomplete items at day end, the user can defer or move items without editing each one manually in a calendar grid—and **without** relying on raw REST/`curl` alone on **either** first-party client (`apps/web` or `apps/mobile`) once the story is product-complete.
 
 **Acceptance Scenarios**:
 
@@ -113,16 +113,20 @@ Users review a chronological history of meaningful plan edits (moves, estimate c
 
 ## Requirements _(mandatory)_
 
+### Definition of done (first-party clients)
+
+A user story is **product-complete** for **003** only when **both** **`apps/web`** and **`apps/mobile`** expose the **intended interactions** for that story in normal use—**not** when the REST API or domain layer alone accepts the payloads. **API-only** behavior does not satisfy functional requirements that describe **user** actions until each platform has **discoverable** UI (see **`tasks.md`** **API ↔ client coverage matrix** and **`quickstart.md`** manual checklist). Open **client tasks** (**T051–T056**, **T043–T047**, etc.) track remaining gaps.
+
 ### Functional Requirements
 
 - **FR-001**: The system MUST let users define actionables with a human-readable title, optional priority or essentiality, and an estimated duration or effort unit suitable for flexible scheduling. **First-party `apps/web` and `apps/mobile` MUST expose in-app creation** for the planner’s selected day (**`tasks.md` T049–T050**); not only via `POST /api/tasks` or `apps/web-legacy` (see **User Story 1** independent test).
 - **FR-002**: The system MUST let users compose a day plan as an ordered collection of actionables against a user-defined daily window (start/end or equivalent).
 - **FR-003**: The system MUST recalculate fit/overflow feedback when estimates, order, priorities, or the daily window change.
-- **FR-004**: The system MUST let users complete, skip, or reopen actionables in a way that updates the plan state and any dependent rewards consistently.
-- **FR-005**: The system MUST provide a triage path for items not executed or not fitting, including deferral to another day and demotion of importance where the user chooses.
+- **FR-004**: The system MUST let users complete, skip, or reopen actionables in a way that updates the plan state and any dependent rewards consistently. **First-party `apps/web` and `apps/mobile` MUST expose in-app** completion, skip/reopen, and **`planned` / `in_progress` / `deferred`** (and related) transitions the spec calls for—not only via `PATCH /api/tasks` (**`tasks.md` T051–T056**, **T043**).
+- **FR-005**: The system MUST provide a triage path for items not executed or not fitting, including deferral to another day and demotion of importance where the user chooses. Triage outcomes MUST be achievable **without** ad hoc `curl` on **each** platform once the story is product-complete (**`tasks.md` T020** + **T043**, with task-edit surfaces **T051** / **T054** where users adjust fields outside triage shortcuts).
 - **FR-006**: The system MUST let users attach expanded content to an actionable, including lightweight structured formatting, without forcing that content into the main list row.
 - **FR-007**: The system MUST maintain a reward balance (or equivalent ledger) and let users acquire configured rewards through a marketplace or catalog interaction.
-- **FR-008**: The system MUST allow configuration of bounties or rewards associated with specific actionables, including differentiated rewards for “high resistance” work when the user sets them up.
+- **FR-008**: The system MUST allow configuration of bounties or rewards associated with specific actionables, including differentiated rewards for “high resistance” work when the user sets them up. **Bounty configuration MUST be user-editable in-app** on **both** web and mobile (**`tasks.md` T053**, **T056**, and bounty fields on the task editor **T051** / **T054**)—not only accepted by the API.
 - **FR-009**: The system MUST offer at least one alternate visual preset affecting colors and density (or clearly scoped style families) across core screens.
 - **FR-010**: The system MUST record a retrievable history of material plan and actionable changes with timestamps and enough identifiers for the user to understand each event.
 - **FR-011**: The system MUST persist user data across sessions so the same user sees a consistent plan, notes, balances, and history after leaving and returning.
@@ -130,7 +134,7 @@ Users review a chronological history of meaningful plan edits (moves, estimate c
 
 ### Key Entities _(include if feature involves data)_
 
-- **Actionable**: A unit of intended work or life activity; title; estimate; priority; status (planned, in progress, done, deferred); optional bounty configuration; optional expanded content.
+- **Actionable**: A unit of intended work or life activity; title; estimate; priority; **status** (`planned`, **in progress**, `done`, `skipped`, `deferred`, etc.—**including user-visible `in progress` / “focus”** per FR-004); optional bounty configuration; optional expanded content.
 - **Day plan**: A date (or logical day window); ordered references to actionables; derived fit/overflow state against the user’s window and rules.
 - **User preferences**: Daily window defaults; visual preset; any default bounty or reward behaviors the product exposes.
 - **Reward definition**: Name; cost or grant rules; type (instant, banked, scheduled); availability in marketplace.
@@ -158,7 +162,7 @@ Users review a chronological history of meaningful plan edits (moves, estimate c
 - **Portable task core / multi-brand reuse** (e.g., personal vs professional flavors) is a strategic direction from next-steps; this spec defines the behavioral contract of the personal day-planning experience so a shared core can emerge in planning work, without prescribing package names or code layout here.
 - **Sync across multiple devices** is desirable; FR-011 requires session-to-session persistence. Full conflict resolution policies are left to planning unless product owners later tighten them.
 - **Offline or interrupted sessions (v1)**: persistence is **server-authoritative**; clients SHOULD retry failed mutations and refresh after success. A **full offline write queue**, merge/conflict UI, and guarantees beyond “no surprising loss on the primary session” are **out of scope** for this spec unless added in a follow-up.
-- **Mobile / web parity**: both **apps/web** and **apps/mobile** MUST implement each user story’s UX for that story to be **done** on the product (constitution: platform-specific UI, shared API). Work can be **parallelized** after API contracts stabilize; `tasks.md` tracks per-surface tasks.
+- **Mobile / web parity**: both **apps/web** and **apps/mobile** MUST implement each user story’s UX for that story to be **done** on the product (constitution: platform-specific UI, shared API). Work can be **parallelized** after API contracts stabilize; `tasks.md` tracks per-surface tasks and the **API ↔ client coverage matrix** (which REST capabilities must appear in which client).
 - **Regulatory or medical claims** are not made; the product is productivity and wellbeing-oriented software, not a clinical tool.
 
 ## Iterations
@@ -178,5 +182,14 @@ Users review a chronological history of meaningful plan edits (moves, estimate c
 **Scope**: Spec / plan / tasks consistency (after `/speckit-analyze`).
 **Artifacts updated**: `spec.md`, `plan.md`, `tasks.md`
 **Tasks added**: —
+**Tasks removed**: —
+**Tasks marked complete**: —
+
+### Iteration 2026-04-02: Client parity + task editor (API vs UI drift)
+
+**Change**: Document **API ↔ client** drift (broad `PATCH /api/tasks` vs narrow client usage); add **definition of done** for first-party clients; tighten **FR-004**, **FR-005**, **FR-008** and **Key Entities** for **in-progress** and **bounty UX**; add **coverage matrix** and tasks **T051–T056** (web/mobile task editor, focus status, bounty on create); extend **plan** / **quickstart** / **research** / **data-model** notes.
+**Scope**: Feature-wide (tasks restructuring + spec alignment).
+**Artifacts updated**: `spec.md`, `plan.md`, `tasks.md`, `quickstart.md`, `data-model.md`, `research.md`
+**Tasks added**: T051, T052, T053, T054, T055, T056
 **Tasks removed**: —
 **Tasks marked complete**: —
