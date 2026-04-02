@@ -120,8 +120,8 @@ Per `spec.md` (**Mobile / web parity**), a user story is **product-done** only w
 
 ### Implementation for User Story 4
 
-- [ ] T024 [P] [US4] Add `RewardDefinition` and `LedgerEntry` types in `packages/core/src/models/reward.ts` and `packages/core/src/models/ledger.ts` (or single module) and export from `packages/core/src/index.ts`
-- [ ] T025 [P] [US4] Add `RewardDefinitionRepository` and `LedgerRepository` ports in `packages/domain/src/interfaces/` and export from `packages/domain/src/index.ts`
+- [x] T024 [P] [US4] Add `RewardDefinition` and `LedgerEntry` types in `packages/core/src/models/reward.ts` and `packages/core/src/models/ledger.ts` (or single module) and export from `packages/core/src/index.ts`
+- [x] T025 [P] [US4] Add `RewardDefinitionRepository` and `LedgerRepository` ports in `packages/domain/src/interfaces/` and export from `packages/domain/src/index.ts`
 - [ ] T026 [US4] Implement `MongoRewardDefinitionRepository` and `MongoLedgerRepository` in `packages/db/src/repositories/`; export from `packages/db/src/index.ts`
 - [ ] T027 [US4] Add domain actions for granting bounty on completion and purchasing rewards in `packages/domain/src/actions/complete-task-with-rewards.ts` (or extend existing completion flow) and `packages/domain/src/actions/purchase-reward.ts` (**FR-004** completion path consistent with **FR-007/FR-008** ledger rules)
 - [ ] T028 [US4] Add `apps/api/src/routes/rewards.ts` and `apps/api/src/routes/ledger.ts` (or combined router) per `specs/003-vision-aligned-rebuild/contracts/day-planning-rest.md`; wire repos/actions in `apps/api/src/index.ts` and mount in `apps/api/src/app.ts`

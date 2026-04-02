@@ -1,4 +1,6 @@
-export type { Task, TaskEssentiality, TaskStatus } from './models/task';
+export type { Task, TaskBounty, TaskEssentiality, TaskStatus } from './models/task';
+export type { LedgerEntry, LedgerEntryReason } from './models/ledger';
+export type { RewardDefinition, RewardDefinitionType } from './models/reward';
 export type { TaskRundownItem } from './models/task-rundown';
 export { taskToRundownItem } from './models/task-rundown';
 export type { User } from './models/user';

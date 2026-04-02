@@ -4,6 +4,16 @@ export type TaskEssentiality = 'essential' | 'normal' | 'optional';
 /** Lifecycle / triage state (data-model.md, FR-004, US2). */
 export type TaskStatus = 'planned' | 'in_progress' | 'done' | 'skipped' | 'deferred';
 
+/**
+ * Optional reward config on a task (P4): currency bounty, tag scope, and
+ * “high resistance” handling for harder completions.
+ */
+export interface TaskBounty {
+  amount: number;
+  tagKeys?: string[];
+  highResistance?: boolean;
+}
+
 export interface Task {
   id: string;
   userId: string;
@@ -23,6 +33,8 @@ export interface Task {
   position: number;
   /** Markdown source for expanded notes (FR-006); omitted from rundown JSON. */
   notesMarkdown?: string;
+  /** Optional reward config (data-model.md P4). */
+  bounty?: TaskBounty;
   createdAt: string;
   updatedAt: string;
 }

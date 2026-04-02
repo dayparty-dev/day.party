@@ -3,6 +3,18 @@ export type { UserRepository } from './interfaces/user-repository';
 export type { SessionRepository } from './interfaces/session-repository';
 export type { TagRepository } from './interfaces/tag-repository';
 export type { UserPreferencesRepository } from './interfaces/user-preferences-repository';
+export type {
+  RewardDefinition,
+  RewardDefinitionRepository,
+  RewardDefinitionType,
+} from './interfaces/reward-definition-repository';
+export type {
+  LedgerEntry,
+  LedgerEntryReason,
+  LedgerListParams,
+  LedgerListResult,
+  LedgerRepository,
+} from './interfaces/ledger-repository';
 
 export { computeDayFit, windowAvailableMinutes, taskCountsTowardRunwayMinutes } from './day-fit';
 export {
