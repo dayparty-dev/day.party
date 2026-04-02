@@ -3,7 +3,9 @@ import { ERROR_CODES, taskFocusedElapsedMs } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
+import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
+import { FocusPiPControl, isDocumentPiPSupported } from '../components/FocusPiP';
 import { nextTaskAfterFocus, openSortedTasks, pickFocusTask } from '../utils/ongoing-focus';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import { todayLocalDateString } from '../utils/today-local';
@@ -133,6 +135,7 @@ export function OngoingPage(): ReactElement {
       setLoadError(result.error.message);
       return;
     }
+    toast.success('Task completed');
     await load();
   }
 
@@ -175,6 +178,7 @@ export function OngoingPage(): ReactElement {
       setEffortError(result.error.message);
       return;
     }
+    toast.success('Effort saved');
     await load();
   }
 
@@ -201,6 +205,7 @@ export function OngoingPage(): ReactElement {
       setLoadError(result.error.message);
       return;
     }
+    toast.success(nextStatus === 'planned' ? 'Paused' : 'Focus started');
     await load();
   }
 
@@ -317,6 +322,19 @@ export function OngoingPage(): ReactElement {
             <button type="button" className={styles.doneBtn} onClick={() => void markComplete()}>
               Mark complete
             </button>
+            {isDocumentPiPSupported() ? (
+              <FocusPiPControl
+                focusTask={focusTask}
+                nextTask={nextTask}
+                tagColor={tagColor}
+                elapsedLabel={elapsedLabel}
+                progressPct={progress}
+                targetMinutes={targetMinutes}
+                focusBusy={focusBusy}
+                onToggleFocus={() => void toggleFocusStatus()}
+                onMarkComplete={() => void markComplete()}
+              />
+            ) : null}
           </div>
         </section>
       ) : null}

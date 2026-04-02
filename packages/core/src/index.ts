@@ -5,6 +5,8 @@ export type { RewardDefinition, RewardDefinitionType } from './models/reward';
 export type { TaskRundownItem } from './models/task-rundown';
 export { taskToRundownItem } from './models/task-rundown';
 export type { User } from './models/user';
+export type { AdminAuditEvent } from './models/admin-audit-event';
+export type { FeedbackCategory, FeedbackSubmission } from './models/feedback-submission';
 export type { Session } from './models/session';
 export type { Tag } from './models/tag';
 export type { DayFit, DayRundown } from './models/day-rundown';

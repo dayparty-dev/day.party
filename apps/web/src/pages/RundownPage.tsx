@@ -9,7 +9,9 @@ import { ERROR_CODES, type VisualPreset } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
+import { toast } from 'sonner';
 import { CreateTaskPanel } from '../components/CreateTaskPanel';
+import { FeedbackForm } from '../components/FeedbackForm';
 import { PlanHistoryPanel } from '../components/PlanHistoryPanel';
 import { RunwayTaskList } from '../components/RunwayTaskList';
 import { useVisualPreset } from '../context/visual-preset-context';
@@ -36,7 +38,7 @@ function planningDayLabel(iso: string, todayIso: string): string {
 }
 
 export function RundownPage(): ReactElement {
-  const { client, onUnauthorized } = useAuth();
+  const { client, onUnauthorized, user } = useAuth();
   const { visualPreset, presetError, savingPreset, saveVisualPreset } = useVisualPreset();
   const [searchParams, setSearchParams] = useSearchParams();
   const todayIso = useMemo(() => todayLocalDateString(), []);
@@ -215,6 +217,7 @@ export function RundownPage(): ReactElement {
       setLoadError(result.error.message);
       return;
     }
+    toast.success('Triage updated');
     await load();
   }
 
@@ -251,6 +254,7 @@ export function RundownPage(): ReactElement {
       setWindowError(res.error.message);
       return;
     }
+    toast.success('Day window saved');
     await load();
   }
 
@@ -319,6 +323,14 @@ export function RundownPage(): ReactElement {
           </p>
         </div>
         <div className={styles.headerActions}>
+          {user?.role === 'admin' ? (
+            <Link className={styles.headerLink} to="/admin">
+              Admin
+            </Link>
+          ) : null}
+          <Link className={styles.headerLink} to="/tags">
+            Tags
+          </Link>
           <Link className={styles.headerLink} to="/rewards">
             Rewards
           </Link>
@@ -429,6 +441,13 @@ export function RundownPage(): ReactElement {
           />
         </section>
       ) : null}
+
+      <details className={styles.feedbackDetails}>
+        <summary className={styles.feedbackSummary}>Send feedback</summary>
+        <div className={styles.feedbackBody}>
+          <FeedbackForm />
+        </div>
+      </details>
 
       <CreateTaskPanel
         client={client}

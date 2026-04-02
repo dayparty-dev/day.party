@@ -10,6 +10,8 @@ import './load-env';
 import { serve } from '@hono/node-server';
 import {
   getDb,
+  MongoAdminAuditRepository,
+  MongoFeedbackRepository,
   MongoLedgerRepository,
   MongoPlanHistoryRepository,
   MongoRewardDefinitionRepository,
@@ -23,6 +25,7 @@ import {
   makeApplyTaskTriageAction,
   makeCreateRewardDefinitionAction,
   makeCreateTaskAction,
+  makeDeleteTagWithPolicyAction,
   makeDeleteTaskAction,
   makeGetHistoryPageAction,
   makeGetLedgerPageAction,
@@ -32,6 +35,7 @@ import {
   makePatchUserPreferencesAction,
   makePurchaseRewardAction,
   makeReorderTasksAction,
+  makeSubmitFeedbackAction,
   makeSuggestDayCapacitiesAction,
   makeUpdateTaskAction,
 } from '@dayparty/domain';
@@ -49,6 +53,8 @@ const userPrefsRepo = new MongoUserPreferencesRepository(db);
 const rewardRepo = new MongoRewardDefinitionRepository(db);
 const ledgerRepo = new MongoLedgerRepository(db);
 const planHistoryRepo = new MongoPlanHistoryRepository(db);
+const adminAuditRepo = new MongoAdminAuditRepository(db);
+const feedbackRepo = new MongoFeedbackRepository(db);
 
 const env = {
   taskRepo,
@@ -72,6 +78,10 @@ const env = {
   getLedgerPage: makeGetLedgerPageAction(ledgerRepo),
   purchaseReward: makePurchaseRewardAction(rewardRepo, ledgerRepo, planHistoryRepo),
   getHistoryPage: makeGetHistoryPageAction(planHistoryRepo),
+  deleteTagWithPolicy: makeDeleteTagWithPolicyAction(tagRepo, taskRepo),
+  adminAuditRepo,
+  feedbackRepo,
+  submitFeedback: makeSubmitFeedbackAction(feedbackRepo),
 };
 
 const app = createApp(env);

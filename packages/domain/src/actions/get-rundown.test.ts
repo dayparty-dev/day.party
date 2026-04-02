@@ -26,6 +26,7 @@ function createTaskRepoWithTasks(forDate: string, userId: string, initial: Task[
     delete: async () => {},
     reorder: async () => {},
     nullifyTagKeyForUser: async () => {},
+    applyTagDeletionPolicy: async () => 0,
   };
 }
 

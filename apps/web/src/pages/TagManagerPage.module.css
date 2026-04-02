@@ -1,0 +1,25 @@
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px 20px 48px;
+}
+
+.top {
+  margin-bottom: 20px;
+}
+
+.back {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dp-accent);
+  text-decoration: none;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.title {
+  margin: 12px 0 0;
+  font-size: 1.5rem;
+}

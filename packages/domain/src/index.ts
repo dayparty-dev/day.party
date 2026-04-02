@@ -1,5 +1,7 @@
 export type { TaskRepository } from './interfaces/task-repository';
 export type { UserRepository } from './interfaces/user-repository';
+export type { AdminAuditRepository, AdminAuditListResult } from './interfaces/admin-audit-repository';
+export type { FeedbackRepository, FeedbackListResult } from './interfaces/feedback-repository';
 export type { SessionRepository } from './interfaces/session-repository';
 export type { TagRepository } from './interfaces/tag-repository';
 export type { UserPreferencesRepository } from './interfaces/user-preferences-repository';
@@ -50,3 +52,6 @@ export { makeApplyTaskTriageAction } from './actions/triage-task';
 export type { TaskTriageInput } from './actions/triage-task';
 export { makeGetUserPreferencesAction, makePatchUserPreferencesAction } from './actions/user-preferences-actions';
 export type { UserPreferencesPatch } from './actions/user-preferences-actions';
+export { makeDeleteTagWithPolicyAction } from './actions/delete-tag-with-policy';
+export type { DeleteTagWithPolicyResult } from './actions/delete-tag-with-policy';
+export { makeSubmitFeedbackAction } from './actions/feedback-actions';

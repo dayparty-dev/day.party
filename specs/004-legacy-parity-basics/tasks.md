@@ -121,7 +121,7 @@
 
 ### Implementation for User Story 5
 
-- [ ] T021 [US5] Add feature-detected Document PiP shell + primary actions in `apps/web/src/components/FocusPiP.tsx` and entry control in `apps/web/src/pages/OngoingPage.tsx` (share state via existing client reload pattern)
+- [x] T021 [US5] Add feature-detected Document PiP shell + primary actions in `apps/web/src/components/FocusPiP.tsx` and entry control in `apps/web/src/pages/OngoingPage.tsx` (share state via existing client reload pattern)
 
 **Checkpoint**: US5 web-only; may ship after US4.
 
@@ -135,11 +135,11 @@
 
 ### Implementation for User Story 6
 
-- [ ] T022 [P] [US6] Implement `deleteTagWithPolicy` domain action in `packages/domain/src/actions/delete-tag-with-policy.ts` (strip `tagKey` / `bounty.tagKeys` or reassign, then delete tag) and export from `packages/domain/src/index.ts` — this satisfies **FR-007** “merge/consolidate” semantics for **004 v1** (reassign-on-delete; no separate merge-two-tags wizard)
-- [ ] T023 [US6] Add repository helpers or queries needed for bulk task updates in `packages/db/src/repositories/task-repository.ts` and wire action to `packages/db` from `apps/api/src/index.ts`
-- [ ] T024 [US6] Add `POST /api/tags/:id/delete-with-policy` with Zod body in `apps/api/src/routes/tags.ts` per `contracts/legacy-parity-rest.md`
-- [ ] T025 [US6] Add `deleteTagWithPolicy` (or named) method to `packages/api-client/src/client.ts`
-- [ ] T026 [P] [US6] Build tag manager UI (list/create/edit color/delete flow with confirmation) in `apps/web/src/components/TagManagerPanel.tsx` and surface from `apps/web/src/pages/RundownPage.tsx` or new settings route
+- [x] T022 [P] [US6] Implement `deleteTagWithPolicy` domain action in `packages/domain/src/actions/delete-tag-with-policy.ts` (strip `tagKey` / `bounty.tagKeys` or reassign, then delete tag) and export from `packages/domain/src/index.ts` — this satisfies **FR-007** “merge/consolidate” semantics for **004 v1** (reassign-on-delete; no separate merge-two-tags wizard)
+- [x] T023 [US6] Add repository helpers or queries needed for bulk task updates in `packages/db/src/repositories/task-repository.ts` and wire action to `packages/db` from `apps/api/src/index.ts`
+- [x] T024 [US6] Add `POST /api/tags/:id/delete-with-policy` with Zod body in `apps/api/src/routes/tags.ts` per `contracts/legacy-parity-rest.md`
+- [x] T025 [US6] Add `deleteTagWithPolicy` (or named) method to `packages/api-client/src/client.ts`
+- [x] T026 [P] [US6] Build tag manager UI (list/create/edit color/delete flow with confirmation) in `apps/web/src/components/TagManagerPanel.tsx` and surface from `apps/web/src/pages/RundownPage.tsx` or new settings route
 - [ ] T027 [P] [US6] Add tag management + delete confirmation UX in `apps/mobile/src/views/rundown-view.ts` or `apps/mobile/src/views/tag-settings-view.ts` + XML
 
 **Checkpoint**: US6 complete on web + mobile.
@@ -154,14 +154,14 @@
 
 ### Implementation for User Story 7
 
-- [ ] T028 [P] [US7] Add `AdminAuditEvent` (or equivalent) type in `packages/core/src/models/admin-audit.ts`, Zod schemas in `packages/validation/src/schemas/admin-audit.ts`, and `MongoAdminAuditRepository` in `packages/db/src/repositories/admin-audit-repository.ts`; export from package indexes
-- [ ] T029 [US7] Register audit repo in `apps/api/src/index.ts` and `apps/api/src/types.ts`; add helper to append audit rows from `apps/api/src/routes/admin/audit-helper.ts` (thin wrapper)
-- [ ] T030 [US7] Implement `GET /api/admin/users` (q=) and `GET /api/admin/users/:id` in `apps/api/src/routes/admin/users.ts` with `requireAdmin`
-- [ ] T031 [US7] Implement `GET /api/admin/tasks` and `PATCH /api/admin/tasks/:id` in `apps/api/src/routes/admin/tasks.ts` with `requireAdmin` and audit on destructive/sensitive patches; implement `GET /api/admin/audit` (cursor pagination) in `apps/api/src/routes/admin/audit.ts` per `specs/004-legacy-parity-basics/contracts/legacy-parity-rest.md`
-- [ ] T032 [US7] Mount admin route subtree from `apps/api/src/app.ts` under `/api/admin` with shared auth + admin middleware (**users**, **tasks**, **audit** from T031); mount **admin feedback** when `T046` is implemented
-- [ ] T033 [P] [US7] Add admin API methods to `packages/api-client/src/client.ts` (`listUsersAdmin`, `getUserAdmin`, `listTasksAdmin`, `patchTaskAdmin`, `listAdminAudit`, etc.)
-- [ ] T034 [P] [US7] Create `apps/web/src/pages/admin/AdminHomePage.tsx` (user search + links) and `apps/web/src/pages/admin/AdminUserDetailPage.tsx` or combined flow with task table; add `apps/web/src/pages/admin/AdminAuditPage.tsx` that loads recent rows via `client.listAdminAudit` (actor, action summary, target, timestamp) with simple pagination or “load more”; add an **Audit log** link from `AdminHomePage` to `/admin/audit`
-- [ ] T035 [US7] Register nested `/admin/*` routes in `apps/web/src/App.tsx` (e.g. `AdminLayout` with `<Outlet />`): `/admin` → home, `/admin/audit` → `AdminAuditPage`; add `/admin/feedback` when **T050** lands. Guard the whole `/admin` tree: non-admins → redirect `/rundown` using `user.role === 'admin'` from `apps/web/src/context/auth-context.tsx`
+- [x] T028 [P] [US7] Add `AdminAuditEvent` (or equivalent) type in `packages/core/src/models/admin-audit-event.ts`, Zod schemas in `packages/validation/src/schemas/admin-audit.ts`, and `MongoAdminAuditRepository` in `packages/db/src/repositories/admin-audit-repository.ts`; export from package indexes
+- [x] T029 [US7] Register audit repo in `apps/api/src/index.ts` and `apps/api/src/types.ts`; add helper to append audit rows from `apps/api/src/routes/admin/audit-helper.ts` (thin wrapper)
+- [x] T030 [US7] Implement `GET /api/admin/users` (q=) and `GET /api/admin/users/:id` in `apps/api/src/routes/admin/users.ts` with `requireAdmin`
+- [x] T031 [US7] Implement `GET /api/admin/tasks` and `PATCH /api/admin/tasks/:id` in `apps/api/src/routes/admin/tasks.ts` with `requireAdmin` and audit on destructive/sensitive patches; implement `GET /api/admin/audit` (cursor pagination) in `apps/api/src/routes/admin/audit.ts` per `specs/004-legacy-parity-basics/contracts/legacy-parity-rest.md`
+- [x] T032 [US7] Mount admin route subtree from `apps/api/src/app.ts` under `/api/admin` with shared auth + admin middleware (**users**, **tasks**, **audit** from T031); mount **admin feedback** when `T046` is implemented
+- [x] T033 [P] [US7] Add admin API methods to `packages/api-client/src/client.ts` (`listUsersAdmin`, `getUserAdmin`, `listTasksAdmin`, `patchTaskAdmin`, `listAdminAudit`, etc.)
+- [x] T034 [P] [US7] Create `apps/web/src/pages/admin/AdminHomePage.tsx` (user search + links) and `apps/web/src/pages/admin/AdminUserDetailPage.tsx` or combined flow with task table; add `apps/web/src/pages/admin/AdminAuditPage.tsx` that loads recent rows via `client.listAdminAudit` (actor, action summary, target, timestamp) with simple pagination or “load more”; add an **Audit log** link from `AdminHomePage` to `/admin/audit`
+- [x] T035 [US7] Register nested `/admin/*` routes in `apps/web/src/App.tsx` (e.g. `AdminLayout` with `<Outlet />`): `/admin` → home, `/admin/audit` → `AdminAuditPage`; add `/admin/feedback` when **T050** lands. Guard the whole `/admin` tree: non-admins → redirect `/rundown` using `user.role === 'admin'` from `apps/web/src/context/auth-context.tsx`
 
 **Checkpoint**: Operator slice web-only; mobile unchanged.
 
@@ -194,15 +194,15 @@
 
 ### Implementation for User Story 9
 
-- [ ] T042 [P] [US9] Add feedback document shape types in `packages/core/src/models/feedback.ts`, `createFeedbackSchema` in `packages/validation/src/schemas/feedback.ts`, and `MongoFeedbackRepository` in `packages/db/src/repositories/feedback-repository.ts`; export indexes
-- [ ] T043 [US9] Register `feedbackRepo` in `apps/api/src/index.ts` and `apps/api/src/types.ts`
-- [ ] T044 [US9] Implement `makeSubmitFeedbackAction` in `packages/domain/src/actions/feedback-actions.ts` and `POST /api/feedback` in `apps/api/src/routes/feedback.ts`; mount in `apps/api/src/app.ts`
-- [ ] T045 [US9] Add `submitFeedback` and admin list method to `packages/api-client/src/client.ts`
-- [ ] T046 [P] [US9] Implement `GET /api/admin/feedback` with cursor/limit in `apps/api/src/routes/admin/feedback.ts` using `requireAdmin`
-- [ ] T047 [P] [US9] Add `sonner` (or chosen) toaster root in `apps/web/src/main.tsx` / `App.tsx` and `apps/web/src/components/FeedbackForm.tsx` with submit wired to `client.submitFeedback`
+- [x] T042 [P] [US9] Add feedback document shape types in `packages/core/src/models/feedback-submission.ts`, `createFeedbackSchema` in `packages/validation/src/schemas/feedback.ts`, and `MongoFeedbackRepository` in `packages/db/src/repositories/feedback-repository.ts`; export indexes
+- [x] T043 [US9] Register `feedbackRepo` in `apps/api/src/index.ts` and `apps/api/src/types.ts`
+- [x] T044 [US9] Implement `makeSubmitFeedbackAction` in `packages/domain/src/actions/feedback-actions.ts` and `POST /api/feedback` in `apps/api/src/routes/feedback.ts`; mount in `apps/api/src/app.ts`
+- [x] T045 [US9] Add `submitFeedback` and admin list method to `packages/api-client/src/client.ts`
+- [x] T046 [P] [US9] Implement `GET /api/admin/feedback` with cursor/limit in `apps/api/src/routes/admin/feedback.ts` using `requireAdmin`
+- [x] T047 [P] [US9] Add `sonner` (or chosen) toaster root in `apps/web/src/main.tsx` / `App.tsx` and `apps/web/src/components/FeedbackForm.tsx` with submit wired to `client.submitFeedback`
 - [ ] T048 [P] [US9] Fire **non-blocking** toasts on **successful** saves (window, triage, notes, etc.) and on **failed** mutations (network/validation) in `apps/web/src/pages/RundownPage.tsx`, `apps/web/src/pages/OngoingPage.tsx`, and `apps/web/src/components/FeedbackForm.tsx` — same pattern: brief message, no focus trap (FR-011)
 - [ ] T049 [P] [US9] Add feedback submission UI (modal or page) in `apps/mobile/src/views/rundown-view.ts` calling new client method
-- [ ] T050 [US9] Build `apps/web/src/pages/admin/AdminFeedbackPage.tsx` listing submissions; link from `apps/web/src/pages/admin/AdminHomePage.tsx`
+- [x] T050 [US9] Build `apps/web/src/pages/admin/AdminFeedbackPage.tsx` listing submissions; link from `apps/web/src/pages/admin/AdminHomePage.tsx`
 
 **Checkpoint**: US9 end-to-end; triage web-only.
 

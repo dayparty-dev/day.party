@@ -28,6 +28,12 @@ export class MongoTagRepository implements TagRepository {
     return doc ? docToTag(doc) : null;
   }
 
+  async findByIdForUser(userId: string, id: string): Promise<Tag | null> {
+    if (!ObjectId.isValid(id)) return null;
+    const doc = await this.collection.findOne({ _id: new ObjectId(id), userId });
+    return doc ? docToTag(doc) : null;
+  }
+
   async create(tag: Omit<Tag, 'id' | 'createdAt'>): Promise<Tag> {
     const createdAt = new Date().toISOString();
     const _id = new ObjectId();

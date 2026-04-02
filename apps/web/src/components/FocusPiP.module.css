@@ -1,0 +1,23 @@
+.pipTrigger {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--dp-border);
+  background: var(--dp-surface-2, var(--dp-surface));
+  color: var(--dp-text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pipTrigger:hover:not(:disabled) {
+  border-color: var(--dp-accent);
+  color: var(--dp-accent);
+}
+
+.pipTrigger:disabled {
+  opacity: 0.65;
+  cursor: default;
+}

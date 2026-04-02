@@ -364,3 +364,21 @@
   font-size: 0.85rem;
   color: var(--dp-danger-text);
 }
+
+.feedbackDetails {
+  margin: 20px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--dp-border);
+  border-radius: 12px;
+  background: var(--dp-surface);
+}
+
+.feedbackSummary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.feedbackBody {
+  margin-top: 12px;
+}

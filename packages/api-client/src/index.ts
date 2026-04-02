@@ -1,5 +1,11 @@
 export { DayPartyClient } from './client';
 export type {
+  AdminAuditListResponse,
+  AdminAuditRow,
+  AdminFeedbackListResponse,
+  AdminFeedbackRow,
+  AdminUserListResponse,
+  AdminUserSummary,
   ApiLedgerEntry,
   ApiRewardDefinition,
   AuthUserResponse,

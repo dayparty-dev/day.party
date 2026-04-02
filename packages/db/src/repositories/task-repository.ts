@@ -1,5 +1,27 @@
 import { ObjectId, type Db, type Collection } from 'mongodb';
 import { DEFAULT_SIZE_TO_MINUTES, type Task, type TaskBounty, type TaskStatus } from '@dayparty/core';
+
+function bountyAfterRemovingTagKey(
+  bounty: TaskBounty | undefined,
+  removedKey: string,
+  replacementKey: string | null,
+): TaskBounty | undefined {
+  if (!bounty?.tagKeys?.includes(removedKey)) {
+    return bounty;
+  }
+  let keys = bounty.tagKeys.filter((k) => k !== removedKey);
+  if (replacementKey && !keys.includes(replacementKey)) {
+    keys = [...keys, replacementKey];
+  }
+  const next: TaskBounty = { amount: bounty.amount };
+  if (bounty.highResistance) {
+    next.highResistance = bounty.highResistance;
+  }
+  if (keys.length > 0) {
+    next.tagKeys = keys;
+  }
+  return next;
+}
 import type { TaskRepository } from '@dayparty/domain';
 import { bsonIdToString } from '../bson-id';
 
@@ -170,5 +192,47 @@ export class MongoTaskRepository implements TaskRepository {
   async nullifyTagKeyForUser(userId: string, tagKey: string): Promise<void> {
     const updatedAt = new Date().toISOString();
     await this.collection.updateMany({ userId, tagKey }, { $unset: { tagKey: '' }, $set: { updatedAt } });
+  }
+
+  async applyTagDeletionPolicy(
+    userId: string,
+    removedTagKey: string,
+    replacementTagKey: string | null,
+  ): Promise<number> {
+    const docs = await this.collection
+      .find({
+        userId,
+        $or: [{ tagKey: removedTagKey }, { 'bounty.tagKeys': removedTagKey }],
+      })
+      .toArray();
+    let count = 0;
+    const updatedAt = new Date().toISOString();
+    for (const doc of docs) {
+      const $set: Record<string, unknown> = { updatedAt };
+      const $unset: Record<string, ''> = {};
+      let touch = false;
+      if (doc.tagKey === removedTagKey) {
+        touch = true;
+        if (replacementTagKey) {
+          $set.tagKey = replacementTagKey;
+        } else {
+          $unset.tagKey = '';
+        }
+      }
+      if (doc.bounty?.tagKeys?.includes(removedTagKey)) {
+        touch = true;
+        $set.bounty = bountyAfterRemovingTagKey(doc.bounty, removedTagKey, replacementTagKey);
+      }
+      if (!touch) {
+        continue;
+      }
+      const payload: { $set: Record<string, unknown>; $unset?: Record<string, ''> } = { $set };
+      if (Object.keys($unset).length > 0) {
+        payload.$unset = $unset;
+      }
+      await this.collection.updateOne({ _id: doc._id }, payload);
+      count += 1;
+    }
+    return count;
   }
 }

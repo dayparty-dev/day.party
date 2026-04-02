@@ -1,7 +1,18 @@
-import type { DayRundown, RewardDefinition, Task, User, UserPreferences } from '@dayparty/core';
 import type {
+  DayRundown,
+  FeedbackCategory,
+  FeedbackSubmission,
+  RewardDefinition,
+  Task,
+  User,
+  UserPreferences,
+} from '@dayparty/core';
+import type {
+  AdminAuditRepository,
   CreateTaskInput,
   DaySuggestionsResult,
+  DeleteTagWithPolicyResult,
+  FeedbackRepository,
   LedgerListParams,
   LedgerPageResult,
   PlanHistoryListParams,
@@ -40,6 +51,19 @@ export type ApiEnv = {
   getLedgerPage: (userId: string, params: LedgerListParams) => Promise<LedgerPageResult>;
   purchaseReward: (userId: string, rewardDefinitionId: string) => Promise<{ balance: number }>;
   getHistoryPage: (userId: string, params: PlanHistoryListParams) => Promise<PlanHistoryListResult>;
+  deleteTagWithPolicy: (
+    userId: string,
+    tagId: string,
+    replacementTagId: string | null | undefined,
+  ) => Promise<DeleteTagWithPolicyResult>;
+  adminAuditRepo: AdminAuditRepository;
+  feedbackRepo: FeedbackRepository;
+  submitFeedback: (input: {
+    userId: string;
+    message: string;
+    category?: FeedbackCategory;
+    userAgent?: string;
+  }) => Promise<FeedbackSubmission>;
 };
 
 export type ApiVariables = {

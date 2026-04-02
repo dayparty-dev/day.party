@@ -27,6 +27,7 @@ function createInMemoryTaskRepo(initial: Task[] = []): { repo: TaskRepository; t
     delete: async () => {},
     reorder: async () => {},
     nullifyTagKeyForUser: async () => {},
+    applyTagDeletionPolicy: async () => 0,
   };
   return { repo, tasks };
 }
@@ -46,6 +47,7 @@ const noopHistory: PlanHistoryRepository = {
 function createInMemoryTagRepo(byKey: Map<string, Tag | null>): TagRepository {
   return {
     findByUser: async () => [],
+    findByIdForUser: async () => null,
     findByKey: async (userId, key) => byKey.get(`${userId}:${key}`) ?? null,
     create: async () => {
       throw new Error('unused in test');

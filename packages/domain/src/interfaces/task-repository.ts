@@ -9,4 +9,9 @@ export interface TaskRepository {
   reorder(updates: Array<{ id: string; position: number }>): Promise<void>;
   /** Sets tagKey to unset for all tasks of the user referencing the given tag key */
   nullifyTagKeyForUser(userId: string, tagKey: string): Promise<void>;
+  /**
+   * Clears or reassigns `tagKey` and `bounty.tagKeys` references from `removedTagKey`
+   * to `replacementTagKey` (or removes). Returns number of tasks updated.
+   */
+  applyTagDeletionPolicy(userId: string, removedTagKey: string, replacementTagKey: string | null): Promise<number>;
 }

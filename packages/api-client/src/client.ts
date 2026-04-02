@@ -18,8 +18,10 @@ import type {
 } from '@dayparty/core';
 import { DEFAULT_COLOR_SCHEME, DEFAULT_LOCALE, ERROR_CODES } from '@dayparty/core';
 import {
+  createFeedbackSchema,
   createRewardDefinitionSchema,
   createTagSchema,
+  deleteTagWithPolicyBodySchema,
   createTaskSchema,
   daySuggestionsQuerySchema,
   fromZodError,
@@ -34,10 +36,12 @@ import {
   updateTaskSchema,
 } from '@dayparty/validation';
 import type {
+  CreateFeedbackInput,
   CreateRewardDefinitionInput,
   CreateTagInput,
   CreateTaskInput,
   DaySuggestionsQuery,
+  DeleteTagWithPolicyBody,
   LoginInput,
   PatchUserPreferencesInput,
   ReorderTasksInput,
@@ -77,6 +81,37 @@ type HistoryPageResponse = {
   events: ApiPlanHistoryEvent[];
   nextCursor?: string;
 };
+
+export type AdminUserSummary = {
+  id: string;
+  email: string;
+  displayName?: string;
+  role: string;
+};
+
+export type AdminUserListResponse = { items: AdminUserSummary[] };
+
+export type AdminAuditRow = {
+  id: string;
+  actorUserId: string;
+  action: string;
+  targetType: string;
+  targetId?: string;
+  summary: string;
+  createdAt: string;
+};
+
+export type AdminAuditListResponse = { items: AdminAuditRow[]; nextCursor: string | null };
+
+export type AdminFeedbackRow = {
+  id: string;
+  userId: string;
+  message: string;
+  category?: string;
+  createdAt: string;
+};
+
+export type AdminFeedbackListResponse = { items: AdminFeedbackRow[]; nextCursor: string | null };
 
 export type DayCapacityHint = {
   date: string;
@@ -344,6 +379,108 @@ export class DayPartyClient {
     });
   }
 
+  async deleteTagWithPolicy(
+    id: string,
+    body: DeleteTagWithPolicyBody = {},
+  ): Promise<Result<{ deletedTagId: string; affectedTaskCount: number }>> {
+    const parsed = deleteTagWithPolicyBodySchema.safeParse(body);
+    if (!parsed.success) {
+      return this.fail(fromZodError(parsed.error));
+    }
+    return this.request(`/tags/${encodeURIComponent(id)}/delete-with-policy`, {
+      method: 'POST',
+      requiresAuth: true,
+      body: parsed.data,
+      parse: parseDeleteTagWithPolicyResult,
+    });
+  }
+
+  async submitFeedback(input: CreateFeedbackInput): Promise<Result<{ id: string; createdAt: string }>> {
+    const parsed = createFeedbackSchema.safeParse(input);
+    if (!parsed.success) {
+      return this.fail(fromZodError(parsed.error));
+    }
+    return this.request('/feedback', {
+      method: 'POST',
+      requiresAuth: true,
+      body: parsed.data,
+      parse: parseFeedbackSubmitResponse,
+    });
+  }
+
+  async listUsersAdmin(q: string): Promise<Result<AdminUserListResponse>> {
+    const query = new URLSearchParams();
+    if (q.trim()) {
+      query.set('q', q.trim());
+    }
+    const suffix = query.toString() ? `?${query}` : '';
+    return this.request(`/admin/users${suffix}`, {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseAdminUserListResponse,
+    });
+  }
+
+  async getUserAdmin(userId: string): Promise<Result<AdminUserSummary>> {
+    return this.request(`/admin/users/${encodeURIComponent(userId)}`, {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseAdminUserSummary,
+    });
+  }
+
+  async listTasksAdmin(params: { userId: string; date: string }): Promise<Result<{ items: ApiTask[] }>> {
+    const q = new URLSearchParams();
+    q.set('userId', params.userId);
+    q.set('date', params.date);
+    return this.request(`/admin/tasks?${q}`, {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseAdminTaskListResponse,
+    });
+  }
+
+  async patchTaskAdmin(taskId: string, body: Partial<UpdateTaskInput>): Promise<Result<ApiTask>> {
+    return this.request(`/admin/tasks/${encodeURIComponent(taskId)}`, {
+      method: 'PATCH',
+      requiresAuth: true,
+      body,
+      parse: parseTask,
+    });
+  }
+
+  async listAdminAudit(params?: { limit?: number; cursor?: string }): Promise<Result<AdminAuditListResponse>> {
+    const q = new URLSearchParams();
+    if (params?.limit != null) {
+      q.set('limit', String(params.limit));
+    }
+    if (params?.cursor) {
+      q.set('cursor', params.cursor);
+    }
+    const suffix = q.toString() ? `?${q}` : '';
+    return this.request(`/admin/audit${suffix}`, {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseAdminAuditListResponse,
+    });
+  }
+
+  async listAdminFeedback(params?: { limit?: number; cursor?: string }): Promise<Result<AdminFeedbackListResponse>> {
+    const q = new URLSearchParams();
+    if (params?.limit != null) {
+      q.set('limit', String(params.limit));
+    }
+    if (params?.cursor) {
+      q.set('cursor', params.cursor);
+    }
+    const suffix = q.toString() ? `?${q}` : '';
+    return this.request(`/admin/feedback${suffix}`, {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseAdminFeedbackListResponse,
+    });
+  }
+
   async getRewards(): Promise<Result<ApiRewardDefinition[]>> {
     return this.request('/rewards', {
       method: 'GET',
@@ -479,6 +616,20 @@ function parseMessageResponse(input: unknown): { message: string } | null {
   return { message: input.message };
 }
 
+function parseDeleteTagWithPolicyResult(input: unknown): { deletedTagId: string; affectedTaskCount: number } | null {
+  if (!isRecord(input) || typeof input.deletedTagId !== 'string' || typeof input.affectedTaskCount !== 'number') {
+    return null;
+  }
+  return { deletedTagId: input.deletedTagId, affectedTaskCount: input.affectedTaskCount };
+}
+
+function parseFeedbackSubmitResponse(input: unknown): { id: string; createdAt: string } | null {
+  if (!isRecord(input) || typeof input.id !== 'string' || typeof input.createdAt !== 'string') {
+    return null;
+  }
+  return { id: input.id, createdAt: input.createdAt };
+}
+
 function parseVerifyResponse(input: unknown): VerifyResponse | null {
   if (!isRecord(input) || typeof input.token !== 'string') {
     return null;
@@ -577,6 +728,135 @@ function parseTask(input: unknown): ApiTask | null {
     createdAt: input.createdAt,
     updatedAt: input.updatedAt,
   };
+}
+
+function parseAdminUserSummary(input: unknown): AdminUserSummary | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+  if (typeof input.id !== 'string' || typeof input.email !== 'string' || typeof input.role !== 'string') {
+    return null;
+  }
+  const displayName = typeof input.displayName === 'string' ? input.displayName : undefined;
+  return { id: input.id, email: input.email, displayName, role: input.role };
+}
+
+function parseAdminUserListResponse(input: unknown): AdminUserListResponse | null {
+  if (!isRecord(input) || !Array.isArray(input.items)) {
+    return null;
+  }
+  const items: AdminUserSummary[] = [];
+  for (const it of input.items) {
+    const u = parseAdminUserSummary(it);
+    if (!u) {
+      return null;
+    }
+    items.push(u);
+  }
+  return { items };
+}
+
+function parseAdminTaskListResponse(input: unknown): { items: ApiTask[] } | null {
+  if (!isRecord(input) || !Array.isArray(input.items)) {
+    return null;
+  }
+  const items: ApiTask[] = [];
+  for (const it of input.items) {
+    const t = parseTask(it);
+    if (!t) {
+      return null;
+    }
+    items.push(t);
+  }
+  return { items };
+}
+
+function parseAdminAuditRow(input: unknown): AdminAuditRow | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+  if (
+    typeof input.id !== 'string' ||
+    typeof input.actorUserId !== 'string' ||
+    typeof input.action !== 'string' ||
+    typeof input.targetType !== 'string' ||
+    typeof input.summary !== 'string' ||
+    typeof input.createdAt !== 'string'
+  ) {
+    return null;
+  }
+  const row: AdminAuditRow = {
+    id: input.id,
+    actorUserId: input.actorUserId,
+    action: input.action,
+    targetType: input.targetType,
+    summary: input.summary,
+    createdAt: input.createdAt,
+  };
+  if (typeof input.targetId === 'string') {
+    row.targetId = input.targetId;
+  }
+  return row;
+}
+
+function parseAdminAuditListResponse(input: unknown): AdminAuditListResponse | null {
+  if (!isRecord(input) || !Array.isArray(input.items)) {
+    return null;
+  }
+  if (!(input.nextCursor === null || typeof input.nextCursor === 'string')) {
+    return null;
+  }
+  const items: AdminAuditRow[] = [];
+  for (const it of input.items) {
+    const r = parseAdminAuditRow(it);
+    if (!r) {
+      return null;
+    }
+    items.push(r);
+  }
+  return { items, nextCursor: input.nextCursor };
+}
+
+function parseAdminFeedbackRow(input: unknown): AdminFeedbackRow | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+  if (
+    typeof input.id !== 'string' ||
+    typeof input.userId !== 'string' ||
+    typeof input.message !== 'string' ||
+    typeof input.createdAt !== 'string'
+  ) {
+    return null;
+  }
+  const row: AdminFeedbackRow = {
+    id: input.id,
+    userId: input.userId,
+    message: input.message,
+    createdAt: input.createdAt,
+  };
+  if (typeof input.category === 'string') {
+    row.category = input.category;
+  }
+  return row;
+}
+
+function parseAdminFeedbackListResponse(input: unknown): AdminFeedbackListResponse | null {
+  if (!isRecord(input) || !Array.isArray(input.items)) {
+    return null;
+  }
+  if (!(input.nextCursor === null || typeof input.nextCursor === 'string')) {
+    return null;
+  }
+  const items: AdminFeedbackRow[] = [];
+  for (const it of input.items) {
+    const r = parseAdminFeedbackRow(it);
+    if (!r) {
+      return null;
+    }
+    items.push(r);
+  }
+  return { items, nextCursor: input.nextCursor };
 }
 
 function parseRundownTaskRow(input: unknown): ApiRundownTask | null {

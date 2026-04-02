@@ -7,3 +7,5 @@ export { MongoUserPreferencesRepository } from './repositories/user-preferences-
 export { MongoRewardDefinitionRepository } from './repositories/reward-definition-repository';
 export { MongoLedgerRepository } from './repositories/ledger-repository';
 export { MongoPlanHistoryRepository } from './repositories/plan-history-repository';
+export { MongoAdminAuditRepository } from './repositories/admin-audit-repository';
+export { MongoFeedbackRepository } from './repositories/feedback-repository';

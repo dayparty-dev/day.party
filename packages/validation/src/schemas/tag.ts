@@ -19,5 +19,10 @@ export const updateTagSchema = z.object({
   icon: z.string().nullable().optional(),
 });
 
+export const deleteTagWithPolicyBodySchema = z.object({
+  replacementTagId: z.string().min(1).nullable().optional(),
+});
+
 export type CreateTagInput = z.infer<typeof createTagSchema>;
 export type UpdateTagInput = z.infer<typeof updateTagSchema>;
+export type DeleteTagWithPolicyBody = z.infer<typeof deleteTagWithPolicyBodySchema>;

@@ -7,6 +7,12 @@ import { LogoutPage } from './pages/LogoutPage';
 import { OngoingPage } from './pages/OngoingPage';
 import { RewardsPage } from './pages/RewardsPage';
 import { RundownPage } from './pages/RundownPage';
+import { TagManagerPage } from './pages/TagManagerPage';
+import { AdminAuditPage } from './pages/admin/AdminAuditPage';
+import { AdminFeedbackPage } from './pages/admin/AdminFeedbackPage';
+import { AdminHomePage } from './pages/admin/AdminHomePage';
+import { AdminLayout } from './pages/admin/AdminLayout';
+import { AdminUserDetailPage } from './pages/admin/AdminUserDetailPage';
 import { VisualPresetProvider } from './context/visual-preset-context';
 
 function AuthBootSpinner(): ReactElement {
@@ -62,6 +68,13 @@ export function App(): ReactElement {
       <Route path="/logout" element={<LogoutPage />} />
       <Route element={<ProtectedLayout />}>
         <Route path="/rundown" element={<RundownPage />} />
+        <Route path="/tags" element={<TagManagerPage />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminHomePage />} />
+          <Route path="audit" element={<AdminAuditPage />} />
+          <Route path="feedback" element={<AdminFeedbackPage />} />
+          <Route path="users/:id" element={<AdminUserDetailPage />} />
+        </Route>
         <Route path="/rewards" element={<RewardsPage />} />
         <Route path="/ongoing" element={<OngoingPage />} />
       </Route>

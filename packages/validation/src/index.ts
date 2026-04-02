@@ -4,4 +4,6 @@ export * from './schemas/rewards';
 export * from './schemas/user-preferences';
 export * from './schemas/user';
 export * from './schemas/tag';
+export * from './schemas/feedback';
+export * from './schemas/admin-audit';
 export * from './errors';

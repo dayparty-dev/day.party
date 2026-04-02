@@ -53,6 +53,7 @@ describe('makeApplyTaskTriageAction', () => {
       delete: async () => {},
       reorder: async () => {},
       nullifyTagKeyForUser: async () => {},
+      applyTagDeletionPolicy: async () => 0,
     };
 
     const action = makeApplyTaskTriageAction(repo, noopHistory);
@@ -75,6 +76,7 @@ describe('makeApplyTaskTriageAction', () => {
       delete: async () => {},
       reorder: async () => {},
       nullifyTagKeyForUser: async () => {},
+      applyTagDeletionPolicy: async () => 0,
     };
     const action = makeApplyTaskTriageAction(repo, noopHistory);
     await expect(action('u1', 'x', { action: 'defer_to_date', targetDate: '2026-04-02' })).rejects.toThrow(

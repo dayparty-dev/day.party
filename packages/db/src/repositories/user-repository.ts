@@ -3,6 +3,10 @@ import type { User } from '@dayparty/core';
 import type { UserRepository } from '@dayparty/domain';
 import { bsonIdToString } from '../bson-id';
 
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 type UserDoc = Omit<User, 'id'> & { _id: ObjectId };
 
 function docToUser(doc: UserDoc): User {
@@ -27,6 +31,19 @@ export class MongoUserRepository implements UserRepository {
   async findByEmail(email: string): Promise<User | null> {
     const doc = await this.collection.findOne({ email });
     return doc ? docToUser(doc) : null;
+  }
+
+  async searchByEmailSubstring(fragment: string, limit: number): Promise<User[]> {
+    const trimmed = fragment.trim();
+    if (!trimmed) {
+      return [];
+    }
+    const cap = Math.min(100, Math.max(1, limit));
+    const docs = await this.collection
+      .find({ email: { $regex: escapeRegex(trimmed), $options: 'i' } })
+      .limit(cap)
+      .toArray();
+    return docs.map(docToUser);
   }
 
   async create(user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {

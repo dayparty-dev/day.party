@@ -1,7 +1,9 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { registerErrorHandler } from './middleware/error-handler';
+import { createAdminRoutes } from './routes/admin';
 import { createAuthRoutes } from './routes/auth';
+import { createFeedbackRoutes } from './routes/feedback';
 import { createTagRoutes } from './routes/tags';
 import { createPreferenceRoutes } from './routes/preferences';
 import { createHistoryRoutes } from './routes/history';
@@ -40,5 +42,7 @@ export function createApp(env: ApiEnv): Hono<{ Variables: ApiVariables }> {
   app.route('/api/ledger', createLedgerRoutes(env));
   app.route('/api/history', createHistoryRoutes(env));
   app.route('/api/marketplace', createMarketplaceRoutes(env));
+  app.route('/api/feedback', createFeedbackRoutes(env));
+  app.route('/api/admin', createAdminRoutes(env));
   return app;
 }
