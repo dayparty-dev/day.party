@@ -9,6 +9,7 @@ import { ERROR_CODES } from '@dayparty/core';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
+import { CreateTaskPanel } from '../components/CreateTaskPanel';
 import { TaskCard, type TaskRunwayPlacement } from '../components/TaskCard';
 import { TaskNotesPanel } from '../components/TaskNotesPanel';
 import { TaskTriageBar } from '../components/TaskTriageBar';
@@ -302,6 +303,15 @@ export function RundownPage(): ReactElement {
           </details>
         </section>
       ) : null}
+
+      <CreateTaskPanel
+        client={client}
+        scheduledDate={date}
+        onUnauthorized={onUnauthorized}
+        onNetworkError={(msg) => setNetworkBanner(msg)}
+        onOtherError={(msg) => setLoadError(msg)}
+        onSuccess={load}
+      />
 
       <ul className={styles.list}>
         {sortedTasks.map((task) => (

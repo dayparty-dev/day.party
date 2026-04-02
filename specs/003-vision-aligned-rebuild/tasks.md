@@ -107,8 +107,8 @@ Per `spec.md` (**Mobile / web parity**), a user story is **product-done** only w
 
 **Purpose**: US1 is incomplete on greenfield clients until users can add tasks without `apps/web-legacy` or raw HTTP. **Depends on**: T011/T013 (API + `DayPartyClient.createTask` already shipped).
 
-- [ ] T049 [P] [US1] Implement create-task UX in `apps/web` (new component under `apps/web/src/components/` and/or `apps/web/src/pages/RundownPage.tsx`), calling `DayPartyClient.createTask` with **`scheduledDate`** aligned to the current rundown date and fields allowed by `createTaskSchema` (`estimatedMinutes` and/or legacy `size`, title, etc.); on success, **refetch rundown** or merge the created task per existing data-loading patterns
-- [ ] T050 [P] [US1] Implement create-task UX in `apps/mobile` (`apps/mobile/src/views/rundown-view.ts` + `rundown-view.xml`, or a small dedicated view + `app.ts` registration), same API contract as T049; register navigation if split into a separate view
+- [x] T049 [P] [US1] Implement create-task UX in `apps/web` (new component under `apps/web/src/components/` and/or `apps/web/src/pages/RundownPage.tsx`), calling `DayPartyClient.createTask` with **`scheduledDate`** aligned to the current rundown date and fields allowed by `createTaskSchema` (`estimatedMinutes` and/or legacy `size`, title, etc.); on success, **refetch rundown** or merge the created task per existing data-loading patterns
+- [x] T050 [P] [US1] Implement create-task UX in `apps/mobile` (`apps/mobile/src/views/rundown-view.ts` + `rundown-view.xml`, or a small dedicated view + `app.ts` registration), same API contract as T049; register navigation if split into a separate view
 
 ---
 

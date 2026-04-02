@@ -70,6 +70,15 @@ class RundownViewModel extends Observable {
     this.set('windowSaving', false);
     this.set('saveWindowEnabled', true);
     this.set('saveButtonText', 'Guardar ventana');
+    this.set('newTaskTitle', '');
+    this.set('newTaskSize', '2');
+    this.set('newTaskMinutes', '');
+    this.set('taskEssential', false);
+    this.set('taskOptional', false);
+    this.set('createTaskError', '');
+    this.set('createTaskSaving', false);
+    this.set('createTaskEnabled', true);
+    this.set('createTaskButtonText', 'Añadir tarea');
   }
 
   async loadRundown(): Promise<void> {
@@ -205,6 +214,84 @@ class RundownViewModel extends Observable {
   onWindowCrossChange(args: EventData): void {
     const sw = args.object as unknown as { checked: boolean };
     this.set('windowCrosses', sw.checked);
+  }
+
+  onEssentialChange(args: EventData): void {
+    const sw = args.object as unknown as { checked: boolean };
+    if (sw.checked) {
+      this.set('taskOptional', false);
+    }
+    this.set('taskEssential', sw.checked);
+  }
+
+  onOptionalChange(args: EventData): void {
+    const sw = args.object as unknown as { checked: boolean };
+    if (sw.checked) {
+      this.set('taskEssential', false);
+    }
+    this.set('taskOptional', sw.checked);
+  }
+
+  async onCreateTask(): Promise<void> {
+    this.set('createTaskError', '');
+    const title = String(this.get('newTaskTitle') ?? '').trim();
+    if (!title) {
+      this.set('createTaskError', 'Escribe un título.');
+      return;
+    }
+    const sizeNum = Number(String(this.get('newTaskSize') ?? '2').trim());
+    if (!Number.isInteger(sizeNum) || sizeNum < 1 || sizeNum > 5) {
+      this.set('createTaskError', 'El tamaño debe ser un entero entre 1 y 5.');
+      return;
+    }
+    const minutesStr = String(this.get('newTaskMinutes') ?? '').trim();
+    let estimatedMinutes: number | undefined;
+    if (minutesStr !== '') {
+      const m = Number(minutesStr);
+      if (!Number.isInteger(m) || m < 0 || m > 2880) {
+        this.set('createTaskError', 'Los minutos deben ser un entero entre 0 y 2880.');
+        return;
+      }
+      estimatedMinutes = m;
+    }
+    const essential = Boolean(this.get('taskEssential'));
+    const optional = Boolean(this.get('taskOptional'));
+    let essentiality: 'essential' | 'optional' | undefined;
+    if (essential) {
+      essentiality = 'essential';
+    } else if (optional) {
+      essentiality = 'optional';
+    }
+
+    const client = authState.getClient();
+    const date = todayIso();
+    const body = {
+      title,
+      size: sizeNum as 1 | 2 | 3 | 4 | 5,
+      scheduledDate: date,
+      ...(estimatedMinutes !== undefined ? { estimatedMinutes } : {}),
+      ...(essentiality ? { essentiality } : {}),
+    };
+
+    this.set('createTaskSaving', true);
+    this.set('createTaskEnabled', false);
+    this.set('createTaskButtonText', 'Añadiendo…');
+    const result = await client.createTask(body);
+    this.set('createTaskSaving', false);
+    this.set('createTaskEnabled', true);
+    this.set('createTaskButtonText', 'Añadir tarea');
+
+    if (authState.consumeUnauthorized(result)) {
+      return;
+    }
+    if (result.ok === false) {
+      const net = isLikelyNetworkFailure(result.error);
+      this.set('createTaskError', net ? 'Sin conexión. Revisa la red o la API.' : result.error.message);
+      return;
+    }
+    this.set('newTaskTitle', '');
+    this.set('newTaskMinutes', '');
+    await this.loadRundown();
   }
 
   async onSaveWindow(): Promise<void> {
