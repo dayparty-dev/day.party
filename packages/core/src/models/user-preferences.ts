@@ -10,6 +10,13 @@ export type DayWindow = {
   crossesMidnight: boolean;
 };
 
+/** Default planning window when prefs are missing (09:00–17:00, same calendar day). */
+export const DEFAULT_DAY_WINDOW: DayWindow = {
+  startMinuteOfDay: 9 * 60,
+  endMinuteOfDay: 17 * 60,
+  crossesMidnight: false,
+};
+
 /** Persisted user planning and presentation preferences (1:1 with user in v1). */
 export type UserPreferences = {
   userId: string;

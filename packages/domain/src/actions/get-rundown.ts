@@ -1,4 +1,4 @@
-import type { DayRundown } from '@dayparty/core';
+import { DEFAULT_DAY_WINDOW, EMPTY_DAY_FIT, type DayRundown } from '@dayparty/core';
 import type { TaskRepository } from '../interfaces/task-repository';
 
 export function makeGetRundownAction(taskRepo: TaskRepository) {
@@ -6,6 +6,14 @@ export function makeGetRundownAction(taskRepo: TaskRepository) {
     const tasks = await taskRepo.findByUserAndDate(userId, date);
     const capacity = tasks.reduce((sum, t) => sum + t.size, 0);
     const completed = tasks.filter((t) => t.isComplete).length;
-    return { date, userId, tasks, capacity, completed };
+    return {
+      date,
+      userId,
+      tasks,
+      capacity,
+      completed,
+      dayFit: EMPTY_DAY_FIT,
+      dayWindow: DEFAULT_DAY_WINDOW,
+    };
   };
 }

@@ -1,4 +1,4 @@
-import type { DayRundown } from '@dayparty/core';
+import { DEFAULT_DAY_WINDOW, EMPTY_DAY_FIT, type DayRundown } from '@dayparty/core';
 import type { TaskRepository } from '../interfaces/task-repository';
 
 export function makeReorderTasksAction(taskRepo: TaskRepository) {
@@ -22,6 +22,14 @@ export function makeReorderTasksAction(taskRepo: TaskRepository) {
 
     const capacity = reorderedTasks.reduce((sum, t) => sum + t.size, 0);
     const completed = reorderedTasks.filter((t) => t.isComplete).length;
-    return { date, userId, tasks: reorderedTasks, capacity, completed };
+    return {
+      date,
+      userId,
+      tasks: reorderedTasks,
+      capacity,
+      completed,
+      dayFit: EMPTY_DAY_FIT,
+      dayWindow: DEFAULT_DAY_WINDOW,
+    };
   };
 }

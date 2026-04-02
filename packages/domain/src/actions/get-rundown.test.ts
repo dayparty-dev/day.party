@@ -1,4 +1,4 @@
-import type { Task } from '@dayparty/core';
+import { DEFAULT_DAY_WINDOW, EMPTY_DAY_FIT, type Task } from '@dayparty/core';
 import { describe, expect, it } from 'vitest';
 import type { TaskRepository } from '../interfaces/task-repository';
 import { makeGetRundownAction } from './get-rundown';
@@ -55,5 +55,7 @@ describe('makeGetRundownAction', () => {
     expect(rundown.capacity).toBe(5);
     expect(rundown.completed).toBe(1);
     expect(rundown.tasks).toHaveLength(2);
+    expect(rundown.dayFit).toEqual(EMPTY_DAY_FIT);
+    expect(rundown.dayWindow).toEqual(DEFAULT_DAY_WINDOW);
   });
 });

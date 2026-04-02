@@ -1,4 +1,4 @@
-import type { ApiError, Tag, Task, User } from '@dayparty/core';
+import type { ApiError, DayFit, DayWindow, Tag, Task, User } from '@dayparty/core';
 import { ERROR_CODES } from '@dayparty/core';
 import {
   createTagSchema,
@@ -30,6 +30,8 @@ interface ApiDayRundown {
   tasks: ApiTask[];
   capacity: number;
   completed: number;
+  dayFit: DayFit;
+  dayWindow: DayWindow;
 }
 
 interface VerifyResponse {
@@ -336,11 +338,15 @@ function parseTask(input: unknown): ApiTask | null {
   }
 
   const tagKey = typeof input.tagKey === 'string' ? input.tagKey : undefined;
+  const estimatedMinutes = typeof input.estimatedMinutes === 'number' ? input.estimatedMinutes : undefined;
+  const essentiality = isTaskEssentiality(input.essentiality) ? input.essentiality : undefined;
 
   return {
     id: input.id,
     title: input.title,
     size: input.size,
+    ...(estimatedMinutes !== undefined ? { estimatedMinutes } : {}),
+    ...(essentiality !== undefined ? { essentiality } : {}),
     tagKey,
     isComplete: input.isComplete,
     scheduledDate: input.scheduledDate,
@@ -410,6 +416,12 @@ function parseDayRundown(input: unknown): ApiDayRundown | null {
     return null;
   }
 
+  const dayFit = parseDayFit(input.dayFit);
+  const dayWindow = parseDayWindow(input.dayWindow);
+  if (!dayFit || !dayWindow) {
+    return null;
+  }
+
   const tasks: ApiTask[] = [];
   for (const task of input.tasks) {
     const parsed = parseTask(task);
@@ -424,6 +436,8 @@ function parseDayRundown(input: unknown): ApiDayRundown | null {
     tasks,
     capacity: input.capacity,
     completed: input.completed,
+    dayFit,
+    dayWindow,
   };
 }
 
@@ -505,6 +519,56 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isTaskSize(value: unknown): value is 1 | 2 | 3 | 4 | 5 {
   return value === 1 || value === 2 || value === 3 || value === 4 || value === 5;
+}
+
+function isTaskEssentiality(value: unknown): value is NonNullable<Task['essentiality']> {
+  return value === 'essential' || value === 'normal' || value === 'optional';
+}
+
+function parseDayWindow(input: unknown): DayWindow | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+  if (
+    typeof input.startMinuteOfDay !== 'number' ||
+    typeof input.endMinuteOfDay !== 'number' ||
+    typeof input.crossesMidnight !== 'boolean'
+  ) {
+    return null;
+  }
+  return {
+    startMinuteOfDay: input.startMinuteOfDay,
+    endMinuteOfDay: input.endMinuteOfDay,
+    crossesMidnight: input.crossesMidnight,
+  };
+}
+
+function parseDayFit(input: unknown): DayFit | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+  if (
+    typeof input.availableMinutes !== 'number' ||
+    typeof input.plannedMinutes !== 'number' ||
+    typeof input.overflowUnresolved !== 'boolean' ||
+    !Array.isArray(input.inRunwayTaskIds) ||
+    !Array.isArray(input.outsideRunwayTaskIds)
+  ) {
+    return null;
+  }
+  if (
+    input.inRunwayTaskIds.some((id) => typeof id !== 'string') ||
+    input.outsideRunwayTaskIds.some((id) => typeof id !== 'string')
+  ) {
+    return null;
+  }
+  return {
+    availableMinutes: input.availableMinutes,
+    plannedMinutes: input.plannedMinutes,
+    inRunwayTaskIds: [...input.inRunwayTaskIds],
+    outsideRunwayTaskIds: [...input.outsideRunwayTaskIds],
+    overflowUnresolved: input.overflowUnresolved,
+  };
 }
 
 function createApiError(code: string, message: string, fields?: Record<string, string[]>): ApiError {
