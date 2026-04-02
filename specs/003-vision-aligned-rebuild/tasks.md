@@ -21,7 +21,7 @@ Per `spec.md` (**Mobile / web parity** and **Definition of done (first-party cli
 
 - **US2** / **US3**: **Web + API** slices (**T016–T023**, **T020**, **T023**) are `[x]`; **mobile** triage/notes are **T043** / **T044** (Phase 10). Until those are `[x]`, US2/US3 are **web slice complete**, not product-closed.
 - **US4**: **Web** marketplace (**T030**) shipped without **mobile** rewards (**T045**) or **bounty** create/edit in clients (**T053**, **T056**, **T051**/`T054`). Until **T045** + **T053** + **T056** + editor bounty paths are `[x]`, treat US4 as **web/API slice complete**, not product-closed.
-- **US1**: **Full lifecycle** (edit fields, **`in_progress`**, not only done-toggle) requires **T051–T055** in addition to earlier US1 tasks.
+- **US1**: **Full lifecycle** (edit fields, **`in_progress`**, optional **bounty** on create/edit, not only done-toggle) requires **T051–T056** in addition to earlier US1 tasks.
 
 ### API ↔ client coverage matrix (003)
 
@@ -94,7 +94,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 **Product story-done**: **US2** on the product also requires **T043** (mobile triage). The tasks below are **web + API slice** complete.
 
-**Independent Test**: Mark incomplete or overflowing items for tomorrow / another date / low importance; verify task dates and statuses update via API and appear correctly in rundown.
+**Independent Test**: On **`apps/web`**, mark incomplete or overflowing items for tomorrow / another date / low importance; verify task dates and statuses update via API and appear correctly in rundown. **Product-complete** US2 also requires **`apps/mobile`** triage (**T043**).
 
 ### Implementation for User Story 2
 
@@ -120,7 +120,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 - [x] T021 [P] [US3] Add `notesMarkdown` to `Task` in `packages/core/src/models/task.ts`, validation in `packages/validation/src/schemas/task.ts`, and BSON mapping in `packages/db/src/repositories/task-repository.ts`; ensure rundown serialization **omits** `notesMarkdown` (see `contracts/day-planning-rest.md` P3)
 - [x] T022 [US3] Add `GET /api/tasks/:id` in `apps/api/src/routes/tasks.ts` returning **full** task including `notesMarkdown`; ensure **route order** registers `GET /`, `PATCH /reorder`, etc. **before** `GET /:id` per `contracts/day-planning-rest.md`. Rundown **`GET /api/tasks?date=`** MUST omit `notesMarkdown` (optional `notesPreview` only per contract)
-- [x] T023 [US3] Add notes editor/detail UI in new `apps/web/src/components/TaskNotesPanel.tsx` (or similar) and integrate from `apps/web/src/pages/RundownPage.tsx` with lightweight markdown rendering
+- [x] T023 [US3] Add notes editor/detail UI in `apps/web/src/components/TaskNotesPanel.tsx` and integrate from `apps/web/src/pages/RundownPage.tsx` with lightweight markdown rendering
 
 ---
 
@@ -152,7 +152,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 **Product story-done**: **US4** requires **T030** + **T045** + **T053** + **T056** + bounty path on **T051** / **T054** (see **coverage matrix**).
 
-**Independent Test**: Complete a bounty task → balance increases → purchase reward → ledger reflects debit.
+**Independent Test**: On **`apps/web`**, complete a bounty task → balance increases → purchase reward → ledger reflects debit. **Product-complete** US4 also requires **`apps/mobile`** rewards (**T045**) and client bounty surfaces (**T053**, **T056**, **T051** / **T054**).
 
 ### Implementation for User Story 4
 

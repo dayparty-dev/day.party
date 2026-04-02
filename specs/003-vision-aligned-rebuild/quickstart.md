@@ -1,6 +1,6 @@
 # Quickstart: 003-vision-aligned-rebuild (local dev)
 
-Use this after implementation tasks land; during planning it documents **intended** validation commands and flow.
+Local validation guide for this feature; keep examples aligned with shipped routes (**`tasks.md` T042**).
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ pnpm --filter @dayparty/web dev
 
 ## Client validation (greenfield web + mobile)
 
-After **T049** / **T050** land:
+With **T049** / **T050** complete:
 
 1. From **`apps/web`**, create an actionable for the selected day (in-app UI, not `curl`).
 2. From **`apps/mobile`**, create an actionable the same way.
@@ -64,10 +64,10 @@ pnpm test
 
 ## Spec artifacts
 
-- Requirements: [`spec.md`](../spec.md)
-- Plan: [`plan.md`](../plan.md)
-- Research: [`research.md`](../research.md)
-- Data model: [`data-model.md`](../data-model.md)
-- REST notes: [`contracts/day-planning-rest.md`](./day-planning-rest.md)
+- Requirements: [`spec.md`](./spec.md)
+- Plan: [`plan.md`](./plan.md)
+- Research: [`research.md`](./research.md)
+- Data model: [`data-model.md`](./data-model.md)
+- REST notes: [`contracts/day-planning-rest.md`](./contracts/day-planning-rest.md)
 
 Task breakdown: [`tasks.md`](./tasks.md) (includes **API ↔ client coverage matrix**).

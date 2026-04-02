@@ -77,7 +77,7 @@ specs/003-vision-aligned-rebuild/
 │   ├── core/src/models/           # Task (actionable) shapes, DayRundown evolution, prefs types
 │   ├── domain/src/
 │   │   ├── actions/               # getRundown, create/update/reorder, triage, ledger hooks
-│   │   └── interfaces/          # repository ports (tasks, prefs, history, rewards, …)
+│   │   └── interfaces/             # repository ports (tasks, prefs, history, rewards, …)
 │   ├── db/src/                    # Mongo implementations of new/updated ports
 │   ├── validation/src/schemas/    # Zod for new fields and endpoints
 │   └── api-client/src/            # DayPartyClient parity with REST

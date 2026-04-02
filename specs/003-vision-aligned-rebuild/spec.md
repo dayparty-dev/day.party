@@ -125,10 +125,10 @@ A user story is **product-complete** for **003** only when **both** **`apps/web`
 - **FR-004**: The system MUST let users complete, skip, or reopen actionables in a way that updates the plan state and any dependent rewards consistently. **First-party `apps/web` and `apps/mobile` MUST expose in-app** completion, skip/reopen, and **`planned` / `in_progress` / `deferred`** (and related) transitions the spec calls for—not only via `PATCH /api/tasks` (**`tasks.md` T051–T056**, **T043**).
 - **FR-005**: The system MUST provide a triage path for items not executed or not fitting, including deferral to another day and demotion of importance where the user chooses. Triage outcomes MUST be achievable **without** ad hoc `curl` on **each** platform once the story is product-complete (**`tasks.md` T020** + **T043**, with task-edit surfaces **T051** / **T054** where users adjust fields outside triage shortcuts).
 - **FR-006**: The system MUST let users attach expanded content to an actionable, including lightweight structured formatting, without forcing that content into the main list row. **First-party `apps/web` and `apps/mobile` MUST expose in-app** notes/detail for this (**`tasks.md` T023**, **T044**); not only via `GET`/`PATCH /api/tasks` alone.
-- **FR-007**: The system MUST maintain a reward balance (or equivalent ledger) and let users acquire configured rewards through a marketplace or catalog interaction.
+- **FR-007**: The system MUST maintain a reward balance (or equivalent ledger) and let users acquire configured rewards through a marketplace or catalog interaction. **First-party `apps/web` and `apps/mobile` MUST expose in-app** balance and purchase/catalog flows once the story is product-complete (**`tasks.md` T030**, **T045**).
 - **FR-008**: The system MUST allow configuration of bounties or rewards associated with specific actionables, including differentiated rewards for “high resistance” work when the user sets them up. **Bounty configuration MUST be user-editable in-app** on **both** web and mobile (**`tasks.md` T053**, **T056**, and bounty fields on the task editor **T051** / **T054**)—not only accepted by the API.
-- **FR-009**: The system MUST offer at least one alternate visual preset affecting colors and density (or clearly scoped style families) across core screens.
-- **FR-010**: The system MUST record a retrievable history of material plan and actionable changes with timestamps and enough identifiers for the user to understand each event.
+- **FR-009**: The system MUST offer at least one alternate visual preset affecting colors and density (or clearly scoped style families) across core screens. When **User Story 5** is product-complete, **first-party `apps/web` and `apps/mobile` MUST** apply presets in-app (**`tasks.md` T031–T033**, **T046**).
+- **FR-010**: The system MUST record a retrievable history of material plan and actionable changes with timestamps and enough identifiers for the user to understand each event. When **User Story 6** is product-complete, **first-party `apps/web` and `apps/mobile` MUST** expose read-only history (**`tasks.md` T039**, **T047**).
 - **FR-011**: The system MUST persist user data across sessions so the same user sees a consistent plan, notes, balances, and history after leaving and returning.
 - **FR-012**: The system SHOULD visualize or label actionables that fall outside the current day plan (the “shaded runway” concept—left out of today’s feasible set) when overflow occurs.
 
@@ -191,5 +191,14 @@ A user story is **product-complete** for **003** only when **both** **`apps/web`
 **Scope**: Feature-wide (tasks restructuring + spec alignment).
 **Artifacts updated**: `spec.md`, `plan.md`, `tasks.md`, `quickstart.md`, `data-model.md`, `research.md`
 **Tasks added**: T051, T052, T053, T054, T055, T056
+**Tasks removed**: —
+**Tasks marked complete**: —
+
+### Iteration 2026-04-02: Speckit-analyze LOW remediation (docs)
+
+**Change**: Align **US1** lifecycle line with **T051–T056**; clarify **US2**/**US4** independent tests (web vs **product-complete**); pin **T023** to **`TaskNotesPanel.tsx`**; fix **`quickstart.md`** same-folder links and intro; align **`plan.md`** ASCII tree spacing; add **FR-007** / **FR-009** / **FR-010** task traceability for client parity.
+**Scope**: Spec / plan / tasks / quickstart wording and consistency only.
+**Artifacts updated**: `spec.md`, `plan.md`, `tasks.md`, `quickstart.md`
+**Tasks added**: —
 **Tasks removed**: —
 **Tasks marked complete**: —
