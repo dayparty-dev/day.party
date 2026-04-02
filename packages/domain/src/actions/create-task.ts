@@ -29,6 +29,7 @@ export function makeCreateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
       title: input.title,
       size: input.size,
       tagKey: input.tagKey,
+      status: 'planned',
       isComplete: false,
       scheduledDate: input.scheduledDate,
       position,

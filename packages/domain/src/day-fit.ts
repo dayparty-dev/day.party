@@ -17,6 +17,14 @@ function effectiveTaskMinutes(task: Task, sizeToMinutes?: Partial<Record<TaskSiz
   return Math.max(0, merged[task.size]);
 }
 
+/** Completed and user-skipped tasks do not consume runway minutes (US2 / research.md §5). */
+export function taskCountsTowardRunwayMinutes(task: Task): boolean {
+  if (task.isComplete || task.status === 'done') {
+    return false;
+  }
+  return task.status !== 'skipped';
+}
+
 /**
  * Greedy pack in list order (research.md §4). Completed tasks do not consume runway
  * minutes; incomplete tasks beyond `availableMinutes` are outside the runway.
@@ -32,7 +40,7 @@ export function computeDayFit(
 
   let plannedMinutes = 0;
   for (const task of orderedTasks) {
-    if (!task.isComplete) {
+    if (taskCountsTowardRunwayMinutes(task)) {
       plannedMinutes += effectiveTaskMinutes(task, sizeToMinutes);
     }
   }
@@ -43,7 +51,7 @@ export function computeDayFit(
   let overflowUnresolved = false;
 
   for (const task of orderedTasks) {
-    if (task.isComplete) {
+    if (!taskCountsTowardRunwayMinutes(task)) {
       inRunwayTaskIds.push(task.id);
       continue;
     }

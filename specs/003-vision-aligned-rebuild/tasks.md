@@ -73,11 +73,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T016 [US2] Add `status` / `deferredToDate` (and related enums) to `Task` in `packages/core/src/models/task.ts` per `specs/003-vision-aligned-rebuild/data-model.md`
-- [ ] T017 [US2] Implement triage transitions in `packages/domain/src/actions/update-task.ts` (or new `packages/domain/src/actions/triage-task.ts`) with validation rules consistent with spec acceptance scenarios
-- [ ] T018 [P] [US2] Extend `apps/api/src/routes/tasks.ts` (or add `apps/api/src/routes/triage.ts`) for triage payloads per `specs/003-vision-aligned-rebuild/contracts/day-planning-rest.md`
-- [ ] T019 [P] [US2] Add optional capacity suggestion helper and `GET` query route in `apps/api/src/routes/tasks.ts` implementing the heuristic in `specs/003-vision-aligned-rebuild/research.md` §5 (**remaining minutes vs planned load per day** only; **no unavailable/busy-period blocking** in v1 — see `spec.md` US2 and `contracts/day-planning-rest.md`)
-- [ ] T020 [US2] Build triage / overflow flows in `apps/web/src/pages/RundownPage.tsx` or new `apps/web/src/components/TriagePanel.tsx`
+- [x] T016 [US2] Add `status` / `deferredToDate` (and related enums) to `Task` in `packages/core/src/models/task.ts` per `specs/003-vision-aligned-rebuild/data-model.md`
+- [x] T017 [US2] Implement triage transitions in `packages/domain/src/actions/update-task.ts` (or new `packages/domain/src/actions/triage-task.ts`) with validation rules consistent with spec acceptance scenarios
+- [x] T018 [P] [US2] Extend `apps/api/src/routes/tasks.ts` (or add `apps/api/src/routes/triage.ts`) for triage payloads per `specs/003-vision-aligned-rebuild/contracts/day-planning-rest.md`
+- [x] T019 [P] [US2] Add optional capacity suggestion helper and `GET` query route in `apps/api/src/routes/tasks.ts` implementing the heuristic in `specs/003-vision-aligned-rebuild/research.md` §5 (**remaining minutes vs planned load per day** only; **no unavailable/busy-period blocking** in v1 — see `spec.md` US2 and `contracts/day-planning-rest.md`)
+- [x] T020 [US2] Build triage / overflow flows in `apps/web/src/pages/RundownPage.tsx` or new `apps/web/src/components/TriagePanel.tsx`
 
 ---
 

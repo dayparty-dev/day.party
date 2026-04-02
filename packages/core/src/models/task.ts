@@ -1,6 +1,9 @@
 /** Importance for runway / overflow handling (FR-001, FR-003). */
 export type TaskEssentiality = 'essential' | 'normal' | 'optional';
 
+/** Lifecycle / triage state (data-model.md, FR-004, US2). */
+export type TaskStatus = 'planned' | 'in_progress' | 'done' | 'skipped' | 'deferred';
+
 export interface Task {
   id: string;
   userId: string;
@@ -10,6 +13,10 @@ export interface Task {
   estimatedMinutes?: number;
   /** Defaults to effective `normal` when omitted. */
   essentiality?: TaskEssentiality;
+  /** Defaults to `planned` when omitted in persistence; kept in sync with `isComplete` for `done`. */
+  status: TaskStatus;
+  /** When status is `deferred`, target calendar day for reconsideration (YYYY-MM-DD). */
+  deferredToDate?: string;
   tagKey?: string;
   isComplete: boolean;
   scheduledDate: string;

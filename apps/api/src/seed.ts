@@ -70,6 +70,7 @@ async function main(): Promise<void> {
       title: s.title,
       size: s.size,
       tagKey: s.tagKey,
+      status: s.isComplete ? 'done' : 'planned',
       isComplete: s.isComplete,
       scheduledDate: date,
       position: position++,

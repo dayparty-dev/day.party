@@ -203,7 +203,7 @@ class RundownViewModel extends Observable {
   }
 
   onWindowCrossChange(args: EventData): void {
-    const sw = args.object as { checked: boolean };
+    const sw = args.object as unknown as { checked: boolean };
     this.set('windowCrosses', sw.checked);
   }
 

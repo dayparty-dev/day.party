@@ -17,12 +17,14 @@ import {
   MongoUserRepository,
 } from '@dayparty/db';
 import {
+  makeApplyTaskTriageAction,
   makeCreateTaskAction,
   makeDeleteTaskAction,
   makeGetRundownAction,
   makeGetUserPreferencesAction,
   makePatchUserPreferencesAction,
   makeReorderTasksAction,
+  makeSuggestDayCapacitiesAction,
   makeUpdateTaskAction,
 } from '@dayparty/domain';
 import { createApp } from './app';
@@ -48,6 +50,8 @@ const env = {
   reorderTasks: makeReorderTasksAction(taskRepo, userPrefsRepo),
   deleteTask: makeDeleteTaskAction(taskRepo),
   updateTask: makeUpdateTaskAction(taskRepo, tagRepo),
+  applyTaskTriage: makeApplyTaskTriageAction(taskRepo),
+  suggestDayCapacities: makeSuggestDayCapacitiesAction(taskRepo, userPrefsRepo),
   getUserPreferences: makeGetUserPreferencesAction(userPrefsRepo),
   patchUserPreferences: makePatchUserPreferencesAction(userPrefsRepo),
 };

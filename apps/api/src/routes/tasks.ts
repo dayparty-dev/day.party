@@ -1,14 +1,15 @@
 /**
- * Task CRUD + rundown/reorder. Responses include P1 planning fields: rundown carries `dayFit` and
- * `dayWindow`; each task may include `estimatedMinutes` and `essentiality` (003 / `day-planning-rest.md`).
+ * Task CRUD + rundown/reorder + US2 triage/suggestions (`day-planning-rest.md` P2).
  */
 import type { DayRundown, Task } from '@dayparty/core';
 import { ERROR_CODES } from '@dayparty/core';
 import {
   createApiError,
   createTaskSchema,
+  daySuggestionsQuerySchema,
   fromZodError,
   reorderTasksSchema,
+  taskTriageSchema,
   updateTaskSchema,
 } from '@dayparty/validation';
 import { Hono } from 'hono';
@@ -43,6 +44,27 @@ export function createTaskRoutes(env: ApiEnv) {
     const user = c.get('user');
     const rundown = await env.getRundown(user.id, date);
     return c.json(rundownResponse(rundown));
+  });
+
+  tasks.get('/suggestions', async (c) => {
+    const raw = {
+      fromDate: c.req.query('fromDate') ?? '',
+      toDate: c.req.query('toDate') ?? '',
+    };
+    const parsed = daySuggestionsQuerySchema.safeParse(raw);
+    if (!parsed.success) {
+      return c.json(fromZodError(parsed.error), 422);
+    }
+    const user = c.get('user');
+    try {
+      const result = await env.suggestDayCapacities(user.id, parsed.data.fromDate, parsed.data.toDate);
+      return c.json(result);
+    } catch (e) {
+      if (e instanceof Error && (e.message.includes('fromDate') || e.message.includes('Date range'))) {
+        return c.json(createApiError(ERROR_CODES.VALIDATION_ERROR, e.message, { query: [e.message] }), 422);
+      }
+      throw e;
+    }
   });
 
   tasks.post('/', async (c) => {
@@ -86,6 +108,37 @@ export function createTaskRoutes(env: ApiEnv) {
     } catch (e) {
       if (e instanceof Error && e.message.includes('does not belong')) {
         return c.json(createApiError(ERROR_CODES.VALIDATION_ERROR, e.message, { taskIds: [e.message] }), 422);
+      }
+      throw e;
+    }
+  });
+
+  tasks.post('/:id/triage', async (c) => {
+    const id = c.req.param('id');
+    let body: unknown;
+    try {
+      body = await c.req.json();
+    } catch {
+      body = {};
+    }
+    const parsed = taskTriageSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json(fromZodError(parsed.error), 422);
+    }
+    const user = c.get('user');
+    const existing = await env.taskRepo.findById(id);
+    if (!existing || existing.userId !== user.id) {
+      return c.json(createApiError(ERROR_CODES.NOT_FOUND, 'Task not found'), 404);
+    }
+    try {
+      const task = await env.applyTaskTriage(user.id, id, parsed.data);
+      return c.json(taskPublic(task));
+    } catch (e) {
+      if (e instanceof Error && e.message.includes('not found')) {
+        return c.json(createApiError(ERROR_CODES.NOT_FOUND, e.message), 404);
+      }
+      if (e instanceof Error && (e.message.includes('must differ') || e.message.includes('not skipped'))) {
+        return c.json(createApiError(ERROR_CODES.VALIDATION_ERROR, e.message, { body: [e.message] }), 422);
       }
       throw e;
     }

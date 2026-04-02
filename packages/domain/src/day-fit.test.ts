@@ -5,7 +5,7 @@ import { computeDayFit, windowAvailableMinutes } from './day-fit';
 const iso = '2026-04-02T12:00:00.000Z';
 
 function task(partial: Partial<Task> & Pick<Task, 'id' | 'size' | 'isComplete' | 'position'>): Task {
-  return {
+  const base = {
     userId: 'u1',
     title: 't',
     scheduledDate: '2026-04-02',
@@ -13,6 +13,8 @@ function task(partial: Partial<Task> & Pick<Task, 'id' | 'size' | 'isComplete' |
     updatedAt: iso,
     ...partial,
   };
+  const status: Task['status'] = base.isComplete ? 'done' : (base.status ?? 'planned');
+  return { ...base, status };
 }
 
 describe('windowAvailableMinutes', () => {
@@ -83,5 +85,16 @@ describe('computeDayFit', () => {
     const tasks: Task[] = [task({ id: 'a', size: 2, isComplete: false, position: 0 })];
     const fit = computeDayFit(tasks, window, { sizeToMinutes: { 2: 100 } });
     expect(fit.plannedMinutes).toBe(100);
+  });
+
+  it('does not count skipped tasks toward runway load', () => {
+    const tasks: Task[] = [
+      task({ id: 'a', size: 1, isComplete: false, position: 0, estimatedMinutes: 120, status: 'skipped' }),
+      task({ id: 'b', size: 1, isComplete: false, position: 1, estimatedMinutes: 50 }),
+    ];
+    const fit = computeDayFit(tasks, window);
+    expect(fit.plannedMinutes).toBe(50);
+    expect(fit.inRunwayTaskIds).toEqual(['a', 'b']);
+    expect(fit.outsideRunwayTaskIds).toEqual([]);
   });
 });

@@ -1,4 +1,4 @@
-export type { Task, TaskEssentiality } from './models/task';
+export type { Task, TaskEssentiality, TaskStatus } from './models/task';
 export type { User } from './models/user';
 export type { Session } from './models/session';
 export type { Tag } from './models/tag';

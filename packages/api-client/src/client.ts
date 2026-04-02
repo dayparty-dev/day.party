@@ -13,19 +13,23 @@ import { ERROR_CODES } from '@dayparty/core';
 import {
   createTagSchema,
   createTaskSchema,
+  daySuggestionsQuerySchema,
   fromZodError,
   loginSchema,
   patchUserPreferencesSchema,
   reorderTasksSchema,
+  taskTriageSchema,
   updateTagSchema,
   updateTaskSchema,
 } from '@dayparty/validation';
 import type {
   CreateTagInput,
   CreateTaskInput,
+  DaySuggestionsQuery,
   LoginInput,
   PatchUserPreferencesInput,
   ReorderTasksInput,
+  TaskTriageInput,
   UpdateTagInput,
   UpdateTaskInput,
 } from '@dayparty/validation';
@@ -36,6 +40,15 @@ type AuthUser = Pick<User, 'id' | 'email' | 'displayName' | 'role'>;
 
 type ApiTask = Omit<Task, 'userId'>;
 type ApiTag = Omit<Tag, 'userId'>;
+
+export type DayCapacityHint = {
+  date: string;
+  remainingMinutes: number;
+  availableMinutes: number;
+  plannedMinutes: number;
+};
+
+export type DaySuggestionsResponse = { hints: DayCapacityHint[] };
 
 interface ApiDayRundown {
   date: string;
@@ -190,6 +203,33 @@ export class DayPartyClient {
       requiresAuth: true,
       body: parsed.data,
       parse: parseTask,
+    });
+  }
+
+  async triageTask(id: string, input: TaskTriageInput): Promise<Result<ApiTask>> {
+    const parsed = taskTriageSchema.safeParse(input);
+    if (!parsed.success) {
+      return this.fail(fromZodError(parsed.error));
+    }
+
+    return this.request(`/tasks/${encodeURIComponent(id)}/triage`, {
+      method: 'POST',
+      requiresAuth: true,
+      body: parsed.data,
+      parse: parseTask,
+    });
+  }
+
+  async getDaySuggestions(query: DaySuggestionsQuery): Promise<Result<DaySuggestionsResponse>> {
+    const parsed = daySuggestionsQuerySchema.safeParse(query);
+    if (!parsed.success) {
+      return this.fail(fromZodError(parsed.error));
+    }
+    const q = `?fromDate=${encodeURIComponent(parsed.data.fromDate)}&toDate=${encodeURIComponent(parsed.data.toDate)}`;
+    return this.request(`/tasks/suggestions${q}`, {
+      method: 'GET',
+      requiresAuth: true,
+      parse: parseDaySuggestions,
     });
   }
 
@@ -376,14 +416,18 @@ function parseTask(input: unknown): ApiTask | null {
     return null;
   }
 
+  const status = isTaskStatus(input.status) ? input.status : input.isComplete ? 'done' : 'planned';
   const tagKey = typeof input.tagKey === 'string' ? input.tagKey : undefined;
   const estimatedMinutes = typeof input.estimatedMinutes === 'number' ? input.estimatedMinutes : undefined;
   const essentiality = isTaskEssentiality(input.essentiality) ? input.essentiality : undefined;
+  const deferredToDate = typeof input.deferredToDate === 'string' ? input.deferredToDate : undefined;
 
   return {
     id: input.id,
     title: input.title,
     size: input.size,
+    status,
+    ...(deferredToDate !== undefined ? { deferredToDate } : {}),
     ...(estimatedMinutes !== undefined ? { estimatedMinutes } : {}),
     ...(essentiality !== undefined ? { essentiality } : {}),
     tagKey,
@@ -564,6 +608,38 @@ function isTaskEssentiality(value: unknown): value is NonNullable<Task['essentia
   return value === 'essential' || value === 'normal' || value === 'optional';
 }
 
+function isTaskStatus(value: unknown): value is Task['status'] {
+  return (
+    value === 'planned' || value === 'in_progress' || value === 'done' || value === 'skipped' || value === 'deferred'
+  );
+}
+
+function parseDaySuggestions(input: unknown): DaySuggestionsResponse | null {
+  if (!isRecord(input) || !Array.isArray(input.hints)) {
+    return null;
+  }
+  const hints: DayCapacityHint[] = [];
+  for (const h of input.hints) {
+    if (!isRecord(h) || typeof h.date !== 'string') {
+      return null;
+    }
+    if (
+      typeof h.remainingMinutes !== 'number' ||
+      typeof h.availableMinutes !== 'number' ||
+      typeof h.plannedMinutes !== 'number'
+    ) {
+      return null;
+    }
+    hints.push({
+      date: h.date,
+      remainingMinutes: h.remainingMinutes,
+      availableMinutes: h.availableMinutes,
+      plannedMinutes: h.plannedMinutes,
+    });
+  }
+  return { hints };
+}
+
 function parseDayWindow(input: unknown): DayWindow | null {
   if (!isRecord(input)) {
     return null;
@@ -672,9 +748,11 @@ export type {
   ClientOptions,
   CreateTagInput,
   CreateTaskInput,
+  DaySuggestionsQuery,
   LoginInput,
   PatchUserPreferencesInput,
   ReorderTasksInput,
+  TaskTriageInput,
   UpdateTagInput,
   UpdateTaskInput,
   VerifyResponse,

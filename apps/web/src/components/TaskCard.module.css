@@ -83,6 +83,7 @@
 
 .essTag,
 .optTag,
+.skipTag,
 .runwayTag {
   font-size: 0.68rem;
   font-weight: 700;
@@ -100,6 +101,11 @@
 .optTag {
   background: #eceff1;
   color: #455a64;
+}
+
+.skipTag {
+  background: #e8eaf6;
+  color: #3949ab;
 }
 
 .runwayTag {

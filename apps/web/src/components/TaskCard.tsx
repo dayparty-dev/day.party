@@ -47,6 +47,7 @@ export function TaskCard({ task, tagColor, runwayPlacement, onToggleComplete }: 
               </span>
             ) : null}
             {task.essentiality === 'optional' ? <span className={styles.optTag}>Optional</span> : null}
+            {task.status === 'skipped' ? <span className={styles.skipTag}>Skipped today</span> : null}
             {runwayPlacement === 'outside-runway' && !task.isComplete ? (
               <span className={styles.runwayTag}>Outside window</span>
             ) : null}

@@ -1,4 +1,4 @@
-import type { Task, TaskEssentiality } from '@dayparty/core';
+import type { Task, TaskEssentiality, TaskStatus } from '@dayparty/core';
 import type { TaskRepository } from '../interfaces/task-repository';
 import type { TagRepository } from '../interfaces/tag-repository';
 
@@ -10,7 +10,54 @@ export type UpdateTaskInput = Partial<{
   isComplete: boolean;
   estimatedMinutes: number;
   essentiality: TaskEssentiality;
+  status: TaskStatus;
+  deferredToDate: string | null;
 }>;
+
+function mergeLifecycleFields(
+  task: Task,
+  input: UpdateTaskInput,
+): Pick<Task, 'isComplete' | 'status' | 'deferredToDate'> {
+  let isComplete = task.isComplete;
+  let status = task.status;
+  let deferredToDate = task.deferredToDate;
+
+  if ('deferredToDate' in input) {
+    deferredToDate = input.deferredToDate ?? undefined;
+  }
+
+  if (input.status !== undefined) {
+    status = input.status;
+    if (status !== 'done') {
+      isComplete = false;
+    }
+  }
+
+  if (input.isComplete !== undefined) {
+    isComplete = input.isComplete;
+    if (!isComplete && (task.status === 'done' || status === 'done')) {
+      status = 'planned';
+      deferredToDate = undefined;
+    }
+  }
+
+  if (isComplete) {
+    status = 'done';
+    deferredToDate = undefined;
+  } else if (status === 'done') {
+    isComplete = true;
+    deferredToDate = undefined;
+  } else {
+    if (status === 'skipped' || status === 'planned' || status === 'in_progress') {
+      deferredToDate = undefined;
+    }
+    if (status === 'deferred' && !deferredToDate) {
+      throw new Error('deferredToDate is required when status is deferred');
+    }
+  }
+
+  return { isComplete, status, deferredToDate };
+}
 
 export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepository) {
   return async (id: string, input: UpdateTaskInput): Promise<Task> => {
@@ -26,14 +73,22 @@ export function makeUpdateTaskAction(taskRepo: TaskRepository, tagRepo: TagRepos
       }
     }
 
+    const touchesLifecycle = input.isComplete !== undefined || input.status !== undefined || 'deferredToDate' in input;
+
     const fields: Partial<Omit<Task, 'id' | 'userId' | 'createdAt'>> = {};
     if (input.title !== undefined) fields.title = input.title;
     if (input.size !== undefined) fields.size = input.size;
     if ('tagKey' in input) fields.tagKey = input.tagKey ?? undefined;
     if (input.scheduledDate !== undefined) fields.scheduledDate = input.scheduledDate;
-    if (input.isComplete !== undefined) fields.isComplete = input.isComplete;
     if (input.estimatedMinutes !== undefined) fields.estimatedMinutes = input.estimatedMinutes;
     if (input.essentiality !== undefined) fields.essentiality = input.essentiality;
+
+    if (touchesLifecycle) {
+      const next = mergeLifecycleFields(task, input);
+      fields.isComplete = next.isComplete;
+      fields.status = next.status;
+      fields.deferredToDate = next.deferredToDate;
+    }
 
     const updated = await taskRepo.update(id, fields);
     if (!updated) {

@@ -1,13 +1,20 @@
+import type {
+  DayCapacityHint,
+  DayRundownResponse,
+  TagResponse,
+  TaskResponse,
+  TaskTriageInput,
+} from '@dayparty/api-client';
 import { ERROR_CODES } from '@dayparty/core';
-import type { DayRundownResponse, TagResponse, TaskResponse } from '@dayparty/api-client';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { TaskCard, type TaskRunwayPlacement } from '../components/TaskCard';
+import { TaskTriageBar } from '../components/TaskTriageBar';
 import { useAuth } from '../hooks/useAuth';
 import { isLikelyNetworkFailure } from '../utils/network-error';
 import { minutesToTimeInput, timeInputToMinutes } from '../utils/time-of-day';
-import { todayLocalDateString } from '../utils/today-local';
+import { addLocalCalendarDays, todayLocalDateString } from '../utils/today-local';
 import styles from './RundownPage.module.css';
 
 function runwayPlacementForTask(task: TaskResponse, dayFit: DayRundownResponse['dayFit']): TaskRunwayPlacement {
@@ -15,6 +22,16 @@ function runwayPlacementForTask(task: TaskResponse, dayFit: DayRundownResponse['
     return 'complete';
   }
   return dayFit.outsideRunwayTaskIds.includes(task.id) ? 'outside-runway' : 'in-runway';
+}
+
+function showTriageForTask(task: TaskResponse, dayFit: DayRundownResponse['dayFit']): boolean {
+  if (task.isComplete) {
+    return false;
+  }
+  if (task.status === 'skipped') {
+    return true;
+  }
+  return dayFit.overflowUnresolved || dayFit.outsideRunwayTaskIds.includes(task.id);
 }
 
 export function RundownPage(): ReactElement {
@@ -26,6 +43,10 @@ export function RundownPage(): ReactElement {
   const [networkBanner, setNetworkBanner] = useState<string | null>(null);
   const [windowError, setWindowError] = useState<string | null>(null);
   const [savingWindow, setSavingWindow] = useState(false);
+  const [capacityHints, setCapacityHints] = useState<DayCapacityHint[]>([]);
+  const [triageBusyId, setTriageBusyId] = useState<string | null>(null);
+
+  const tomorrowDate = useMemo(() => addLocalCalendarDays(date, 1), [date]);
 
   const [winStart, setWinStart] = useState('09:00');
   const [winEnd, setWinEnd] = useState('17:00');
@@ -74,6 +95,12 @@ export function RundownPage(): ReactElement {
     }
     setRundown(rRes.data);
     setTags(tRes.data);
+
+    const to = addLocalCalendarDays(date, 7);
+    const sRes = await client.getDaySuggestions({ fromDate: date, toDate: to });
+    if (sRes.ok) {
+      setCapacityHints(sRes.data.hints);
+    }
   }, [client, date, onUnauthorized]);
 
   useEffect(() => {
@@ -92,6 +119,25 @@ export function RundownPage(): ReactElement {
 
   async function toggleTask(task: TaskResponse): Promise<void> {
     const result = await client.updateTask(task.id, { isComplete: !task.isComplete });
+    if (!result.ok) {
+      if (result.error.code === ERROR_CODES.UNAUTHORIZED) {
+        onUnauthorized();
+        return;
+      }
+      if (isLikelyNetworkFailure(result.error)) {
+        setNetworkBanner(result.error.message);
+        return;
+      }
+      setLoadError(result.error.message);
+      return;
+    }
+    await load();
+  }
+
+  async function runTriage(taskId: string, body: TaskTriageInput): Promise<void> {
+    setTriageBusyId(taskId);
+    const result = await client.triageTask(taskId, body);
+    setTriageBusyId(null);
     if (!result.ok) {
       if (result.error.code === ERROR_CODES.UNAUTHORIZED) {
         onUnauthorized();
@@ -199,7 +245,7 @@ export function RundownPage(): ReactElement {
               <strong>{rundown.dayFit.availableMinutes}</strong> min in window
             </span>
             {rundown.dayFit.overflowUnresolved ? (
-              <span className={styles.planWarn}>Essential work does not fit — triage in the next slice.</span>
+              <span className={styles.planWarn}>Essential work does not fit — use triage actions below each task.</span>
             ) : null}
           </div>
           <div className={styles.planBar} role="presentation">
@@ -260,6 +306,20 @@ export function RundownPage(): ReactElement {
               runwayPlacement={rundown ? runwayPlacementForTask(task, rundown.dayFit) : 'in-runway'}
               onToggleComplete={toggleTask}
             />
+            {rundown && showTriageForTask(task, rundown.dayFit) ? (
+              <TaskTriageBar
+                task={task}
+                listDate={date}
+                tomorrowDate={tomorrowDate}
+                hints={capacityHints}
+                busy={triageBusyId === task.id}
+                onDeferTomorrow={() => runTriage(task.id, { action: 'defer_to_date', targetDate: tomorrowDate })}
+                onDeferToDate={(targetDate) => runTriage(task.id, { action: 'defer_to_date', targetDate })}
+                onDemote={() => runTriage(task.id, { action: 'demote' })}
+                onMarkSkipped={() => runTriage(task.id, { action: 'mark_skipped' })}
+                onClearSkipped={() => runTriage(task.id, { action: 'clear_skipped' })}
+              />
+            ) : null}
           </li>
         ))}
       </ul>

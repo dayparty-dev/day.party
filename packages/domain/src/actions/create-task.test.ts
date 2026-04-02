@@ -57,6 +57,7 @@ describe('makeCreateTaskAction', () => {
     });
 
     expect(task.position).toBe(0);
+    expect(task.status).toBe('planned');
     expect(tasks).toHaveLength(1);
     expect(tasks[0]?.title).toBe('Morning block');
   });

@@ -1,9 +1,30 @@
 import { ObjectId, type Db, type Collection } from 'mongodb';
-import { DEFAULT_SIZE_TO_MINUTES, type Task } from '@dayparty/core';
+import { DEFAULT_SIZE_TO_MINUTES, type Task, type TaskStatus } from '@dayparty/core';
 import type { TaskRepository } from '@dayparty/domain';
 import { bsonIdToString } from '../bson-id';
 
-type TaskDoc = Omit<Task, 'id'> & { _id: ObjectId };
+const TASK_STATUSES: readonly TaskStatus[] = ['planned', 'in_progress', 'done', 'skipped', 'deferred'];
+
+function isStoredStatus(s: unknown): s is TaskStatus {
+  return typeof s === 'string' && TASK_STATUSES.includes(s as TaskStatus);
+}
+
+type TaskDoc = {
+  _id: ObjectId;
+  userId: string;
+  title: string;
+  size: 1 | 2 | 3 | 4 | 5;
+  estimatedMinutes?: number;
+  essentiality?: Task['essentiality'];
+  status?: TaskStatus;
+  deferredToDate?: string;
+  tagKey?: string;
+  isComplete: boolean;
+  scheduledDate: string;
+  position: number;
+  createdAt: string;
+  updatedAt: string;
+};
 
 function docToTask(doc: TaskDoc): Task {
   const { _id, ...rest } = doc;
@@ -12,7 +33,25 @@ function docToTask(doc: TaskDoc): Task {
     rest.estimatedMinutes != null && Number.isFinite(rest.estimatedMinutes)
       ? rest.estimatedMinutes
       : DEFAULT_SIZE_TO_MINUTES[rest.size];
-  return { id, ...rest, estimatedMinutes };
+
+  const status: TaskStatus = rest.isComplete ? 'done' : isStoredStatus(rest.status) ? rest.status : 'planned';
+
+  return {
+    id,
+    userId: rest.userId,
+    title: rest.title,
+    size: rest.size,
+    estimatedMinutes,
+    essentiality: rest.essentiality,
+    status,
+    deferredToDate: typeof rest.deferredToDate === 'string' ? rest.deferredToDate : undefined,
+    tagKey: rest.tagKey,
+    isComplete: rest.isComplete,
+    scheduledDate: rest.scheduledDate,
+    position: rest.position,
+    createdAt: rest.createdAt,
+    updatedAt: rest.updatedAt,
+  };
 }
 
 export class MongoTaskRepository implements TaskRepository {

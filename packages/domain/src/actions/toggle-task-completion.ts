@@ -8,7 +8,12 @@ export function makeToggleTaskCompletionAction(taskRepo: TaskRepository) {
       throw new Error(`Task "${id}" not found`);
     }
 
-    const updated = await taskRepo.update(id, { isComplete: !task.isComplete });
+    const nextComplete = !task.isComplete;
+    const updated = await taskRepo.update(id, {
+      isComplete: nextComplete,
+      status: nextComplete ? 'done' : 'planned',
+      deferredToDate: undefined,
+    });
     if (!updated) {
       throw new Error(`Task "${id}" not found after update`);
     }
