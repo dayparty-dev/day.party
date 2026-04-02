@@ -5,6 +5,7 @@ Started: 2026-04-02 15:10:01
 
 ## Codebase Patterns
 
+- **Plan history (US6 T034–T039)**: `PlanHistoryEvent` in `@dayparty/core`; `PlanHistoryRepository.append` / `listByUserId` in `@dayparty/domain`; Mongo `plan_history_events` with base64url cursor embedding `order` + `timestamp` + `_id` (matches asc/desc). Domain actions take `historyRepo`: create/update/reorder/delete/triage, `patchUserPreferences`, `createRewardDefinition`, `purchaseReward`. **Idempotency**: `append` optional `correlation` + pre-insert `findOne` by `{ userId, correlation }` for bounty credit (`history-bounty:task-bounty:<taskId>`) and purchase (`history-purchase:<ledger correlation>`). API `GET /api/history?limit=&cursor=&order=` omits `userId` on events; client `getHistory` + `PlanHistoryPanel` (collapsible on `RundownPage`).
 - **US5 visual presets (T031–T033)**: `DEFAULT_VISUAL_PRESET` in `@dayparty/core`; domain prefs actions already synthesize full `UserPreferences` on GET when no doc; Mongo `docToPrefs` fills missing `visualPreset` / `dayWindow` for legacy rows. Web: `apps/web/src/styles/presets.css` defines `:root.preset-{calm,playful,highContrast}` token maps (default = no class, base vars in `index.css`); `VisualPresetProvider` (`context/visual-preset-context.tsx`) wraps protected routes, applies classes from `getUserPreferences` / `patchUserPreferences`; rundown **Day window** `<details>` includes **Look & feel** `<select>`. Shared `--dp-on-accent` for text on accent-filled buttons (high-contrast preset uses yellow accent + dark label).
 - **Mobile bounty on create (T056)**: `rundown-view` optional recompensa block mirrors web `CreateTaskPanel`: integer amount 1–1M, comma-separated scope tags, **Alta resistencia**; omitted from `createTask` when amount empty. `task-detail-view` `onSave`: `clearBounty` → `bounty: null` (aligned with `TaskEditPanel`, not gated on `hadBounty`).
 - **Create task bounty (T053)**: Web `CreateTaskPanel` optional bounty block: amount (points), comma-separated scope tags, **High resistance** checkbox; omitted from POST when amount empty; same bounds as `taskBountySchema` / `TaskEditPanel`.
@@ -544,5 +545,40 @@ Started: 2026-04-02 15:10:01
 
 - `:root.preset-*` shares the same element as `:root`; non-default presets add a single class; `default` clears preset classes so base `index.css` tokens apply.
 - High-contrast yellow accent needs `--dp-on-accent` (dark text) on filled primary buttons site-wide.
+
+---
+
+## Iteration 17 - 2026-04-02
+
+**User Story**: User Story 6 — Plan change history (T034–T039)
+
+**Tasks Completed**:
+
+- [x] T034 [P] [US6]: `PlanHistoryEvent` + `PlanHistoryRepository` port; package exports
+- [x] T035 [US6]: `MongoPlanHistoryRepository` (`plan_history_events`), `@dayparty/db` export
+- [x] T036 [US6]: History from create/update/reorder/delete/triage/prefs/reward mutations; correlation dedup for bounty + purchase
+- [x] T037 [P] [US6]: `GET /api/history`, `ApiEnv.getHistoryPage`, app mount
+- [x] T038 [P] [US6]: `DayPartyClient.getHistory`, `historyQuerySchema`, response types
+- [x] T039 [US6]: `PlanHistoryPanel` + `RundownPage` integration
+
+**Tasks Remaining in Story**: None — story complete
+
+**Commit**: 50448a48e7c27b1f456b0aa9b36fca4899b7e294
+
+**Files Changed**:
+
+- `packages/core/src/models/plan-history.ts`, `packages/core/src/index.ts`
+- `packages/domain/src/interfaces/plan-history-repository.ts`, `actions/get-history-page.ts`, `actions/*.ts` (history wiring), `*.test.ts` noop history fakes
+- `packages/db/src/repositories/plan-history-repository.ts`, `packages/db/src/index.ts`
+- `packages/validation/src/schemas/history.ts`, `packages/validation/src/index.ts`
+- `packages/api-client/src/client.ts`, `packages/api-client/src/index.ts`
+- `apps/api/src/routes/history.ts`, `apps/api/src/app.ts`, `apps/api/src/index.ts`, `apps/api/src/types.ts`
+- `apps/web/src/components/PlanHistoryPanel.tsx`, `PlanHistoryPanel.module.css`, `apps/web/src/pages/RundownPage.tsx`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Vitest domain tests need an in-memory `PlanHistoryRepository` when actions gain a history dependency.
+- `task.updated` is skipped when a PATCH produces no diff in the summarized fields (avoids empty noise).
 
 ---
