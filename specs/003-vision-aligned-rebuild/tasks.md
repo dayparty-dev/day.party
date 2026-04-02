@@ -81,7 +81,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 - [x] T011 [US1] Update `apps/api/src/routes/tasks.ts` to return extended rundown and accept new fields on create/update; keep existing auth and error patterns
 - [x] T012 [US1] Add preferences routes (e.g. `GET`/`PATCH` user prefs) in `apps/api/src/routes/preferences.ts` and mount them from `apps/api/src/app.ts` with Zod validation at the edge
 - [x] T013 [US1] Extend `DayPartyClient` in `packages/api-client/src/client.ts` for rundown shape and preferences methods; align shared types from `@dayparty/core`
-- [x] T014 [US1] Implement day window controls, fit/overflow, and **runway vs outside-runway labeling** (and priority badges) in `apps/web/src/pages/RundownPage.tsx` and `apps/web/src/components/TaskCard.tsx` — **no triage actions** here (defer/demote → US2 / `TriagePanel.tsx`)
+- [x] T014 [US1] Implement day window controls, fit/overflow, and **runway vs outside-runway labeling** (and priority badges) in `apps/web/src/pages/RundownPage.tsx` and `apps/web/src/components/TaskCard.tsx` — **no triage actions** on this component (defer/demote/skip → US2 / **`TaskTriageBar`** on `RundownPage`)
 - [x] T015 [P] [US1] Surface extended rundown and day-window feedback in `apps/mobile/src/views/rundown-view.ts` (and `apps/mobile/src/views/rundown-view.xml` as needed)
 
 **Checkpoint**: MVP day planning + fit feedback on web and mobile **after T049–T050** — **stop here** for demo if desired (US1 product story-done still requires create UX on both clients per `spec.md`).
@@ -102,7 +102,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 - [x] T017 [US2] Implement triage transitions in `packages/domain/src/actions/update-task.ts` (or new `packages/domain/src/actions/triage-task.ts`) with validation rules consistent with spec acceptance scenarios
 - [x] T018 [P] [US2] Extend `apps/api/src/routes/tasks.ts` (or add `apps/api/src/routes/triage.ts`) for triage payloads per `specs/003-vision-aligned-rebuild/contracts/day-planning-rest.md`
 - [x] T019 [P] [US2] Add optional capacity suggestion helper and `GET` query route in `apps/api/src/routes/tasks.ts` implementing the heuristic in `specs/003-vision-aligned-rebuild/research.md` §5 (**remaining minutes vs planned load per day** only; **no unavailable/busy-period blocking** in v1 — see `spec.md` US2 and `contracts/day-planning-rest.md`)
-- [x] T020 [US2] Build triage / overflow flows in `apps/web/src/pages/RundownPage.tsx` or new `apps/web/src/components/TriagePanel.tsx`
+- [x] T020 [US2] Build triage / overflow flows in `apps/web/src/pages/RundownPage.tsx` and `apps/web/src/components/TaskTriageBar.tsx` (defer, demote, skip/clear skip, capacity hints)
 
 ---
 
@@ -113,6 +113,8 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 **Product story-done**: **US3** on the product also requires **T044** (mobile notes). The tasks below are **web + API slice** complete.
 
 **Independent Test**: Add long markdown to a task, reload, confirm formatting preserved and list rows stay compact.
+
+**T044 vs T054**: **T044** is **notes-first** mobile detail (view/edit `notesMarkdown`, plain or markdown). **T054** is the **full task editor** (same field set as **T051**). **Implementation order**: ship **T054** as the single **task detail** screen and **embed** the notes editor there **or** complete **T044** first and **merge/replace** with **T054** so users do not get two competing detail entry points.
 
 ### Implementation for User Story 3
 
@@ -215,7 +217,7 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 **⚠️ Lifecycle parity**: **T043–T047** alone do not complete **product story-done** for **full task lifecycle** if **T051–T056** remain open—users must be able to **edit tasks**, set **in progress**, and configure **bounties** on **mobile** as well as web.
 
 - [ ] T043 [P] [US2] Implement triage / defer / move-day flows on mobile in `apps/mobile/src/views/rundown-view.ts` and `apps/mobile/src/views/rundown-view.xml` (or add `apps/mobile/src/views/triage-view.ts` + `triage-view.xml` and register in `apps/mobile/src/app.ts`)
-- [ ] T044 [P] [US3] Add actionable notes UX (view/edit markdown or plain text detail) in new `apps/mobile/src/views/task-detail-view.ts` + `task-detail-view.xml`, navigable from rundown
+- [ ] T044 [P] [US3] Add actionable **notes** UX (view/edit markdown or plain text detail) in new `apps/mobile/src/views/task-detail-view.ts` + `task-detail-view.xml`, navigable from rundown — **see US3 “T044 vs T054”**; prefer one combined detail route when **T054** runs
 - [ ] T045 [P] [US4] Add rewards balance + marketplace minimal flow in new `apps/mobile/src/views/rewards-view.ts` + `rewards-view.xml` and wire navigation in `apps/mobile/src/app.ts`
 - [ ] T046 [P] [US5] Apply `visualPreset` from preferences API to mobile chrome (theme classes or `App_Resources` colors) in `apps/mobile/src/app.ts` with at least two presets matching web intent
 - [ ] T047 [P] [US6] Add read-only plan history list in new `apps/mobile/src/views/history-view.ts` + `history-view.xml` and entry from `apps/mobile/src/app.ts`

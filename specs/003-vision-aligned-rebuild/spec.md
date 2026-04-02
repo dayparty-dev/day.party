@@ -47,7 +47,7 @@ Users attach longer notes or checklists to an actionable so “expand task” ma
 
 **Why this priority**: Listed in legacy next-steps; supports deeper use without cluttering the primary runway.
 
-**Independent Test**: Create an actionable, add structured long-form content, collapse it in the list, reopen and edit—without rewards or history.
+**Independent Test**: From **first-party `apps/web` and `apps/mobile`** (see **Definition of done**), create or open an actionable, add structured long-form content, collapse it in the list, reopen and edit—without rewards or history. (**`tasks.md` T023** web, **T044** mobile.)
 
 **Acceptance Scenarios**:
 
@@ -124,7 +124,7 @@ A user story is **product-complete** for **003** only when **both** **`apps/web`
 - **FR-003**: The system MUST recalculate fit/overflow feedback when estimates, order, priorities, or the daily window change.
 - **FR-004**: The system MUST let users complete, skip, or reopen actionables in a way that updates the plan state and any dependent rewards consistently. **First-party `apps/web` and `apps/mobile` MUST expose in-app** completion, skip/reopen, and **`planned` / `in_progress` / `deferred`** (and related) transitions the spec calls for—not only via `PATCH /api/tasks` (**`tasks.md` T051–T056**, **T043**).
 - **FR-005**: The system MUST provide a triage path for items not executed or not fitting, including deferral to another day and demotion of importance where the user chooses. Triage outcomes MUST be achievable **without** ad hoc `curl` on **each** platform once the story is product-complete (**`tasks.md` T020** + **T043**, with task-edit surfaces **T051** / **T054** where users adjust fields outside triage shortcuts).
-- **FR-006**: The system MUST let users attach expanded content to an actionable, including lightweight structured formatting, without forcing that content into the main list row.
+- **FR-006**: The system MUST let users attach expanded content to an actionable, including lightweight structured formatting, without forcing that content into the main list row. **First-party `apps/web` and `apps/mobile` MUST expose in-app** notes/detail for this (**`tasks.md` T023**, **T044**); not only via `GET`/`PATCH /api/tasks` alone.
 - **FR-007**: The system MUST maintain a reward balance (or equivalent ledger) and let users acquire configured rewards through a marketplace or catalog interaction.
 - **FR-008**: The system MUST allow configuration of bounties or rewards associated with specific actionables, including differentiated rewards for “high resistance” work when the user sets them up. **Bounty configuration MUST be user-editable in-app** on **both** web and mobile (**`tasks.md` T053**, **T056**, and bounty fields on the task editor **T051** / **T054**)—not only accepted by the API.
 - **FR-009**: The system MUST offer at least one alternate visual preset affecting colors and density (or clearly scoped style families) across core screens.
@@ -178,7 +178,7 @@ A user story is **product-complete** for **003** only when **both** **`apps/web`
 
 ### Iteration 2026-04-02: Post-analyze doc alignment
 
-**Change**: Align Phase 3 independent test with US1; document **product story-done** vs **web slice** for US2/US3; expand **FR-004**/`skip` traceability in `tasks.md`; replace stale `plan.md` baseline with current implementation state; tighten **FR-001** wording.
+**Change**: Align Phase 3 independent test with US1; document **product story-done** vs **web slice** for US2/US3; expand **FR-004**/`skip` traceability in `tasks.md`; replace stale `plan.md` baseline with current implementation state; tighten **FR-001** wording. **Follow-up (same iteration)**: `plan.md` **Implementation state** now includes US4 routes, **T049–T050** shipped, **T051–T056** + **T043–T047** as blocking parity; **US3** independent test and **FR-006** cite **T023**/**T044**; **tasks.md** **T014**/**T020** use **`TaskTriageBar`**; **T044 vs T054** guidance under US3.
 **Scope**: Spec / plan / tasks consistency (after `/speckit-analyze`).
 **Artifacts updated**: `spec.md`, `plan.md`, `tasks.md`
 **Tasks added**: —
