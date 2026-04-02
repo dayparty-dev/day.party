@@ -203,10 +203,10 @@ _Update this table when `updateTaskSchema` or routes gain fields._
 
 **Scheduling note**: **T040** and **T041** may run **incrementally** during the milestone (fix build/test regressions as slices land). **T042** and **T048** should align with **release or sign-off** documentation so quickstart and session/offline notes match shipped behavior—avoid reading “after all stories” as “never start T040/T041 early,” or treating doc tasks as interchangeable with build/test health checks.
 
-- [ ] T040 [P] Run `pnpm build` from repository root and fix TypeScript errors from 003 changes
-- [ ] T041 [P] Run `pnpm test` from repository root (or scoped filters per package) and fix regressions introduced by 003 tasks
-- [ ] T042 [P] Refresh `specs/003-vision-aligned-rebuild/quickstart.md` with final routes, env vars, and curl examples matching shipped code. Include **FR-011** cross-session checks: same authenticated user after logout/login (or new browser session) sees consistent plan, notes, ledger balance, and history as applicable.
-- [ ] T048 [P] Add **Session / offline (v1)** subsection to `specs/003-vision-aligned-rebuild/quickstart.md`: server-authoritative persistence, client retry after failed mutations, refresh-after-success; state that **offline write queue** and **merge UI** are out of scope for 003 v1 (see `spec.md` Assumptions)
+- [x] T040 [P] Run `pnpm build` from repository root and fix TypeScript errors from 003 changes
+- [x] T041 [P] Run `pnpm test` from repository root (or scoped filters per package) and fix regressions introduced by 003 tasks
+- [x] T042 [P] Refresh `specs/003-vision-aligned-rebuild/quickstart.md` with final routes, env vars, and curl examples matching shipped code. Include **FR-011** cross-session checks: same authenticated user after logout/login (or new browser session) sees consistent plan, notes, ledger balance, and history as applicable.
+- [x] T048 [P] Add **Session / offline (v1)** subsection to `specs/003-vision-aligned-rebuild/quickstart.md`: server-authoritative persistence, client retry after failed mutations, refresh-after-success; state that **offline write queue** and **merge UI** are out of scope for 003 v1 (see `spec.md` Assumptions)
 
 ---
 
