@@ -21,6 +21,7 @@ Started: 2026-04-02 15:10:01
 - **Task lifecycle (US2)**: `Task.status` is required on the core type; Mongo normalizes legacy rows (`isComplete` → `done`, else stored `status` or `planned`). `skipped` tasks do not consume runway minutes in `computeDayFit` (`taskCountsTowardRunwayMinutes`).
 - **Triage API**: `POST /api/tasks/:id/triage` body discriminated by `action`: `defer_to_date` (moves `scheduledDate`, appends `position` on target day), `demote`, `mark_skipped`, `clear_skipped`. `PATCH /api/tasks/:id` also accepts `status` / `deferredToDate` with Zod refiners. Suggestions: `GET /api/tasks/suggestions?fromDate=&toDate=` (max 14-day span) returns `hints` where `remainingMinutes >= 30`.
 - **Web triage**: `TaskTriageBar` under tasks that are outside the runway, when `overflowUnresolved`, or when status is `skipped`; loads suggestions for list date +7 days for the date picker hint.
+- **Web task edit (T051)**: `TaskEditPanel` (`<details>` under each rundown row) loads `getTask` when opened, saves via `updateTask` with `UpdateTaskInput`: title, size, optional minutes (omit field when blank — does not unset Mongo estimate), essentiality, `tagKey` `null` for none, `scheduledDate`, `status` (+ `deferredToDate` when `deferred`), bounty `{ amount, tagKeys?, highResistance? }` or `bounty: null` / “Remove bounty” when a bounty existed. Tag labels use `TagResponse.displayName`.
 
 ---
 
@@ -394,5 +395,31 @@ Started: 2026-04-02 15:10:01
 
 - Ledger pagination cursor: base64url of `createdAt` + unit-separator + hex `_id`; query uses `$or` tie-break for descending `(createdAt, _id)`.
 - `costCurrency` 0 is allowed for free rewards; purchase still inserts a ledger line with `amount: 0` (no-op debit) — acceptable v1 or tighten later.
+
+---
+
+## Iteration 12 - 2026-04-02
+
+**User Story**: Partial progress on gap closure — task editor / focus / bounty (T051)
+
+**Tasks Completed**:
+
+- [x] T051 [US1]: `TaskEditPanel` + `RundownPage` wiring; `getTask` / `updateTask` for full edit field set (incl. bounty set/clear, deferred + date)
+
+**Tasks Remaining in Story**: 5 (T052–T056 in gap-closure block)
+
+**Commit**: e94d86e67cfb590cfa1d4c09a6381e2165705237
+
+**Files Changed**:
+
+- `apps/web/src/components/TaskEditPanel.tsx`
+- `apps/web/src/components/TaskEditPanel.module.css`
+- `apps/web/src/pages/RundownPage.tsx`
+- `specs/003-vision-aligned-rebuild/tasks.md`
+
+**Learnings**:
+
+- Empty “Est. minutes” omits `estimatedMinutes` on PATCH so existing stored estimates are unchanged (no `$unset` path in task repo for that field).
+- Bounty updates replace the whole subdocument; omitting `highResistance` on a new `{ amount }` clears a previously set flag when the stored object is overwritten.
 
 ---
